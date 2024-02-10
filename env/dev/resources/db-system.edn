@@ -1,0 +1,5 @@
+{:credentials/db {:file-path "env/dev/resources/db-credentials.edn"}
+
+ :db.sql/connection {:db-credentials #ig/ref :credentials/db}
+
+ :migratus/config (:database #ig/ref :db.sql/connection)}

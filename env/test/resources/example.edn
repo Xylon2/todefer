@@ -1,0 +1,7 @@
+{
+  :id 123
+  :name "John Doe"
+  :email "johndoe@example.com"
+  :tags [:employee :manager]
+  :address {:street "123 Elm St." :city "Springfield" :zip 98765}
+}

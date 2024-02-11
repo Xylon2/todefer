@@ -10,7 +10,7 @@
 
 ;; the core namespace will closure over this with the connection
 (defn execute-query
-  "takes a connection, a hugsql query, and a post-processor function"
+  "takes a connection, a honeysql query, and a post-processor function"
   [conn [query processor] & [debug]]
   (let [formatted-query (sql/format query)]
     (when debug (println (str "formatted-query: " formatted-query)))
@@ -35,3 +35,30 @@
 
    (fn [[{hashed :users/password}]]
      (hashers/check password hashed))])
+
+(defn create-page!
+  "we create a page with a name and a type"
+  [page_name page_type]
+  [(-> (insert-into :appPage)
+       (values [{:page_name page_name
+                 :page_type [:cast page_type :pageType]}]))
+   
+   identity])
+
+(defn delete-page!
+  "we delete the page"
+  [page_id]
+  [(-> (delete-from :appPage)
+       (where [:= :page_id page_id]))
+
+   identity])
+
+(defn reorder-page!
+  "updates the order_key of one page"
+  [page_id order_key]
+  [(-> (update :appPage)
+       (set {:order_key order_key})
+       (where [:= :page_id page_id]))
+
+   identity]
+  )

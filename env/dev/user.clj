@@ -17,5 +17,6 @@
 (defn create-migration [name]
   (migratus/create (:migratus/config integrant.repl.state/system) name))
 
+;; use like this: (query (q/myquery "foo" "bar"))
 (defn query [& args]
   (apply (:todefer/queries integrant.repl.state/system) args))

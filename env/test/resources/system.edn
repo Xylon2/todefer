@@ -1,0 +1,15 @@
+{:credentials/db {:file-path "env/test/resources/db-credentials.edn"}
+
+ :db.sql/connection {:db-credentials #ig/ref :credentials/db}
+
+ :todefer/queries {:database #ig/ref :db.sql/connection}
+ 
+ :todefer/handler {:q-builder #ig/ref :todefer/queries
+                   :debug false
+                   :t-opts {:rollback-only true}}
+
+ :migratus/config (:database #ig/ref :db.sql/connection)
+
+ :ring.adaptor/jetty {:opts {:port 3000
+                             :join? false}
+                      :handler #ig/ref :todefer/handler}}

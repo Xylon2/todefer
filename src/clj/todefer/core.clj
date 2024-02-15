@@ -40,10 +40,15 @@
 (defmethod ig/init-key :todefer/handler [_ {:keys [q-builder]}]
   (routes/app q-builder))
 
-;; query builder
-(defmethod ig/init-key :todefer/queries [_ {:keys [database]}]
-  (fn [& args]
-    (apply queries/execute-query database args)))
+;; query builder. for prod use, debug and rollback may simply be unset
+(defmethod ig/init-key :todefer/queries [_ {:keys [database debug t-opts]
+                                            :or
+                                            {debug false
+                                             t-opts {:rollback-only false}}}]
+  (let [defaults {:debug debug
+                  :t-opts t-opts}]
+    (fn [& args]
+      (apply queries/execute-query database defaults args))))
 
 ;; jetty
 (defmethod ig/init-key :ring.adaptor/jetty [_ {:keys [handler opts]}]

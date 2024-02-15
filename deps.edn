@@ -18,10 +18,19 @@
  :aliases {;; Run with clj -T:build function-in-build
            :build {:deps {io.github.clojure/tools.build {:git/tag "v0.9.6" :git/sha "8e78bcc"}}
                    :ns-default build}
-           :dev {:extra-paths ["env/dev" "env/dev/resources" "test/clj" "env/test/resources"]
+
+           :dev {:extra-paths ["env/dev" "env/dev/resources"]
                  :extra-deps {integrant/repl {:mvn/version "0.3.3"}}}
+
            :test {:extra-paths ["test/clj" "env/test/resources"]
-                 :extra-deps {io.github.cognitect-labs/test-runner 
-                              {:git/tag "v0.5.1" :git/sha "dfb30dd"}}
-                 :main-opts ["-m" "cognitect.test-runner"]
-                 :exec-fn cognitect.test-runner.api/test}}}
+                  :extra-deps {io.github.cognitect-labs/test-runner 
+                               {:git/tag "v0.5.1" :git/sha "dfb30dd"}}
+                  :main-opts ["-m" "cognitect.test-runner"]
+                  :exec-fn cognitect.test-runner.api/test}
+
+           ;; devtest namespace is for debugging the test stuff. fire up repl,
+           ;; open dev user.clj and evauluate the buffer
+           :devtest {:extra-paths ["test/clj" "env/test/resources"]
+                     :extra-deps {io.github.cognitect-labs/test-runner 
+                                  {:git/tag "v0.5.1" :git/sha "dfb30dd"}
+                                  integrant/repl {:mvn/version "0.3.3"}}}}}

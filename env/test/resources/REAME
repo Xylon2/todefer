@@ -1,0 +1,17 @@
+The database dump test_database.sql is used to create a database for testing,
+which is already populated with some reasonable sample data.
+
+In order to run your tests, you need to:
+- create a test database
+- create a db-credentials.edn here.
+- import like this: psql -U todefer_test -d todefer_test -f test_database.sql -W -h localhost
+
+If you need to produce a new test database, dump a dev or prod database thus:
+pg_dump --no-privileges --no-owner -U username -h hostname -d dbname -f db_dump.sql
+
+Now (with AI assistance) edit the dump to replace these text fields with lorem ipsum:
+  - column page_name of table apppage
+  - column cat_name of table defcatnamed
+  - column habit_name of table habit
+  - column task_name of table task
+  - column password of table users

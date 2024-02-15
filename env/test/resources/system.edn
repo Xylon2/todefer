@@ -2,11 +2,11 @@
 
  :db.sql/connection {:db-credentials #ig/ref :credentials/db}
 
- :todefer/queries {:database #ig/ref :db.sql/connection}
- 
- :todefer/handler {:q-builder #ig/ref :todefer/queries
+ :todefer/queries {:database #ig/ref :db.sql/connection
                    :debug false
                    :t-opts {:rollback-only true}}
+ 
+ :todefer/handler {:q-builder #ig/ref :todefer/queries}
 
  :migratus/config (:database #ig/ref :db.sql/connection)
 

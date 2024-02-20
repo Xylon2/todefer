@@ -5,7 +5,7 @@
 
 (use-fixtures :once (tu/system-fixture))
 
-;; the tests can use (tu/q-fn) to run their queries
+;; the tests can use factory function tu/q-fn to run their queries
 
 (deftest test-create-user
   (is (= 1 (-> ((tu/q-fn) (create-user "username" "password"))

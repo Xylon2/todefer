@@ -19,18 +19,23 @@
            :build {:deps {io.github.clojure/tools.build {:git/tag "v0.9.6" :git/sha "8e78bcc"}}
                    :ns-default build}
 
-           :dev {:extra-paths ["env/dev" "env/dev/resources"]
+           :dev {:extra-paths ["env/dev" "env/dev/resources" "test/clj"]
                  :extra-deps {integrant/repl {:mvn/version "0.3.3"}}}
 
            :test {:extra-paths ["test/clj" "env/test/resources"]
-                  :extra-deps {io.github.cognitect-labs/test-runner 
-                               {:git/tag "v0.5.1" :git/sha "dfb30dd"}}
+                  :extra-deps {io.github.cognitect-labs/test-runner {:git/tag "v0.5.1" :git/sha "dfb30dd"}
+                               ;; we don't actually use repl in this namespace,
+                               ;; but the test-utils namespace needs it to
+                               ;; at-least be there
+                               integrant/repl {:mvn/version "0.3.3"}}
                   :main-opts ["-m" "cognitect.test-runner"]
                   :exec-fn cognitect.test-runner.api/test}
 
-           ;; devtest namespace is for debugging the test stuff. fire up repl,
-           ;; open dev user.clj and evauluate the buffer
-           :devtest {:extra-paths ["test/clj" "env/test/resources"]
-                     :extra-deps {io.github.cognitect-labs/test-runner 
-                                  {:git/tag "v0.5.1" :git/sha "dfb30dd"}
+           ;; devtest namespace is for testing in repl. what is the difference
+           ;; between running tests in :dev or :devtest?
+           ;; 1. they use a different database
+           ;; 2. :dev rolls back for tests but not when running queries from
+           ;;    user ns. :devtest rolls back either way
+           :devtest {:extra-paths ["test/clj" "env/test" "env/test/resources"]
+                     :extra-deps {io.github.cognitect-labs/test-runner {:git/tag "v0.5.1" :git/sha "dfb30dd"}
                                   integrant/repl {:mvn/version "0.3.3"}}}}}

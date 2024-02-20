@@ -3,8 +3,6 @@
             [todefer.core :refer :all]))
 
 (deftest test-read-edn-file
-  (is (= "John Doe" (:name (read-edn-file "env/test/resources/example.edn")))))
+  (is (= "John Doe" (:name (read-edn-file "test_assets/example.edn")))))
 
-(comment
-  (test-read-edn-file)
-  )
+;; .n.b "is" macro doesn't work inside a rich comment

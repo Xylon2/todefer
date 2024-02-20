@@ -1,0 +1,7 @@
+{:credentials/db {:file-path "env/test/resources/db-credentials.edn"}
+
+ :db.sql/connection {:db-credentials #ig/ref :credentials/db}
+
+ :todefer/queries {:database #ig/ref :db.sql/connection}
+ 
+ :todefer/handler {:q-builder #ig/ref :todefer/queries}}

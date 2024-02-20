@@ -11,14 +11,12 @@
 ;; the core namespace will closure over this with the connection and defaults
 (defn execute-query
   "Essentially this function just executes a honeysql query, and runs a
-   post-processor on it. However it has some extra features to support
-   testing and debugging.
+   post-processor on it.
 
-   We take 5 args:
+   We take 4 args:
 
-   The first three args are required:
+   The first two args are required:
    - the db connection - to be closured in when the system starts up
-   - a map of default settings - to be closured in when the system starts up
    - a vector containing the query and post-processor function
 
    The last two args are optional:
@@ -26,15 +24,15 @@
    - t-opts - this is a map of arguments for jdbc/with-transaction
    "
 
-  ([conn {default-debug :debug default-t-opts :t-opts :as defaults} [query processor]]
-   (execute-query conn defaults [query processor] default-debug default-t-opts))
+  ([conn [query processor]]
+   (execute-query conn [query processor] false {:rollback-only false}))
 
-  ([conn {default-t-opts :t-opts :as defaults} [query processor] debug]
-   (execute-query conn defaults [query processor] debug default-t-opts))
+  ([conn [query processor] debug]
+   (execute-query conn [query processor] debug {:rollback-only false}))
 
   ;; debug is truthy or falsy
   ;; t-opts is option-map for jdbc/with-transaction
-  ([conn _ [query processor] debug t-opts]
+  ([conn [query processor] debug t-opts]
    (let [formatted-query (sql/format query)]
      (when debug (println (str "formatted-query: " formatted-query)))
      (jdbc/with-transaction [t-conn conn t-opts]

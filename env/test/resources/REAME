@@ -6,6 +6,9 @@ In order to run your tests, you need to:
 - create a db-credentials.edn here.
 - import like this: psql -U todefer_test -d todefer_test -f test_database.sql -W -h localhost
 
+For allowing testing `authenticate-user`, you must create a test user. See
+comments in queries_test.clj.
+
 If you need to produce a new test database, dump a dev or prod database thus:
 pg_dump --no-privileges --no-owner -U username -h hostname -d dbname -f db_dump.sql
 
@@ -15,3 +18,4 @@ Now (with AI assistance) edit the dump to replace these text fields with lorem i
   - column habit_name of table habit
   - column task_name of table task
   - column password of table users
+

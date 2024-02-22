@@ -23,3 +23,9 @@
       (reset! test-system (core/start-system :test)))
     (f)
     (core/halt-system @test-system)))
+
+;; the lines below mean, if starting a REPL from here, it uses devtest profile
+
+;; Local Variables:
+;; cider-clojure-cli-aliases: "devtest"
+;; End:

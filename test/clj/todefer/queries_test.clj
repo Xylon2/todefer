@@ -107,6 +107,32 @@
                  (get-task-info [1806 1739 1810]))
                 (mapv :task/task_name))))))
 
+(deftest test-list-all-tasks
+  (testing "list all task deets for a page"
+    (is (= 28 (-> ((tu/q-fn)
+                   (list-all-tasks 1))
+                  count)))))
+
+(deftest test-tasks-defcat-named
+  (testing "list all the tasks in a deferred category"
+    (is (= 2 (-> ((tu/q-fn)
+                  (tasks-defcat-named 13))
+                 count)))))
+
+(deftest test-create-defcat-named!
+  (testing "create a defCatNamed with a name"
+    (is (integer? (-> ((tu/q-fn)
+                       (create-defcat-named! "foobar"))
+                      first
+                      :defcatnamed/cat_id)))))
+
+(deftest test-create-defcat-dated!
+  (testing "create a defCatDated"
+    (is (integer? (-> ((tu/q-fn)
+                       (create-defcat-dated! "2051-06-14"))
+                      first
+                      :defcatdated/cat_id)))))
+
 (comment
   ;; .n.b "is" macro doesn't work inside a rich comment
   ;; this is a template

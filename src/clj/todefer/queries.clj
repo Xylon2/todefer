@@ -127,7 +127,7 @@
   []
   [(-> (select [:page_name])
        (from :appPage)
-       (order-by [:order_key])
+       (order-by :order_key)
        (limit 1))
 
    identity])
@@ -158,7 +158,7 @@
          (join :task [:= :cat_id :defcat_named])
          (where [:= :page_ref page_ref])
          (specialfn)
-         (order-by [:order_key])))
+         (order-by :order_key)))
 
    identity])
 
@@ -176,7 +176,7 @@
                  [:= :page_ref page_ref]
                  [:= :def_date [:cast def_date :date]]]
                 [:= :page_ref page_ref]))
-       (order-by [:def_date]))
+       (order-by :def_date))
 
    identity])
 
@@ -186,7 +186,44 @@
   [(-> (select :*)
        (from :task)
        (where [:= :task_id [:any [:array task_ids :integer]]])
-       (order-by [:task_id]))
+       (order-by :task_id))
+   
+   identity])
+
+(defn list-all-tasks
+  "list all task deets for a page"
+  [page_ref]
+  [(-> (select :*)
+       (from :task)
+       (where [:= :page_ref page_ref])
+       (order-by :task_id))
+   
+   identity])
+
+(defn tasks-defcat-named
+  "list all the tasks in a deferred category"
+  [defcat_ref]
+  [(-> (select :*)
+       (from :task)
+       (where [:= :defcat_named defcat_ref]))
+   
+   identity])
+
+(defn create-defcat-named!
+  "create a defCatNamed with a name"
+  [cat_name]
+  [(-> (insert-into :defCatNamed)
+       (values [{:cat_name cat_name}])
+       (returning :cat_id))
+   
+   identity])
+
+(defn create-defcat-dated!
+  "create a defCatDated"
+  [def_date]
+  [(-> (insert-into :defCatDated)
+       (values [{:def_date [:cast def_date :date]}])
+       (returning :cat_id))
    
    identity])
 

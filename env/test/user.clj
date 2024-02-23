@@ -5,10 +5,14 @@
             [clojure.repl :refer [doc]]
             [migratus.core :as migratus]
             [todefer.queries :as q]
-            [todefer.test-utils :as tu]))
+            [todefer.test-utils :as tu]
+            [clojure.test :refer [run-tests run-all-tests]]))
 
 (integrant.repl/set-prep! #(ig/prep (pc/system-config :test)))
 
 ;; use like this: (query (q/myquery "foo" "bar"))
 (defn query [& args]
   (apply tu/q-fn args))
+
+;; you can run (run-all-tests) in this namespace to test everything
+;; however it only tests namespaces you have loaded

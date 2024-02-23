@@ -378,16 +378,16 @@ COPY public.defcatdated (cat_id, def_date, order_key) FROM stdin;
 31	2024-01-01	31
 36	2023-02-26	36
 93	2023-05-10	93
-96	2024-04-15	96
+96	2124-04-15	96
 103	2023-07-01	103
 50	2023-03-02	50
-118	2026-08-13	118
+118	2126-08-13	118
 119	2023-09-18	119
-121	2033-02-05	121
+121	2133-02-05	121
 140	2024-01-25	140
 141	2024-02-09	141
-143	2024-03-19	143
-148	2024-02-15	148
+143	2124-03-19	143
+148	2124-02-15	148
 \.
 
 
@@ -485,10 +485,10 @@ COPY public.task (task_id, task_name, page_ref, defcat_named, defcat_dated, high
 1759	Quis nostrud	1	\N	148	\N	\N
 1806	Exercitation ullamco	1	\N	\N	lightblue	1
 1809	Laboris nisi	1	\N	\N	\N	\N
-1811	Ut aliquip	1	\N	\N	lightblue	1
+1811	Ut aliquip	1	12	\N	lightblue	1
 1798	Ex ea	1	\N	\N	\N	\N
 1781	Commodo consequat	1	\N	\N	\N	\N
-1735	Duis aute	1	\N	\N	\N	\N
+1735	Duis aute	1	12	\N	\N	\N
 1262	Irure dolor	1	\N	121	\N	\N
 1526	Lorem ipsum	1	13	\N	\N	\N
 1527	Dolor sit	1	13	\N	\N	\N

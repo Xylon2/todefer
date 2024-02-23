@@ -19,3 +19,7 @@ Now (with AI assistance) edit the dump to replace these text fields with lorem i
   - column task_name of table task
   - column password of table users
 
+Now, for "task" table, ensure that:
+- there are exactly 5 tasks deferred to a date
+- those dates are very far in the future
+- those dates are all different

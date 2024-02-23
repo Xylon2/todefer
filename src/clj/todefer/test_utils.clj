@@ -16,11 +16,16 @@
   (let [{query-fn :todefer/queries} (system-state)]
     #(query-fn % false {:rollback-only true})))
 
+(defn debug-q-fn
+  "use this one if want debug"
+  []
+  (let [{query-fn :todefer/queries} (system-state)]
+    #(query-fn % true {:rollback-only true})))
+
 (defn system-fixture
   []
   (fn [f]
-    (when (nil? (system-state))
-      (reset! test-system (core/start-system :test)))
+    (reset! test-system (or (system-state) (core/start-system :test)))
     (f)
     (core/halt-system @test-system)))
 

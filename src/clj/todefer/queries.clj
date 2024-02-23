@@ -51,7 +51,7 @@
 (defn authenticate-user
   "we return true or false indicating authentication success"
   [login password]
-  [(-> (select [:*])
+  [(-> (select :*)
        (from :users)
        (where [:= :login login]))
 
@@ -107,7 +107,7 @@
 (defn list-pages
   "lists pages in order"
   []
-  [(-> (select [:*])
+  [(-> (select :*)
        (from :appPage)
        (order-by :order_key))
 
@@ -116,7 +116,7 @@
 (defn get-page
   "gets the info for a single page"
   [page_name]
-  [(-> (select [:*])
+  [(-> (select :*)
        (from :appPage)
        (where [:= :page_name page_name]))
 
@@ -135,7 +135,7 @@
 (defn list-due-tasks
   "lists the tasks for a page"
   [page_ref]
-  [(-> (select [:*])
+  [(-> (select :*)
        (from :task)
        (where [:and [:= :page_ref page_ref]
                     [:is :defcat_named nil]
@@ -144,33 +144,60 @@
 
    identity])
 
-;; queries bellow written by gpt-engineer and not tested yet
-
 (defn list-defcats-named
-  "get all the defcats that need to be displayed on a page"
-  [page_ref cat_name]
-  [(-> (select [:distinct :cat_id :cat_name :order_key])
-       (from [:defCatNamed])
-       (join :task [:= :cat_id :defcat_named])
-       (where [:= :page_ref page_ref])
-       (when cat_name (where [:= :cat_name cat_name]))
-       (order-by [:order_key]))
+  "get all the defcats that need to be displayed on a page
+
+   The optional cat_name is used when we want to check if a page contains a
+   category of a certain name."
+  [page_ref & cat_name]
+  [(let [specialfn #(if-not (empty? cat_name)
+                      (where % [:= :cat_name (first cat_name)])
+                      %)]
+     (-> (select-distinct :cat_id :order_key :cat_name)
+         (from :defCatNamed)
+         (join :task [:= :cat_id :defcat_named])
+         (where [:= :page_ref page_ref])
+         (specialfn)
+         (order-by [:order_key])))
 
    identity])
 
 (defn list-defcats-dated
-  "get all the defcats that need to be displayed on a page"
-  [page_ref def_date]
-  [(-> (select [:distinct :cat_id :def_date :order_key])
-       (from [:defCatDated])
+  "get all the defcats that need to be displayed on a page
+
+   The optional def_date is used when we want to check if a page contains a
+   deferred date category of a certain date"
+  [page_ref & def_date]
+  [(-> (select-distinct :cat_id :def_date :order_key)
+       (from :defCatDated)
        (join :task [:= :cat_id :defcat_dated])
-       (where [:= :page_ref page_ref])
-       (when def_date (where [:= :def_date def_date]))
+       (where (if-not (empty? def_date)
+                [:and
+                 [:= :page_ref page_ref]
+                 [:= :def_date [:cast def_date :date]]]
+                [:= :page_ref page_ref]))
        (order-by [:def_date]))
 
    identity])
 
+(defn get-task-info
+  "get all the info for a list of tasks"
+  [task_ids]
+  [(-> (select :*)
+       (from :task)
+       (where [:= :task_id [:any [:array task_ids :integer]]])
+       (order-by [:task_id]))
+   
+   identity])
+
 (comment
+(defn query-name
+  ""
+  [arg]
+  [(-> ())
+   
+   identity])
+
   (sql/format [:array (range 5)])
   (sql/format [:cast [:array (range 5)] :integer])
   )

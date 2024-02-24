@@ -133,6 +133,16 @@
                       first
                       :defcatdated/cat_id)))))
 
+(deftest test-delete-defcat-named!
+  (testing "delete a defCatNamed"
+    (is (one-update? ((tu/q-fn)
+                      (delete-defcat-named! 5))))))
+
+(deftest test-delete-defcat-dated!
+  (testing "delete a defCatDated"
+    (is (one-update? ((tu/q-fn)
+                      (delete-defcat-dated! 5))))))
+
 (comment
   ;; .n.b "is" macro doesn't work inside a rich comment
   ;; this is a template

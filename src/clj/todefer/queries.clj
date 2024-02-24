@@ -227,6 +227,22 @@
    
    identity])
 
+(defn delete-defcat-named!
+  "delete a defCatNamed"
+  [cat_id]
+  [(-> (delete-from :defCatNamed)
+       (where [:= :cat_id cat_id]))
+
+   identity])
+
+(defn delete-defcat-dated!
+  "delete a defCatDated"
+  [cat_id]
+  [(-> (delete-from :defCatDated)
+       (where [:= :cat_id cat_id]))
+
+   identity])
+
 (comment
 (defn query-name
   ""

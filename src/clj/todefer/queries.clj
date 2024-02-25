@@ -243,6 +243,86 @@
 
    identity])
 
+(defn defer-task-named!
+  "assign tasks to a defCatNamed and clear highlight"
+  [defcat_ref task_ids]
+  [(-> (update :task)
+       (set {:defcat_named [:cast defcat_ref :integer]
+             :highlight nil})
+       (where [:= :task_id [:any [:array task_ids :integer]]]))
+
+   identity])
+
+(defn defer-task-dated!
+  "assign tasks to a defCatDated and clear highlight"
+  [defcat_ref task_ids]
+  [(-> (update :task)
+       (set {:defcat_dated [:cast defcat_ref :integer]
+             :highlight nil})
+       (where [:= :task_id [:any [:array task_ids :integer]]]))
+
+   identity])
+ 
+(defn undefer-task-named!
+  "undefer a task from a defCatNamed"
+  [task_ids]
+  [(-> (update :task)
+       (set {:defcat_named nil})
+       (where [:= :task_id [:any [:array task_ids :integer]]]))
+
+   identity])
+
+(defn undefer-task-dated!
+  "undefer a task from a defCatDated"
+  [task_ids]
+  [(-> (update :task)
+       (set {:defcat_dated nil})
+       (where [:= :task_id [:any [:array task_ids :integer]]]))
+
+   identity])
+
+(defn move-task!
+  "moves one-or-more tasks to a new page"
+  [newpage task_ids]
+  [(-> (update :task)
+       (set {:page_ref [:cast newpage :integer]})
+       (where [:= :task_id [:any [:array task_ids :integer]]]))
+
+   identity])
+
+(defn add-habit!
+  "add a habit"
+  [habit_name page_ref freq_unit freq_value]
+  [(-> (insert-into :habit)
+       (values [{:habit_name habit_name
+                 :page_ref [:cast page_ref :integer]
+                 :freq_unit [:cast freq_unit :timeUnit]
+                 :freq_value [:cast freq_value :integer]}]))
+
+   identity])
+
+ (defn list-due-habits
+   "get all due habits, ordered by due date"
+   [page_ref]
+   [(-> (select :*)
+        (from :habit)
+        (where [:and [:= :page_ref page_ref]
+                [:<= :date_scheduled :CURRENT_DATE]])
+        (order-by [:sort_id :asc] [:date_scheduled :asc] [:habit_id :asc]))
+
+    identity])
+
+(defn list-upcoming-habits
+  "get all upcoming habits, ordered by due date"
+  [page_ref]
+  [(-> (select :*)
+       (from :habit)
+       (where [:and [:= :page_ref page_ref]
+               [:> :date_scheduled :CURRENT_DATE]])
+       (order-by :date_scheduled))
+
+   identity])
+
 (comment
 (defn query-name
   ""

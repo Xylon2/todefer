@@ -7,8 +7,11 @@
 
 ;; the tests can use factory function tu/q-fn to run their queries
 
-(defn one-update? [x]
-  (= 1 (:next.jdbc/update-count (first x))))
+(defn num-updated [n x]
+  (= n (:next.jdbc/update-count (first x))))
+
+(def one-update? #(num-updated 1 %))
+(def two-updates? #(num-updated 2 %))
 
 (deftest test-create-user
   (testing "creating a user"
@@ -51,7 +54,7 @@
 
 (deftest test-list-pages
   (testing "listing pages"
-    (is (= ["Lorem ipsum" "Consectetur adipiscing" "Dolor sit amet" "new page"]
+    (is (= ["Lorem ipsum" "Consectetur adipiscing" "Dolor sit amet" "Another Page"]
            (->> ((tu/q-fn)
                  (list-pages))
                 (mapv :apppage/page_name))))))
@@ -142,6 +145,52 @@
   (testing "delete a defCatDated"
     (is (one-update? ((tu/q-fn)
                       (delete-defcat-dated! 5))))))
+
+(deftest test-defer-task-named!
+  (testing "assign tasks to a defCatNamed and clear highlight"
+    (is (one-update? ((tu/q-fn)
+                      (defer-task-named! 1 [1812]))))))
+
+(deftest test-defer-task-dated!
+  (testing "assign tasks to a defCatDated and clear highlight"
+    (is (one-update? ((tu/q-fn)
+                      (defer-task-dated! 65 [1812]))))))
+ 
+(deftest test-undefer-task-named!
+  (testing "undefer a task from a defCatNamed"
+    (is (one-update? ((tu/q-fn)
+                      (undefer-task-named! [1526]))))))
+
+(deftest test-undefer-task-dated!
+  (testing "undefer a task from a defCatDated"
+    (is (one-update? ((tu/q-fn)
+                      (undefer-task-dated! [1719]))))))
+
+(deftest test-move-task!
+  (testing "move tasks to a new page"
+    (is (two-updates? ((tu/q-fn)
+                      (move-task! 14 [1799 1791]))))))
+
+(deftest test-add-habit!
+  (testing "add a habit"
+    (is (one-update? ((tu/q-fn)
+                      (add-habit! "habit name" 10 "days" 4))))))
+
+(deftest test-list-due-habits
+  (testing "get all due habits, ordered by due date"
+    (is (= ["Incididunt ut" "Labore et" "Nisi ut"]
+         (->> ((tu/q-fn)
+               (list-due-habits 13))
+              (mapv :habit/habit_name)
+              (take 3))))))
+
+(deftest test-list-upcoming-habits
+  (testing "get all upcoming habits, ordered by due date"
+    (is (= ["Aliquip ex" "Ea commodo" "Ullamco laboris"]
+         (->> ((tu/q-fn)
+               (list-upcoming-habits 13))
+              (mapv :habit/habit_name)
+              (take 3))))))
 
 (comment
   ;; .n.b "is" macro doesn't work inside a rich comment

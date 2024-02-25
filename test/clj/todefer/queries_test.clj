@@ -1,7 +1,8 @@
 (ns todefer.queries-test
   (:require [clojure.test :refer :all]
             [todefer.test-utils :as tu]
-            [todefer.queries :refer :all]))
+            [todefer.queries :refer :all]
+            [java-time :as jt]))
 
 (use-fixtures :once (tu/system-fixture))
 
@@ -191,6 +192,34 @@
                (list-upcoming-habits 13))
               (mapv :habit/habit_name)
               (take 3))))))
+
+(deftest test-get-habit-info
+  (testing "get all the info for a list of habits"
+    (is (= ["Lorem ipsum" "Dolor sit" "Amet consectetur"]
+           (->> ((tu/q-fn)
+                 (get-habit-info [2 39 45]))
+                (mapv :habit/habit_name))))))
+
+(deftest test-list-all-habits
+  (testing "list all habit deets for a page"
+    (is (= 18 (-> ((tu/q-fn)
+                  (list-all-habits 10))
+                 count)))))
+
+(deftest test-defer-habit!
+  (testing "defer habit(s) to a specific date"
+    (is (two-updates? ((tu/debug-q-fn)
+            (defer-habit! [25 36] (jt/plus (jt/local-date) (jt/days 10))))))))
+
+(deftest test-delete-habit!
+  (testing "delete one or more habits"
+    (is (two-updates? ((tu/q-fn)
+                       (delete-habit! [42 35]))))))
+
+(deftest test-modify-habit!
+  (testing "modifies a single habit"
+    (is (one-update? ((tu/q-fn)
+                      (modify-habit! 42 "Updated Habit" 7 "days" "2023-04-01"))))))
 
 (comment
   ;; .n.b "is" macro doesn't work inside a rich comment

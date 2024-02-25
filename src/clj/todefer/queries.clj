@@ -323,6 +323,60 @@
 
    identity])
 
+(defn get-habit-info
+  "get all the info for habit(s)"
+  [habit_ids]
+  [(-> (select :*)
+       (from :habit)
+       (where [:= :habit_id [:any [:array habit_ids :integer]]])
+       (order-by :date_scheduled))
+   
+   identity])
+
+(defn list-all-habits
+  "list all habit deets for a page"
+  [page_ref]
+  [(-> (select :*)
+       (from :habit)
+       (where [:= :page_ref page_ref])
+       (order-by :date_scheduled))
+   
+   identity])
+
+(defn defer-habit!
+  "defer habit(s) to a specific date"
+  [habit_ids defer_date & [done]]
+  (let [updates {:date_scheduled [:cast defer_date :date]
+                 :highlight nil}]
+
+    [(-> (update :habit)
+         (set (if done
+                (assoc updates :last_done :CURRENT_DATE)
+                updates))
+         (where [:= :habit_id [:any [:array habit_ids :integer]]]))
+
+     identity]))
+
+(defn delete-habit!
+  "delete one or more habits"
+  [habit_ids]
+  [(-> (delete-from :habit)
+       (where [:= :habit_id [:any [:array habit_ids :integer]]]))
+
+   identity])
+
+(defn modify-habit!
+  "modifies a single habit"
+  [habit_id habit_name freq_value freq_unit date_scheduled]
+  [(-> (update :habit)
+       (set {:habit_name habit_name
+             :freq_value [:cast freq_value :integer]
+             :freq_unit [:cast freq_unit :timeUnit]
+             :date_scheduled [:cast date_scheduled :date]})
+       (where [:= :habit_id habit_id]))
+
+   identity])
+
 (comment
 (defn query-name
   ""

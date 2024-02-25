@@ -221,6 +221,21 @@
     (is (one-update? ((tu/q-fn)
                       (modify-habit! 42 "Updated Habit" 7 "days" "2023-04-01"))))))
 
+(deftest test-modify-task!
+  (testing "modifies a single task"
+    (is (one-update? ((tu/q-fn)
+                      (modify-task! 1811 "Updated Task"))))))
+
+(deftest test-highlight-tasks!
+  (testing "set the highlight for one or more tasks"
+    (is (two-updates? ((tu/q-fn)
+                      (highlight-tasks! [1788 1811] "highlighted"))))))
+
+(deftest test-highlight-habits!
+  (testing "set the highlight for one or more habits"
+    (is (two-updates? ((tu/q-fn)
+                       (highlight-habits! [41 10] "highlighted"))))))
+
 (comment
   ;; .n.b "is" macro doesn't work inside a rich comment
   ;; this is a template

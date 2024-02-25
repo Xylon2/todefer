@@ -377,6 +377,33 @@
 
    identity])
 
+(defn modify-task!
+  "modifies a single task"
+  [task_id task_name]
+  [(-> (update :task)
+       (set {:task_name task_name})
+       (where [:= :task_id task_id]))
+
+   identity])
+
+(defn highlight-tasks!
+  "set the highlight for one or more tasks"
+  [task_ids highlight]
+  [(-> (update :task)
+       (set {:highlight highlight})
+       (where [:= :task_id [:any [:array task_ids :integer]]]))
+
+   identity])
+
+(defn highlight-habits!
+  "set the highlight for one or more habits"
+  [habit_ids highlight]
+  [(-> (update :habit)
+       (set {:highlight highlight})
+       (where [:= :habit_id [:any [:array habit_ids :integer]]]))
+
+   identity])
+
 (comment
 (defn query-name
   ""

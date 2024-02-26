@@ -236,6 +236,32 @@
     (is (two-updates? ((tu/q-fn)
                        (highlight-habits! [41 10] "highlighted"))))))
 
+(deftest test-undefer-highlight!
+  (testing "highlight all tasks for a given category a special color"
+    (is (one-update? ((tu/q-fn)
+                      (undefer-highlight! 96))))))
+
+(deftest test-move-habit!
+  (testing "move one-or-more habits to a new page"
+    (is (two-updates? ((tu/q-fn)
+                       (move-habit! [2 44] 13))))))
+;; todo
+(deftest test-distinct-task-highlights
+  (testing "select distinct highlight from tasks for a page"
+    (is (= '(nil "lightblue")
+           (->> ((tu/q-fn)
+                 (distinct-task-highlights 1))
+                (mapv :task/highlight)
+                (sort))))))
+
+(deftest test-distinct-habit-highlights
+  (testing "select distinct highlight from habits for a page"
+    (is (= '(nil "lightblue" "red")
+           (->> ((tu/q-fn)
+                 (distinct-habit-highlights 10))
+                (mapv :habit/highlight)
+                (sort))))))
+
 (comment
   ;; .n.b "is" macro doesn't work inside a rich comment
   ;; this is a template

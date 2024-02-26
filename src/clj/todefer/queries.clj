@@ -404,6 +404,42 @@
 
    identity])
 
+(defn undefer-highlight!
+  "highlights all tasks for a given category a special color"
+  [cat_id]
+  [(-> (update :task)
+       (set {:highlight "khaki"})
+       (where [:= :defcat_dated cat_id]))
+
+   identity])
+
+(defn move-habit!
+  "moves one-or-more habits to a new page"
+  [habit_ids newpage]
+  [(-> (update :habit)
+       (set {:page_ref [:cast newpage :integer]})
+       (where [:= :habit_id [:any [:array habit_ids :integer]]]))
+
+   identity])
+
+(defn distinct-task-highlights
+  "select distinct highlight from tasks for a page"
+  [page_ref]
+  [(-> (select-distinct :highlight)
+       (from :task)
+       (where [:= :page_ref page_ref]))
+
+   identity])
+
+(defn distinct-habit-highlights
+  "select distinct highlight from habits for a page"
+  [page_ref]
+  [(-> (select-distinct :highlight)
+       (from :habit)
+       (where [:= :page_ref page_ref]))
+
+   identity])
+
 (comment
 (defn query-name
   ""

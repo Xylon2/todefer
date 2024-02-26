@@ -422,7 +422,7 @@ COPY public.habit (habit_id, habit_name, page_ref, freq_unit, freq_value, date_s
 2	Dolor sit	10	weeks	1	2024-02-17	2024-02-10	\N	\N
 45	Amet consectetur	10	months	2	2024-03-02	\N	\N	\N
 25	Adipiscing elit	13	weeks	1	2024-02-17	2024-02-10	\N	\N
-36	Sed do	10	days	3	2024-02-17	2024-02-14	\N	0
+36	Sed do	10	days	3	2024-02-17	2024-02-14	lightblue	0
 31	Eiusmod tempor	10	weeks	1	2024-02-21	2024-02-14	\N	\N
 4	Incididunt ut	13	months	1	2022-12-05	\N	\N	\N
 42	Labore et	13	days	4	2024-01-17	\N	\N	\N
@@ -431,12 +431,12 @@ COPY public.habit (habit_id, habit_name, page_ref, freq_unit, freq_value, date_s
 5	Enim ad	10	months	1	2023-01-24	\N	\N	\N
 41	Minim veniam	10	months	1	2023-11-12	\N	\N	\N
 10	Quis nostrud	10	months	1	2024-02-21	2024-01-24	\N	\N
-8	Exercitation	10	months	3	2024-04-21	2024-01-29	\N	\N
+8	Exercitation	10	months	3	2024-04-21	2024-01-29	red	\N
 38	Ullamco laboris	13	days	5	2124-02-03	2024-01-29	\N	\N
 33	Nisi ut	13	weeks	1	2024-01-21	2024-01-14	\N	\N
 7	Aliquip ex	13	months	1	2123-04-10	\N	\N	\N
 6	Ea commodo	13	months	1	2123-05-02	\N	\N	\N
-9	Consequat	13	years	2	2124-10-03	\N	\N	\N
+9	Consequat	13	years	2	2124-10-03	\N	red	\N
 28	Duis aute	13	months	1	2124-02-21	2024-01-24	\N	0
 26	Irure dolor	10	weeks	3	2024-02-19	2024-01-29	\N	\N
 37	In reprehenderit	10	days	9	2024-02-07	2024-01-29	\N	\N

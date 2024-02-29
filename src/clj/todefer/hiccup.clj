@@ -2,13 +2,23 @@
     (:require [hiccup2.core :as h]))
 
 (defn render-base
-  "the basic structure of an html document. takes a title and list of elements"
-  [title contents]
+  "the basic structure of an html document. takes a page-list title and list of
+  elements
+
+  The pagelist is a list of maps, each containing page_link & page_title"
+  [pagelist title contents]
   (->> [:html {:lang "en"}
         [:head
          [:title title]
+         [:meta {:name "viewport"
+                 :content "width=device-width, initial-scale=1.0"}]
          [:link {:rel "stylesheet" :href "/public/style/style.css"}]]
         [:body
+         [:nav#navbar
+          (into [:ul]
+                (for [{page_title :apppage/page_name
+                       page_link :apppage/page_id} pagelist]
+                  [:li [:a {:href page_link} page_title]]))]
          [:header [:h1 title]]
          (into [:main]
                contents)]]
@@ -17,9 +27,9 @@
 
 (defn render-message
   "render a message on an html page"
-  [msg]
+  [pagelist msg]
   (let [contents [:p msg]]
-    (render-base "Message" [contents])))
+    (render-base pagelist "Message" [contents])))
 
 (defn render-login
   "prompt for login deets"

@@ -15,7 +15,7 @@
   [{exec-query :q-builder}]
   {:status 200
    :headers {"Content-Type" "text/html"}
-   :body (ph/render-message "Hello World!")})
+   :body (ph/render-message (exec-query (q/list-pages)) "Hello World!")})
 
 (defn login-handler
   "show the login prompt. the parameter variable holds the url the user was trying

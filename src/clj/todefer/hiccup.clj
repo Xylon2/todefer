@@ -14,13 +14,14 @@
                  :content "width=device-width, initial-scale=1.0"}]
          [:link {:rel "stylesheet" :href "/public/style/style.css"}]]
         [:body
-         [:nav#navbar
-          (into [:ul]
-                (for [{page_title :apppage/page_name
-                       page_link :apppage/page_id} pagelist]
-                  [:li [:a {:href page_link} page_title]]))]
-         [:header [:h1 title]]
-         (into [:main]
+         [:div.hero-header
+          [:nav#navbar.width
+           (into [:ul]
+                 (for [{page_title :apppage/page_name
+                        page_link :apppage/page_id} pagelist]
+                   [:li [:a {:href page_link} page_title]]))]]
+         [:header.width [:h1 title]]
+         (into [:main.width]
                contents)]]
        h/html
        (str "<!DOCTYPE html>")))

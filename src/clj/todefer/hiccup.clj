@@ -26,7 +26,6 @@
            [:div#actionbar.hero-header
             (into [:div.width] actionbar)])
          
-         [:header.width [:h1 title]]
          (into [:main.width]
                contents)]]
        h/html
@@ -64,11 +63,22 @@
 (defn render-tasks
   "the meat of a tasks page. used both in initial page-load and by AJAX"
   [page-id due-tasks defcats-named defcats-dated]
-  [:p "hi"]
+  [[:h2 "Due"]
+   [:table
+    [:colgroup
+     [:col {:style "width: 2em;"}]
+     [:col {:style "width: 100%;"}]]
+    [:tbody
+     (for [{:keys [highlight task_id task_name]} due-tasks]
+       [:tr (when highlight {:style (str "background-color: " highlight)})
+        [:td [:input {:type "checkbox" :name "task_id" :value task_id}]]
+        [:td task_name]]
+       )]]]
+
   )
 
 (defn tasks-page
   "renders a full page of tasks"
   [pagelist page-name page-id due-tasks defcats-named defcats-dated]
   (let [contents (render-tasks page-id due-tasks defcats-named defcats-dated)]
-    (render-base pagelist (str page-name " tasks") [contents])))
+    (render-base pagelist (str page-name " tasks") contents)))

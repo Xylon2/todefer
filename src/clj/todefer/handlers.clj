@@ -34,10 +34,11 @@
   [exec-query buildme defcat]
   (let [{cat_id :cat_id
          catdate :def_date} defcat
+        catdate' (.toLocalDate catdate) ;; it was in java.sql.Date format
         datenow (jt/local-date)]
-    (if (jt/not-after? catdate datenow)
-      (do (exec-query (q/undefer-highlight! {:cat_id cat_id}))
-          (exec-query (q/delete-defcat-dated! {:cat_id cat_id}))
+    (if (jt/not-after? catdate' datenow)
+      (do (exec-query (q/undefer-highlight! cat_id))
+          (exec-query (q/delete-defcat-dated! cat_id))
           buildme)
       (conj buildme defcat))))
 

@@ -5,8 +5,10 @@
   "the basic structure of an html document. takes a page-list title and list of
   elements
 
-  The pagelist is a list of maps, each containing page_link & page_title"
-  [pagelist title contents]
+  The pagelist is a list of maps, each containing page_link & page_title.
+
+  If a fourth arg is provided it will go into the actionbar"
+  [pagelist title contents & [actionbar]]
   (->> [:html {:lang "en"}
         [:head
          [:title title]
@@ -14,12 +16,16 @@
                  :content "width=device-width, initial-scale=1.0"}]
          [:link {:rel "stylesheet" :href "/public/style/style.css"}]]
         [:body
-         [:div.hero-header
+         [:div#topbar.hero-header
           [:nav#navbar.width
            (into [:ul]
                  (for [{page_title :page_name
                         page_link :page_id} pagelist]
                    [:li [:a {:href page_link} page_title]]))]]
+         (when-not (empty? actionbar)
+           [:div#actionbar.hero-header
+            (into [:div.width] actionbar)])
+         
          [:header.width [:h1 title]]
          (into [:main.width]
                contents)]]

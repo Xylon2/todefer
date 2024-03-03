@@ -58,17 +58,17 @@
     (is (= ["Lorem ipsum" "Consectetur adipiscing" "Dolor sit amet" "Another Page"]
            (->> ((tu/q-fn)
                  (list-pages))
-                (mapv :apppage/page_name))))))
+                (mapv :page_name))))))
 
 (deftest test-get-page
   (testing "get page info"
-    (is (= [#:apppage{:page_id 1, :page_name "Lorem ipsum", :order_key 0, :page_type "task"}]
+    (is (= {:page_id 1, :page_name "Lorem ipsum", :order_key 0, :page_type "task"}
            ((tu/q-fn)
             (get-page "Lorem ipsum"))))))
 
 (deftest test-get-default-page
   (testing "get default page"
-    (is (= [#:apppage{:page_name "Lorem ipsum"}]
+    (is (= [{:page_name "Lorem ipsum"}]
            ((tu/q-fn)
             (get-default-page))))))
 
@@ -109,7 +109,7 @@
     (is (= ["Adipiscing elit" "Exercitation ullamco" "Labore et"]
            (->> ((tu/q-fn)
                  (get-task-info [1806 1739 1810]))
-                (mapv :task/task_name))))))
+                (mapv :task_name))))))
 
 (deftest test-list-all-tasks
   (testing "list all task deets for a page"
@@ -128,14 +128,14 @@
     (is (integer? (-> ((tu/q-fn)
                        (create-defcat-named! "foobar"))
                       first
-                      :defcatnamed/cat_id)))))
+                      :cat_id)))))
 
 (deftest test-create-defcat-dated!
   (testing "create a defCatDated"
     (is (integer? (-> ((tu/q-fn)
                        (create-defcat-dated! "2051-06-14"))
                       first
-                      :defcatdated/cat_id)))))
+                      :cat_id)))))
 
 (deftest test-delete-defcat-named!
   (testing "delete a defCatNamed"
@@ -182,7 +182,7 @@
     (is (= ["Incididunt ut" "Labore et" "Nisi ut"]
          (->> ((tu/q-fn)
                (list-due-habits 13))
-              (mapv :habit/habit_name)
+              (mapv :habit_name)
               (take 3))))))
 
 (deftest test-list-upcoming-habits
@@ -190,7 +190,7 @@
     (is (= ["Aliquip ex" "Ea commodo" "Ullamco laboris"]
          (->> ((tu/q-fn)
                (list-upcoming-habits 13))
-              (mapv :habit/habit_name)
+              (mapv :habit_name)
               (take 3))))))
 
 (deftest test-get-habit-info
@@ -198,7 +198,7 @@
     (is (= ["Lorem ipsum" "Dolor sit" "Amet consectetur"]
            (->> ((tu/q-fn)
                  (get-habit-info [2 39 45]))
-                (mapv :habit/habit_name))))))
+                (mapv :habit_name))))))
 
 (deftest test-list-all-habits
   (testing "list all habit deets for a page"
@@ -208,7 +208,7 @@
 
 (deftest test-defer-habit!
   (testing "defer habit(s) to a specific date"
-    (is (two-updates? ((tu/debug-q-fn)
+    (is (two-updates? ((tu/q-fn)
             (defer-habit! [25 36] (jt/plus (jt/local-date) (jt/days 10))))))))
 
 (deftest test-delete-habit!
@@ -251,7 +251,7 @@
     (is (= '(nil "lightblue")
            (->> ((tu/q-fn)
                  (distinct-task-highlights 1))
-                (mapv :task/highlight)
+                (mapv :highlight)
                 (sort))))))
 
 (deftest test-distinct-habit-highlights
@@ -259,7 +259,7 @@
     (is (= '(nil "lightblue" "red")
            (->> ((tu/q-fn)
                  (distinct-habit-highlights 10))
-                (mapv :habit/highlight)
+                (mapv :highlight)
                 (sort))))))
 
 (comment

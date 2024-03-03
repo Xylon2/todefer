@@ -14,5 +14,4 @@
 (defn query [& args]
   (apply tu/q-fn args))
 
-;; you can run (run-all-tests) in this namespace to test everything
-;; however it only tests namespaces you have loaded
+;; example to test a single namespace: (run-tests 'todefer.queries-test)

@@ -6,6 +6,7 @@
             [honey.sql.helpers :refer :all]  ;; shadows core functions
             [clojure.core :as c]  ;; so we can still access core functions
             [next.jdbc :as jdbc]
+            [next.jdbc.result-set :as result-set]
             [buddy.hashers :as hashers]))
 
 ;; the core namespace will closure over this with the connection and defaults
@@ -36,7 +37,7 @@
    (let [formatted-query (sql/format query)]
      (when debug (println (str "formatted-query: " formatted-query)))
      (jdbc/with-transaction [t-conn conn t-opts]
-       (processor (jdbc/execute! t-conn formatted-query))
+       (processor (jdbc/execute! t-conn formatted-query {:builder-fn result-set/as-unqualified-maps}))
        ))))
 
 (defn create-user
@@ -55,7 +56,7 @@
        (from :users)
        (where [:= :login login]))
 
-   (fn [[{hashed :users/password}]]
+   (fn [[{hashed :password}]]
      (hashers/check password hashed))])
 
 (defn create-page!
@@ -120,7 +121,7 @@
        (from :appPage)
        (where [:= :page_name page_name]))
 
-   identity])
+   first])
 
 (defn get-default-page
   "gets the name of the page with the lowest index"

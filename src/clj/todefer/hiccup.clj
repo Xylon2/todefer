@@ -17,8 +17,8 @@
          [:div.hero-header
           [:nav#navbar.width
            (into [:ul]
-                 (for [{page_title :apppage/page_name
-                        page_link :apppage/page_id} pagelist]
+                 (for [{page_title :page_name
+                        page_link :page_id} pagelist]
                    [:li [:a {:href page_link} page_title]]))]]
          [:header.width [:h1 title]]
          (into [:main.width]
@@ -54,3 +54,15 @@
                     
                     [:input {:type "submit" :value "Login"}]]]
     (render-base "Login" [errorprint login-form])))
+
+(defn render-tasks
+  "the meat of a tasks page. used both in initial page-load and by AJAX"
+  [page-id]
+  [:p "hi"]
+  )
+
+(defn tasks-page
+  "renders a full page of tasks"
+  [pagelist page-name page-id]
+  (let [contents (render-tasks page-id)]
+    (render-base pagelist (str page-name " tasks") [contents])))

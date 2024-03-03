@@ -1,11 +1,65 @@
 (ns todefer.handlers
   (:require [todefer.queries :as q]
             [todefer.hiccup :as ph]
-            [hiccup2.core :as h]))
+            [hiccup2.core :as h]
+            [java-time :as jt]))
+
+(def days {"Mon" "Monday"
+           "Tue" "Tuesday"
+           "Wed" "Wednesday"
+           "Thu" "Thursday"
+           "Fri" "Friday"
+           "Sat" "Saturday"
+           "Sun" "Sunday"})
+
+(defn prettify-due
+  "we take a map, and we add a :prettydue based off of the key in datekey"
+  [taskdata datekey]
+  (let [{date_scheduled datekey} taskdata
+        now (jt/local-date)]
+    (conj taskdata {:prettydue (cond
+                                  (= date_scheduled now)
+                                    "today"
+                                  (= date_scheduled (jt/plus now (jt/days 1)))
+                                    "tomorrow"
+                                  (= date_scheduled (jt/minus now (jt/days 1)))
+                                    "yesturday"
+                                  (jt/before? (jt/minus now (jt/days 6)) date_scheduled (jt/plus now (jt/days 6)))
+                                    (days (jt/format "E" date_scheduled))
+                                  :else
+                                    date_scheduled)})))
+
+(defn undefer-due
+  "to be used by reduce to either return a category back or undefer it"
+  [exec-query buildme defcat]
+  (let [{cat_id :cat_id
+         catdate :def_date} defcat
+        datenow (jt/local-date)]
+    (if (jt/not-after? catdate datenow)
+      (do (exec-query (q/undefer-highlight! {:cat_id cat_id}))
+          (exec-query (q/delete-defcat-dated! {:cat_id cat_id}))
+          buildme)
+      (conj buildme defcat))))
+
+(defn list-defcats-dated-undefer
+  "basically a wrapper for q/list-defcats-dated that undefers categories as appropriate"
+  [exec-query page_id]
+  (let [defcats_dated (exec-query (q/list-defcats-dated page_id))]
+    (reduce #(undefer-due exec-query %1 %2) [] defcats_dated)))
+
+(defn add-tasks-named
+  "given a map of cat info, add a new key called :tasks, with all the task info"
+  [exec-query defcat]
+  (conj defcat {:tasks (exec-query (q/tasks-defcat-named {:defcat_ref (defcat :cat_id)}))}))
+
+(defn add-tasks-dated
+  "given a map of cat info, add a new key called :tasks, with all the task info"
+  [exec-query defcat]
+  (conj defcat {:tasks (exec-query (q/tasks-defcat-dated {:defcat_ref (defcat :cat_id)}))}))
 
 (defn not-found-handler
   "display not found page"
-  [& x]
+  [& _]
   {:status 404
    :headers {"Content-Type" "text/html"}
    :body (ph/render-message "Page Not Found")})
@@ -31,7 +85,19 @@
       "task"
       {:status 200
        :headers {"Content-Type" "text/html"}
-       :body (ph/tasks-page page-list page-name page-id)}
+       :body (let [due-tasks (exec-query (q/list-due-tasks page-id))
+                   defcatsnamed (map #(add-tasks-named exec-query %)
+                                     (exec-query (q/list-defcats-named page-id)))
+                   defcatsdated (map #(add-tasks-dated exec-query %)
+                                     (map #(prettify-due % :def_date)
+                                          (list-defcats-dated-undefer exec-query page-id)))]
+               (ph/tasks-page
+                page-list
+                page-name
+                page-id
+                due-tasks
+                defcatsnamed
+                defcatsdated))}
       ;; "habit"
       ;; {:status 200
       ;;  :headers {"Content-Type" "text/html"}

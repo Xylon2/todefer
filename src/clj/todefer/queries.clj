@@ -210,6 +210,15 @@
    
    identity])
 
+(defn tasks-defcat-dated
+  "list all the tasks in a deferred category"
+  [defcat_ref]
+  [(-> (select :*)
+       (from :task)
+       (where [:= :defcat_dated defcat_ref]))
+   
+   identity])
+
 (defn create-defcat-named!
   "create a defCatNamed with a name"
   [cat_name]

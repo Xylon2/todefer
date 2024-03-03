@@ -57,12 +57,12 @@
 
 (defn render-tasks
   "the meat of a tasks page. used both in initial page-load and by AJAX"
-  [page-id]
+  [page-id due-tasks defcats-named defcats-dated]
   [:p "hi"]
   )
 
 (defn tasks-page
   "renders a full page of tasks"
-  [pagelist page-name page-id]
-  (let [contents (render-tasks page-id)]
+  [pagelist page-name page-id due-tasks defcats-named defcats-dated]
+  (let [contents (render-tasks page-id due-tasks defcats-named defcats-dated)]
     (render-base pagelist (str page-name " tasks") [contents])))

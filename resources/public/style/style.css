@@ -11,7 +11,7 @@ h1,h2,h3{
 }
 
 .width {
-    max-width:650px;
+    max-width:1000px;
     margin: 0 auto;
 }
 
@@ -64,4 +64,20 @@ h1,h2,h3{
 #actionbar {
     background-color: #e8e8e8;
     padding: 1px 10px;
+}
+
+table {
+    border-collapse:collapse
+}
+
+table, td {
+    border: none;
+}
+
+td {
+    padding: 3px 10px;
+}
+
+tr {
+    border-bottom: 2px solid #ccc;
 }

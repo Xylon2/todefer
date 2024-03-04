@@ -16,18 +16,19 @@
   "we take a map, and we add a :prettydue based off of the key in datekey"
   [taskdata datekey]
   (let [{date_scheduled datekey} taskdata
+        date_scheduled' (.toLocalDate date_scheduled)
         now (jt/local-date)]
     (conj taskdata {:prettydue (cond
-                                  (= date_scheduled now)
+                                  (= date_scheduled' now)
                                     "today"
-                                  (= date_scheduled (jt/plus now (jt/days 1)))
+                                  (= date_scheduled' (jt/plus now (jt/days 1)))
                                     "tomorrow"
-                                  (= date_scheduled (jt/minus now (jt/days 1)))
+                                  (= date_scheduled' (jt/minus now (jt/days 1)))
                                     "yesturday"
-                                  (jt/before? (jt/minus now (jt/days 6)) date_scheduled (jt/plus now (jt/days 6)))
-                                    (days (jt/format "E" date_scheduled))
+                                  (jt/before? (jt/minus now (jt/days 6)) date_scheduled' (jt/plus now (jt/days 6)))
+                                    (days (jt/format "E" date_scheduled'))
                                   :else
-                                    date_scheduled)})))
+                                    date_scheduled')})))
 
 (defn undefer-due
   "to be used by reduce to either return a category back or undefer it"
@@ -51,12 +52,12 @@
 (defn add-tasks-named
   "given a map of cat info, add a new key called :tasks, with all the task info"
   [exec-query defcat]
-  (conj defcat {:tasks (exec-query (q/tasks-defcat-named {:defcat_ref (defcat :cat_id)}))}))
+  (conj defcat {:tasks (exec-query (q/tasks-defcat-named (defcat :cat_id)))}))
 
 (defn add-tasks-dated
   "given a map of cat info, add a new key called :tasks, with all the task info"
   [exec-query defcat]
-  (conj defcat {:tasks (exec-query (q/tasks-defcat-dated {:defcat_ref (defcat :cat_id)}))}))
+  (conj defcat {:tasks (exec-query (q/tasks-defcat-dated (defcat :cat_id)))}))
 
 (defn not-found-handler
   "display not found page"

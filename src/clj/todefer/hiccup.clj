@@ -63,19 +63,54 @@
 (defn render-tasks
   "the meat of a tasks page. used both in initial page-load and by AJAX"
   [page-id due-tasks defcats-named defcats-dated]
-  [[:h2 "Due"]
-   [:table
-    [:colgroup
-     [:col {:style "width: 2em;"}]
-     [:col {:style "width: 100%;"}]]
-    [:tbody
-     (for [{:keys [highlight task_id task_name]} due-tasks]
-       [:tr (when highlight {:style (str "background-color: " highlight)})
-        [:td [:input {:type "checkbox" :name "task_id" :value task_id}]]
-        [:td task_name]]
-       )]]]
-
-  )
+  (let [duehiccup
+        [[:h2 "Due"]
+         [:table
+          [:colgroup
+           [:col {:style "width: 2em;"}]
+           [:col {:style "width: 100%;"}]]
+          [:tbody
+           (for [{:keys [highlight task_id task_name]} due-tasks]
+             [:tr (when highlight {:style (str "background-color: " highlight)})
+              [:td [:input {:type "checkbox" :name "task_id" :value task_id}]]
+              [:td task_name]]
+             )]]
+         [:br]]
+        dnamedhiccup
+        (apply concat
+               (for [{:keys [cat_name tasks]} defcats-named]
+                 [[:button.collapsible {:type "button"} cat_name]
+                  [:div.collapsiblecontent
+                   [:table
+                    [:colgroup
+                     [:col {:style "width: 2em;"}]
+                     [:col {:style "width: 100%;"}]]
+                    [:tbody
+                     (for [{:keys [highlight task_id task_name]} tasks]
+                       [:tr (when highlight {:style (str "background-color: " highlight)})
+                        [:td [:input {:type "checkbox" :name "task_id" :value task_id}]]
+                        [:td task_name]]
+                       )]]]
+                  [:br]]))
+        ddatedhiccup
+        [[:button.collapsible {:type "button"} "Upcoming"]
+         [:div.collapsiblecontent
+          [:table
+           [:colgroup
+            [:col {:style "width: 2em;"}]
+            [:col {:style "width: 100%;"}]
+            [:col]]
+           [:tbody
+            (for [{:keys [tasks prettydue]} defcats-dated]
+              (for [{:keys [highlight task_id task_name]} tasks]
+                [:tr (when highlight {:style (str "background-color: " highlight)})
+                 [:td [:input {:type "checkbox" :name "task_id" :value task_id}]]
+                 [:td task_name]
+                 [:td prettydue]]
+                ))]]]
+         [:br]]
+        ]
+    (concat duehiccup dnamedhiccup ddatedhiccup)))
 
 (defn tasks-page
   "renders a full page of tasks"

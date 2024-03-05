@@ -8,7 +8,7 @@
   The pagelist is a list of maps, each containing page_link & page_title.
 
   If a fourth arg is provided it will go into the actionbar"
-  [pagelist title contents & [actionbar]]
+  [pagelist title contents & {:keys [scripts actionbar]}]
   (->> [:html {:lang "en"}
         [:head
          [:title title]
@@ -27,7 +27,10 @@
             (into [:div.width] actionbar)])
          
          (into [:main.width]
-               contents)]]
+               contents)
+         (when-not (empty? scripts)
+           (for [script scripts]
+             [:script {:type "text/javascript" :src script}]))]]
        h/html
        (str "<!DOCTYPE html>")))
 
@@ -91,7 +94,7 @@
                         [:td [:input {:type "checkbox" :name "task_id" :value task_id}]]
                         [:td task_name]]
                        )]]]
-                  [:br]]))
+                  [:div [:br]]]))
         ddatedhiccup
         [[:button.collapsible {:type "button"} "Upcoming"]
          [:div.collapsiblecontent
@@ -108,7 +111,7 @@
                  [:td task_name]
                  [:td prettydue]]
                 ))]]]
-         [:br]]
+         [:div [:br]]]
         ]
     (concat duehiccup dnamedhiccup ddatedhiccup)))
 
@@ -116,4 +119,4 @@
   "renders a full page of tasks"
   [pagelist page-name page-id due-tasks defcats-named defcats-dated]
   (let [contents (render-tasks page-id due-tasks defcats-named defcats-dated)]
-    (render-base pagelist (str page-name " tasks") contents)))
+    (render-base pagelist (str page-name " tasks") contents :scripts ["/public/cljs/todefer.js"])))

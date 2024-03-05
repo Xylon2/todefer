@@ -1,0 +1,7 @@
+{:source-paths ["src/cljs"]
+ :dependencies []
+ :dev-http {3010 "resources/public/cljs/"}
+ :builds {:app {:output-dir "resources/public/cljs/"
+                :asset-path "."
+                :target :browser
+                :modules {:todefer {:entries [todefer.tasks]}}}}}

@@ -103,8 +103,7 @@ tr {
 /* Style the collapsible content. Note: hidden by default */
 .collapsiblecontent {
   padding: 1em 1em;
-  /* TODO uncomment the bellow when we have the js we need */
-  /* display: none; */
+  display: none;
   overflow: hidden;
   background-color: #f1f1f1;
 }

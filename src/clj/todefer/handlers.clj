@@ -61,17 +61,17 @@
 
 (defn not-found-handler
   "display not found page"
-  [& _]
+  [{exec-query :q-builder}]
   {:status 404
    :headers {"Content-Type" "text/html"}
-   :body (ph/render-message "Page Not Found")})
+   :body (ph/render-message "Page Not Found" (exec-query (q/list-pages)))})
 
 (defn home-handler
   "display the list of questions"
   [{exec-query :q-builder}]
   {:status 200
    :headers {"Content-Type" "text/html"}
-   :body (ph/render-message (exec-query (q/list-pages)) "Hello World!")})
+   :body (ph/render-message "Hello World!" (exec-query (q/list-pages)))})
 
 (defn display-page
   "displays a task, habit or agenda page"

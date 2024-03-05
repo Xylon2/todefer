@@ -8,7 +8,7 @@
   The pagelist is a list of maps, each containing page_link & page_title.
 
   If a fourth arg is provided it will go into the actionbar"
-  [pagelist title contents & {:keys [scripts actionbar]}]
+  [title contents & {:keys [pagelist scripts actionbar]}]
   (->> [:html {:lang "en"}
         [:head
          [:title title]
@@ -18,10 +18,12 @@
         [:body
          [:div#topbar.hero-header
           [:nav#navbar.width
-           (into [:ul]
-                 (for [{page_title :page_name
-                        page_link :page_id} pagelist]
-                   [:li [:a {:href page_link} page_title]]))]]
+           (if (empty? pagelist)
+             [:ul [:li [:a {:href "/login"} "Login"]]]
+             (into [:ul]
+                   (for [{page_title :page_name
+                          page_link :page_id} pagelist]
+                     [:li [:a {:href page_link} page_title]])))]]
          (when-not (empty? actionbar)
            [:div#actionbar.hero-header
             (into [:div.width] actionbar)])
@@ -36,9 +38,11 @@
 
 (defn render-message
   "render a message on an html page"
-  [pagelist msg]
+  [msg & [pagelist]]
+  (println (str "pagelist: " pagelist))
   (let [contents [:p msg]]
-    (render-base pagelist "Message" [contents])))
+    (apply render-base "Message" [contents] (when pagelist
+                                              [:pagelist pagelist]))))
 
 (defn render-login
   "prompt for login deets"
@@ -119,4 +123,4 @@
   "renders a full page of tasks"
   [pagelist page-name page-id due-tasks defcats-named defcats-dated]
   (let [contents (render-tasks page-id due-tasks defcats-named defcats-dated)]
-    (render-base pagelist (str page-name " tasks") contents :scripts ["/public/cljs/todefer.js"])))
+    (render-base (str page-name " tasks") contents :scripts ["/public/cljs/todefer.js"] :pagelist pagelist)))

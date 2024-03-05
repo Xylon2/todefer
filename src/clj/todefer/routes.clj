@@ -64,4 +64,5 @@
                            wrap-query-builder
                            [wrap-session {:store session-store}]
                            wrap-anti-forgery]}})
-    hl/not-found-handler)))
+     ;; default handler
+     (wrap-query-builder hl/not-found-handler))))

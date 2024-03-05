@@ -6,3 +6,5 @@
 db-credentials.edn
 /.gpteng/
 /prompt
+.shadow-cljs
+/resources/public/cljs/

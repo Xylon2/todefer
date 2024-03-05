@@ -1,0 +1,22 @@
+{
+  "name": "todefer-new",
+  "version": "1.0.0",
+  "description": "This branch serves as a template to make your own web app, with authenticated pages.",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "ssh://git@gitlab.xylon.me.uk:942/root/todefer.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "shadow-cljs": "^2.27.5"
+  }
+}

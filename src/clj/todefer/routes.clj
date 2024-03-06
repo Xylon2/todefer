@@ -12,10 +12,25 @@
             [ring.middleware.session.memory :as memory]
             [clojure.spec.alpha :as s]
             [todefer.handlers :as hl]
-            [ring.logger :as logger]))
+            [ring.logger :as logger]
+            [clojure.string :as string]
+            [clojure.pprint]
+            [clojure.java.io]))
 
 (s/def ::id int?)
 (s/def ::string string?)
+
+(defn wrap-debug-reqmap
+  "debug middleware to save the requestmap to a file so we can analyze"
+  [handler comment]
+  (fn [req]
+    (when-not (string/includes? (:uri req) "favicon.ico")
+      (let [timestamp (.toString (java.time.LocalDateTime/now))
+            filename (str "reqlog/request-" comment "-" timestamp ".edn")]
+        (clojure.pprint/pprint req (clojure.java.io/writer filename))))
+
+    ; Call the handler and return its response
+    (handler req)))
 
 (defn wrap-auth [handler]
   (fn [{:keys [uri query-string session] :as request}]
@@ -57,7 +72,9 @@
       ;; router data affecting all routes
       {:data {:coercion   reitit.coercion.spec/coercion
               :muuntaja   m/instance
-              :middleware [parameters/parameters-middleware
+              :middleware [
+                           ;; [wrap-debug-reqmap "complete"]
+                           parameters/parameters-middleware
                            rrc/coerce-request-middleware
                            muuntaja/format-response-middleware
                            rrc/coerce-response-middleware

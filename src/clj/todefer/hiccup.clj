@@ -38,7 +38,6 @@
 (defn render-message
   "render a message on an html page"
   [msg & [pagelist]]
-  (println (str "pagelist: " pagelist))
   (let [contents [:p msg]]
     (apply render-base "Message" [contents] (when pagelist
                                               [:pagelist pagelist]))))

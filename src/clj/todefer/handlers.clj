@@ -61,10 +61,12 @@
 
 (defn not-found-handler
   "display not found page"
-  [{exec-query :q-builder}]
+  [{exec-query :q-builder
+    session :session}]
   {:status 404
    :headers {"Content-Type" "text/html"}
-   :body (ph/render-message "Page Not Found" (exec-query (q/list-pages)))})
+   :body (ph/render-message "Page Not Found" (when (contains? session :user)
+                                               (exec-query (q/list-pages))))})
 
 (defn home-handler
   "display the list of questions"

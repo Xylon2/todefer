@@ -76,7 +76,7 @@
 (defn display-page
   "displays a task, habit or agenda page"
   [{exec-query :q-builder
-    {{page-name :page-name} :path} :parameters}]
+    {{page-name :page-name} :path} :parameters :as request}]
 
   ;; check the page_name is legit and find out what type of page it is
   (let [page-list (exec-query (q/list-pages))
@@ -112,6 +112,7 @@
       ;; {:status 404
       ;;  :headers {"Content-Type" "text/html"}
       ;;  :body (ph/render-message "Page Not Found")}
+      (not-found-handler request)
       )))
 
 (defn login-handler

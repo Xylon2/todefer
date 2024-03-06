@@ -43,7 +43,8 @@
     (ring/ring-handler
      (ring/router
       [["/" {:handler hl/home-handler}]
-       ["/page/:page-name" {:get {:handler hl/display-page
+       ["/page/:page-name" {:middleware [wrap-auth]
+                            :get {:handler hl/display-page
                                   :parameters {:path {:page-name ::string}}}}]
        ["/login" {:get {:handler hl/login-handler}
                   :post {:handler hl/login-post-handler

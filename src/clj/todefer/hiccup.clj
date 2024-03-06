@@ -21,9 +21,8 @@
            (if (empty? pagelist)
              [:ul [:li [:a {:href "/login"} "Login"]]]
              (into [:ul]
-                   (for [{page_title :page_name
-                          page_link :page_id} pagelist]
-                     [:li [:a {:href page_link} page_title]])))]]
+                   (for [{page_name :page_name} pagelist]
+                     [:li [:a {:href (str "/page/" page_name)} page_name]])))]]
          (when-not (empty? actionbar)
            [:div#actionbar.hero-header
             (into [:div.width] actionbar)])

@@ -20,6 +20,10 @@
 (s/def ::id int?)
 (s/def ::string string?)
 
+;; the reason we put the session store in this atom is so we can log ourselfes
+;; in when testing
+(def session-atom (atom {}))
+
 (defn wrap-debug-reqmap
   "debug middleware to save the requestmap to a file so we can analyze"
   [handler comment]
@@ -53,7 +57,7 @@
   (let [wrap-query-builder (fn [handler]
                              (fn [request]
                                (handler (assoc request :q-builder q-builder))))
-        session-store (memory/memory-store)]
+        session-store (memory/memory-store session-atom)]
 
     (ring/ring-handler
      (ring/router
@@ -73,7 +77,6 @@
       {:data {:coercion   reitit.coercion.spec/coercion
               :muuntaja   m/instance
               :middleware [
-                           ;; [wrap-debug-reqmap "complete"]
                            parameters/parameters-middleware
                            rrc/coerce-request-middleware
                            muuntaja/format-response-middleware
@@ -81,7 +84,9 @@
                            logger/wrap-with-logger
                            wrap-query-builder
                            [wrap-session {:store session-store}]
-                           wrap-anti-forgery]}})
+                           wrap-anti-forgery
+                           ;; [wrap-debug-reqmap "complete"]
+                           ]}})
 
      ;; default handler
      (wrap-query-builder

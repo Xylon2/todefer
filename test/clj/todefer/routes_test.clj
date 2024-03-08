@@ -41,32 +41,44 @@
                                    :request-method :get
                                    :headers {}
                                    :cookies {"ring-session"
-                                             {:value "testsession3"}}
-                                   })]
+                                             {:value "testsession3"}}})]
+      
       ;; log ourselfes in
 
       (expect 404 (:status response-map))
       ;; page names are included in navbar
-      (expect (string/includes? (:body response-map) "<a href=\"/page/"))
-      ))
-  )
+      (expect (string/includes? (:body response-map) "<a href=\"/page/")))))
+
+(deftest test-not-found-static
+  (expecting "unauthenticated"
+    (let [response-map ((handler) {:uri "/public/bliblablib"
+                                   :query-string nil
+                                   :request-method :get
+                                   :headers {}
+                                   })]
+      (expect 404 (:status response-map))
+      ;; not exposing page names in navbar
+      (expect (not (string/includes? (:body response-map) "<a href=\"/page/")))))
+
+  (expecting "authenticated"
+    (swap! session-atom assoc "testsession3" {:user "foo"})
+    (let [response-map ((handler) {:uri "/public/bliblablib"
+                                   :query-string nil
+                                   :request-method :get
+                                   :headers {}
+                                   :cookies {"ring-session"
+                                             {:value "testsession3"}}})]
+      (expect 404 (:status response-map))
+      ;; not exposing page names in navbar
+      (expect (string/includes? (:body response-map) "<a href=\"/page/")))))
 
 (comment
- (deftest test-not-found-static
-   (expecting "unauthenticated"
-     (let [response-map ((handler) {:uri "/"
-                                    :query-string nil
-                                    :request-method :get
-                                    :headers {}
-                                    })]))
-   )
-
- (deftest test-not-found-page
-   (expecting "unauthenticated"
-     (let [response-map ((handler) {:uri "/"
-                                    :query-string nil
-                                    :request-method :get
-                                    :headers {}
-                                    })]))
-   )
- )
+  (deftest test-not-found-page
+    (expecting "unauthenticated"
+      (let [response-map ((handler) {:uri "/"
+                                     :query-string nil
+                                     :request-method :get
+                                     :headers {}
+                                     })]))
+    )
+  )

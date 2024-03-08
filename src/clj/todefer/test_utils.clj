@@ -26,8 +26,7 @@
   []
   (fn [f]
     (reset! test-system (or (system-state) (core/start-system :test)))
-    (f)
-    (core/halt-system @test-system)))
+    (f)))
 
 ;; the lines below mean, if starting a REPL from here, it uses devtest profile
 

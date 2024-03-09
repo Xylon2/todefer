@@ -12,6 +12,7 @@
             [ring.middleware.session.memory :as memory]
             [clojure.spec.alpha :as s]
             [todefer.handlers :as hl]
+            [todefer.task-controllers :as tc]
             [ring.logger :as logger]
             [clojure.string :as string]
             [clojure.pprint]
@@ -66,6 +67,10 @@
        ["/page/:page-name" {:middleware [wrap-auth]
                             :get {:handler hl/display-page
                                   :parameters {:path {:page-name ::string}}}}]
+       ["/page/:page-name/add-task" {:middleware [wrap-auth]
+                                     :post {:handler tc/add-task-handler
+                                            :parameters {:path {:page-name ::string}
+                                                         :form {:task_name ::string}}}}]
        ["/login" {:get {:handler hl/login-handler}
                   :post {:handler hl/login-post-handler
                          :parameters {:form {:username ::string

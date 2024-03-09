@@ -2,19 +2,20 @@
     (:require [hiccup2.core :as h]))
 
 (defn render-base
-  "the basic structure of an html document. takes a page-list title and list of
+  "the basic structure of an html document. takes a title and list of
   elements
 
-  The pagelist is a list of maps, each containing page_link & page_title.
-
-  If a fourth arg is provided it will go into the actionbar"
+  The pagelist is a list of maps, each containing page_link & page_title."
   [title contents & {:keys [pagelist scripts actionbar]}]
   (->> [:html {:lang "en"}
         [:head
          [:title title]
          [:meta {:name "viewport"
                  :content "width=device-width, initial-scale=1.0"}]
-         [:link {:rel "stylesheet" :href "/public/style/style.css"}]]
+         [:link {:rel "stylesheet" :href "/public/style/style.css"}]
+         [:script {:src "https://unpkg.com/htmx.org@1.9.10"
+          :integrity "sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC"
+          :crossorigin "anonymous"}]]
         [:body
          [:div#topbar.hero-header
           [:nav#navbar.width
@@ -119,6 +120,23 @@
 
 (defn tasks-page
   "renders a full page of tasks"
-  [pagelist page-name page-id due-tasks defcats-named defcats-dated]
+  [pagelist page-name page-id due-tasks defcats-named defcats-dated f-token]
   (let [contents (render-tasks page-id due-tasks defcats-named defcats-dated)]
-    (render-base (str page-name " tasks") contents :scripts ["/public/cljs/todefer.js"] :pagelist pagelist)))
+    (render-base
+     (str page-name " tasks")
+     contents
+     :scripts ["/public/cljs/todefer.js"]
+     :pagelist pagelist
+     :actionbar [[:form.navbar-item {:method "post"
+                                     :style "padding-left: 0;"}
+                  [:input {:name "__anti-forgery-token"
+                           :type "hidden"
+                           :value f-token}]
+                  [:span
+                   [:input#add_new {:type "text"
+                                    :name "task_name"}]
+                   [:button {:hx-post (str "/page/" page-name "/add-task")
+                             :hx-trigger "click"
+                             :hx-include "[name='task_name']"
+                             :hx-target "main"} "add task"]]]])))
+

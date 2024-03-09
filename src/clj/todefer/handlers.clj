@@ -78,7 +78,8 @@
 (defn display-page
   "displays a task, habit or agenda page"
   [{exec-query :q-builder
-    {{page-name :page-name} :path} :parameters :as request}]
+    {{page-name :page-name} :path} :parameters :as request
+    f-token :anti-forgery-token}]
 
   ;; check the page_name is legit and find out what type of page it is
   (let [page-list (exec-query (q/list-pages))
@@ -101,7 +102,8 @@
                 page-id
                 due-tasks
                 defcatsnamed
-                defcatsdated))}
+                defcatsdated
+                f-token))}
       ;; "habit"
       ;; {:status 200
       ;;  :headers {"Content-Type" "text/html"}
@@ -145,3 +147,4 @@
     {:status 200
      :headers {"Content-Type" "text/html"}
      :body (ph/render-login redirect f-token "Login failed")}))
+

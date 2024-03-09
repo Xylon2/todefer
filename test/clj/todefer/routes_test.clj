@@ -3,12 +3,12 @@
             [expectations.clojure.test
              :refer [defexpect expect expecting
                      approximately between between' functionally
-                     side-effects]]
+                     side-effects from-each]]
             [todefer.test-utils :as tu]
-            [todefer.routes :refer [session-atom]]
             [clojure.string :as string]))
 
 (use-fixtures :once (tu/system-fixture))
+(use-fixtures :once (tu/logged-in-fixture))
 
 (defn handler [] (:todefer/handler (tu/system-state)))
 
@@ -20,65 +20,53 @@
                             })]
 
     (expect 200 (:status response-map))
-    (expect (string/includes? (:body response-map) "Please login"))))
+    (expect #(string/includes? (:body response-map) %) "Please login")))
 
-(deftest test-not-found-global
-  (expecting "unauthenticated"
-    (let [response-map ((handler) {:uri "/bliblablib"
-                                   :query-string nil
-                                   :request-method :get
-                                   :headers {}
-                                   })]
-      (expect 404 (:status response-map))
-      ;; not exposing page names in navbar
-      (expect (not (string/includes? (:body response-map) "<a href=\"/page/")))
-      ))
-  
-  (expecting "authenticated"
-    (swap! session-atom assoc "testsession3" {:user "foo"})
-    (let [response-map ((handler) {:uri "/bliblablib"
-                                   :query-string nil
-                                   :request-method :get
-                                   :headers {}
-                                   :cookies {"ring-session"
-                                             {:value "testsession3"}}})]
-      
-      ;; log ourselfes in
+(deftest test-not-found-unauthenticated
+  (expect #(#{404 303} %)
+          (from-each [url ["/bliblablib"
+                           "/public/bliblablib"
+                           "/page/bliblablib"]]
+            (:status
+             ((handler) {:uri url
+                         :query-string nil
+                         :request-method :get
+                         :headers {}}))))
 
-      (expect 404 (:status response-map))
-      ;; page names are included in navbar
-      (expect (string/includes? (:body response-map) "<a href=\"/page/")))))
+  ;; not exposing page names in navbar
+  (expect (complement #(string/includes? % "<a href=\"/page/"))
+          (from-each [url ["/bliblablib"
+                           "/public/bliblablib"
+                           "/page/bliblablib"]]
+            (:body
+             ((handler) {:uri url
+                         :query-string nil
+                         :request-method :get
+                         :headers {}})))))
 
-(deftest test-not-found-static
-  (expecting "unauthenticated"
-    (let [response-map ((handler) {:uri "/public/bliblablib"
-                                   :query-string nil
-                                   :request-method :get
-                                   :headers {}
-                                   })]
-      (expect 404 (:status response-map))
-      ;; not exposing page names in navbar
-      (expect (not (string/includes? (:body response-map) "<a href=\"/page/")))))
+(deftest test-not-found-authenticated
+  (expect 404
+          (from-each [url ["/bliblablib"
+                           "/public/bliblablib"
+                           "/page/bliblablib"]]
+            (:status
+             ((handler) {:uri url
+                         :query-string nil
+                         :request-method :get
+                         :headers {}
+                         :cookies {"ring-session"
+                                   {:value "testsession1"}}}))))
 
-  (expecting "authenticated"
-    (swap! session-atom assoc "testsession3" {:user "foo"})
-    (let [response-map ((handler) {:uri "/public/bliblablib"
-                                   :query-string nil
-                                   :request-method :get
-                                   :headers {}
-                                   :cookies {"ring-session"
-                                             {:value "testsession3"}}})]
-      (expect 404 (:status response-map))
-      ;; not exposing page names in navbar
-      (expect (string/includes? (:body response-map) "<a href=\"/page/")))))
+  ;; page names are included in navbar
+  (expect #(string/includes? % "<a href=\"/page/")
+          (from-each [url ["/bliblablib"
+                           "/public/bliblablib"
+                           "/page/bliblablib"]]
+            (:body
+             ((handler) {:uri url
+                         :query-string nil
+                         :request-method :get
+                         :headers {}
+                         :cookies {"ring-session"
+                                   {:value "testsession1"}}})))))
 
-(comment
-  (deftest test-not-found-page
-    (expecting "unauthenticated"
-      (let [response-map ((handler) {:uri "/"
-                                     :query-string nil
-                                     :request-method :get
-                                     :headers {}
-                                     })]))
-    )
-  )

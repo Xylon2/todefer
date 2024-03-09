@@ -22,6 +22,11 @@
     (expect 200 (:status response-map))
     (expect #(string/includes? (:body response-map) %) "Please login")))
 
+;; test the three different code paths which can result in a 404.
+;; - the router can trigger a 404
+;; - the static files serving middleware (ring's wrap-resource) can trigger a 404
+;; - the page names come from database so the page handler generates it's own 404s
+
 (deftest test-not-found-unauthenticated
   (expect #(#{404 303} %)
           (from-each [url ["/bliblablib"

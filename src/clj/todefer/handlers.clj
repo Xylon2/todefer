@@ -70,12 +70,10 @@
 
 (defn home-handler
   "display the list of questions"
-  [{exec-query :q-builder
-    session :session}]
+  [{exec-query :q-builder}]
   {:status 200
    :headers {"Content-Type" "text/html"}
-   :body (ph/render-message "Hello World!" (when (contains? session :user)
-                                             (exec-query (q/list-pages))))})
+   :body (ph/render-message "Select a page" (exec-query (q/list-pages)))})
 
 (defn display-page
   "displays a task, habit or agenda page"

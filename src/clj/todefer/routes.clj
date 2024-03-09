@@ -61,7 +61,8 @@
 
     (ring/ring-handler
      (ring/router
-      [["/" {:handler hl/home-handler}]
+      [["/" {:middleware [wrap-auth]
+             :handler hl/home-handler}]
        ["/page/:page-name" {:middleware [wrap-auth]
                             :get {:handler hl/display-page
                                   :parameters {:path {:page-name ::string}}}}]

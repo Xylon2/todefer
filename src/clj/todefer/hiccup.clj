@@ -135,8 +135,8 @@
                   [:input {:name "__anti-forgery-token"
                            :type "hidden"
                            :value f-token}]
-                  [:span
-                   [:input#add_new {:type "text"
-                                    :name "task_name"}]
+                  [:div.t-container
+                   [:input#add_new.flex-input {:type "text"
+                                               :name "task_name"}]
                    [:button {:type "submit"} "add task"]]]])))
 

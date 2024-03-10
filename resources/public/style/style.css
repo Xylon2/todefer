@@ -63,7 +63,7 @@ h1,h2,h3{
 
 #actionbar {
     background-color: #e8e8e8;
-    padding: 1px 10px;
+    padding: 2px 0;
 }
 
 table {
@@ -118,4 +118,19 @@ tr {
 
 .active:after {
   content: "\2796"; /* Unicode character for "minus" sign (-) */
+}
+
+.t-container {
+  display: flex; /* Establishes a flex container */
+  justify-content: space-between; /* Distributes space between the children */
+  align-items: center; /* Aligns children vertically in the middle */
+}
+
+.flex-input {
+  flex-grow: 1; /* Allows the input to grow and fill the available space */
+  margin-right: 10px; /* Adds some space between the input and the button */
+}
+
+button {
+  white-space: nowrap; /* Prevents text wrapping inside the button */
 }

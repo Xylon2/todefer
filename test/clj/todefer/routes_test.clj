@@ -1,5 +1,6 @@
 (ns todefer.routes-test
   (:require [clojure.test :refer [deftest is use-fixtures]]
+            [todefer.routes :refer :all]
             [expectations.clojure.test
              :refer [defexpect expect expecting
                      approximately between between' functionally
@@ -75,3 +76,8 @@
                          :cookies {"ring-session"
                                    {:value "testsession1"}}})))))
 
+(deftest test-wrap-filter-minus-one
+  (expect {:parameters {:form {:task_id [123 42]}}}
+          ((wrap-filter-minus-one identity) {:parameters
+                                             {:form
+                                              {:task_id [-1 123 42]}}})))

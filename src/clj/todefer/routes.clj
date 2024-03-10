@@ -20,6 +20,7 @@
 
 (s/def ::id int?)
 (s/def ::string string?)
+(s/def ::ints-list (s/coll-of int?))
 
 ;; the reason we put the session store in this atom is so we can log ourselfes
 ;; in when testing
@@ -51,6 +52,15 @@
          :headers {"Location" (str "/login?redirect=" redirect-url)}
          :body ""}))))
 
+(defn wrap-filter-minus-one
+  "there is a kludge in-place to force certain form inputs to always be a list
+  because otherwize coercion fails. here we remove the extra items"
+  [handler]
+  (fn [req]
+    (let [nuke-minus-one #(vec (remove #{-1} %))
+          req' (update-in req [:parameters :form :task_id] nuke-minus-one)]
+      (handler req'))))
+
 (defn app
   "reitit with format negotiation and input & output coercion"
   [q-builder]
@@ -67,10 +77,13 @@
        ["/page/:page-name" {:middleware [wrap-auth]
                             :get {:handler hl/display-page
                                   :parameters {:path {:page-name ::string}}}}]
-       ["/page/:page-name/add-task" {:middleware [wrap-auth]
-                                     :post {:handler tc/add-task-handler
-                                            :parameters {:path {:page-name ::string}
-                                                         :form {:task_name ::string}}}}]
+       ["/page/:page-name/" {:middleware [wrap-auth
+                                          wrap-filter-minus-one]
+                             :post {:parameters {:path {:page-name ::string}}}}
+        ["add-task" {:post {:handler tc/add-task-handler
+                            :parameters {:form {:task_name ::string}}}}]
+        ["delete-task" {:post {:handler tc/delete-task-handler
+                               :parameters {:form {:task_id ::ints-list}}}}]]
        ["/login" {:get {:handler hl/login-handler}
                   :post {:handler hl/login-post-handler
                          :parameters {:form {:username ::string

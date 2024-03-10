@@ -76,6 +76,8 @@
            [:col {:style "width: 2em;"}]
            [:col {:style "width: 100%;"}]]
           [:tbody
+           ;; this is a kludge to force task_id to always be a list
+           [:input {:type "hidden" :name "task_id" :value "-1"}]
            (for [{:keys [highlight task_id task_name]} due-tasks]
              [:tr (when highlight {:style (str "background-color: " highlight)})
               [:td [:input {:type "checkbox" :name "task_id" :value task_id}]]
@@ -129,7 +131,6 @@
      :pagelist pagelist
      :actionbar [[:form.navbar-item {:method "post"
                                      :style "padding-left: 0;"
-                                     :hx-post (str "/page/" page-name "/add-task")
                                      :hx-target "main"
                                      :hx-on:htmx:after-request "this.reset()"}
                   [:input {:name "__anti-forgery-token"
@@ -138,5 +139,12 @@
                   [:div.t-container
                    [:input#add_new.flex-input {:type "text"
                                                :name "task_name"}]
-                   [:button {:type "submit"} "add task"]]]])))
+                   [:button {:type "submit"
+                             :hx-post (str "/page/" page-name "/add-task")}
+                    "add task"]]
+                  [:div
+                   [:button {:type "submit"
+                             :hx-post (str "/page/" page-name "/delete-task")
+                             :hx-include "[name='task_id']"}
+                    "delete task"]]]])))
 

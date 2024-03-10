@@ -24,12 +24,20 @@
           (.setAttribute (byid "action_defer_existing") "name" "action")
           (.submit (byid "due_tasks_form")))))))
 
-(let [elements (byclass "collapsible")
-      deferbutton (byid "deferbutton")]
+(defn setup-collapsibles
+  "setup the collapsibles"
+  []
+  (let [elements (byclass "collapsible")]
 
-  ;; collapsibles
-  (doseq [elem elements]
-    (.addEventListener elem "click" collapser))
+    ;; collapsibles
+    (doseq [elem elements]
+      (.addEventListener elem "click" collapser))))
+
+(let [deferbutton (byid "deferbutton")]
+
+  (setup-collapsibles)
+
+  (.onLoad js/htmx setup-collapsibles)
 
   ;; defer button handler
   (.addEventListener deferbutton "change" deferhandler))

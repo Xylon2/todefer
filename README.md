@@ -1,24 +1,3 @@
-This branch serves as a template to make your own web app, with authenticated pages.
-
-First, ensure you're on the correct branch, and delete the .git:
-```
-git checkout template
-rm -rf .git
-```
-
-Next name your project:
-```
-./name-project.sh
-```
-
-Tidy up and make your new git repo:
-```
-rm name-project.sh
-git init
-git add .
-git commit -m
-```
-
 Create a PostgreSQL database [like this](http://readtheorg.xylon.me.uk/local_postgres.html#org12d8c14).
 
 Then, make a `env/dev/resources/db-credentials.edn` of the form:
@@ -37,4 +16,9 @@ Now migrate your database. Fire up repl and run this in your `user` namespace:
 Now add your dev admin user:
 ```
 (query (q/create-user "testuser" "testpass"))
+```
+
+Don't forget to build your js:
+```
+npx shadow-cljs compile app
 ```

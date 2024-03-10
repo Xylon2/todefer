@@ -9,7 +9,8 @@
             [ring.middleware.content-type :refer [wrap-content-type]]
             [ring.middleware.anti-forgery :refer [wrap-anti-forgery]]
             [ring.middleware.session :refer [wrap-session]]
-            [ring.middleware.session.memory :as memory]
+            ;; [ring.middleware.session.memory :as memory]
+            [ring.redis.session :refer [redis-store]]
             [clojure.spec.alpha :as s]
             [todefer.handlers :as hl]
             [todefer.task-controllers :as tc]
@@ -25,6 +26,10 @@
 ;; the reason we put the session store in this atom is so we can log ourselfes
 ;; in when testing
 (def session-atom (atom {}))
+
+(def conn {:pool {}
+           :spec {:host "127.0.0.1"
+                  :port 6379}})
 
 (defn wrap-debug-reqmap
   "debug middleware to save the requestmap to a file so we can analyze"
@@ -68,7 +73,8 @@
   (let [wrap-query-builder (fn [handler]
                              (fn [request]
                                (handler (assoc request :q-builder q-builder))))
-        session-store (memory/memory-store session-atom)]
+        ;; session-store (memory/memory-store session-atom)
+        session-store (redis-store conn)]
 
     (ring/ring-handler
      (ring/router

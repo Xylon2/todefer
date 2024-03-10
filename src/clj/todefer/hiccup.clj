@@ -128,15 +128,15 @@
      :scripts ["/public/cljs/todefer.js"]
      :pagelist pagelist
      :actionbar [[:form.navbar-item {:method "post"
-                                     :style "padding-left: 0;"}
+                                     :style "padding-left: 0;"
+                                     :hx-post (str "/page/" page-name "/add-task")
+                                     :hx-target "main"
+                                     :hx-on:htmx:after-request "this.reset()"}
                   [:input {:name "__anti-forgery-token"
                            :type "hidden"
                            :value f-token}]
                   [:span
                    [:input#add_new {:type "text"
                                     :name "task_name"}]
-                   [:button {:hx-post (str "/page/" page-name "/add-task")
-                             :hx-trigger "click"
-                             :hx-include "[name='task_name']"
-                             :hx-target "main"} "add task"]]]])))
+                   [:button {:type "submit"} "add task"]]]])))
 

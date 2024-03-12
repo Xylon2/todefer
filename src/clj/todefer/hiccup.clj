@@ -129,10 +129,10 @@
      contents
      :scripts ["/public/cljs/todefer.js"]
      :pagelist pagelist
-     :actionbar [[:form.navbar-item {:method "post"
-                                     :style "padding-left: 0;"
-                                     :hx-target "main"
-                                     :hx-on:htmx:after-request "this.reset()"}
+     :actionbar [[:form {:method "post"
+                         :style "padding-left: 0;"
+                         :hx-target "main"
+                         :hx-on:htmx:after-request "this.reset()"}
                   [:input {:name "__anti-forgery-token"
                            :type "hidden"
                            :value f-token}]
@@ -146,5 +146,32 @@
                    [:button {:type "submit"
                              :hx-post (str "/page/" page-name "/delete-task")
                              :hx-include "[name='task_id']"}
-                    "delete task"]]]])))
+                    "delete"]
+                   [:button {:type "submit"
+                             :hx-post (str "/page/" page-name "/modify-task-view")
+                             :hx-include "[name='task_id']"}
+                    "modify"]]]])))
 
+(defn render-modify-tasks
+  "page to modify selected tasks"
+  [tasks f-token page-name]
+  (list[:h2 "Modify tasks"]
+       [:form {:method "post"
+               :hx-post (str "/page/" page-name "/modify-task-save")
+               :hx-target "main"}
+        [:input {:name "__anti-forgery-token"
+                 :type "hidden"
+                 :value f-token}]
+        [:table
+         [:colgroup
+          [:col]]
+         [:tbody
+           ;; this is a kludge to force these inputs to always be a list
+           [:input {:type "hidden" :name "task_id" :value "-1"}]
+           [:input {:type "hidden" :name "task_newname" :value "-1"}]
+          (for [{:keys [task_id task_name]} tasks]
+            [:tr
+             [:td
+              [:input {:type "hidden" :name "task_id" :value task_id}]
+              [:input {:type "text" :name "task_newname" :value task_name}]]])]]
+        [:button {:type "submit"} "Save changes"]]))

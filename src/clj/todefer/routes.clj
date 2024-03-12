@@ -22,6 +22,7 @@
 (s/def ::id int?)
 (s/def ::string string?)
 (s/def ::ints-list (s/coll-of int?))
+(s/def ::strs-list (s/coll-of string?))
 
 ;; the reason we put the session store in this atom is so we can log ourselfes
 ;; in when testing
@@ -62,8 +63,10 @@
   because otherwize coercion fails. here we remove the extra items"
   [handler]
   (fn [req]
-    (let [nuke-minus-one #(vec (remove #{-1} %))
-          req' (update-in req [:parameters :form :task_id] nuke-minus-one)]
+    (let [nuke-minus-one #(vec (remove #{-1 "-1"} %))
+          req' (-> req
+                (update-in [:parameters :form :task_id] nuke-minus-one)
+                (update-in [:parameters :form :task_newname] nuke-minus-one))]
       (handler req'))))
 
 (defn app
@@ -80,16 +83,30 @@
      (ring/router
       [["/" {:middleware [wrap-auth]
              :handler hl/home-handler}]
-       ["/page/:page-name" {:middleware [wrap-auth]
-                            :get {:handler hl/display-page
-                                  :parameters {:path {:page-name ::string}}}}]
-       ["/page/:page-name/" {:middleware [wrap-auth
-                                          wrap-filter-minus-one]
-                             :post {:parameters {:path {:page-name ::string}}}}
-        ["add-task" {:post {:handler tc/add-task-handler
-                            :parameters {:form {:task_name ::string}}}}]
-        ["delete-task" {:post {:handler tc/delete-task-handler
-                               :parameters {:form {:task_id ::ints-list}}}}]]
+
+       ["/page/:page-name"
+        {:middleware [wrap-auth]
+         :get {:handler hl/display-page
+               :parameters {:path {:page-name ::string}}}}]
+
+       ["/page/:page-name/"
+        {:middleware [wrap-auth
+                      wrap-filter-minus-one]
+         :post {:parameters {:path {:page-name ::string}}}}
+        ["add-task"
+         {:post {:handler tc/add-task-handler
+                 :parameters {:form {:task_name ::string}}}}]
+        ["delete-task"
+         {:post {:handler tc/delete-task-handler
+                 :parameters {:form {:task_id ::ints-list}}}}]
+        ["modify-task-view"
+         {:post {:handler tc/modify-task-view
+                 :parameters {:form {:task_id ::ints-list}}}}]
+        ["modify-task-save"
+         {:post {:handler tc/modify-task-save
+                 :parameters {:form {:task_id ::ints-list
+                                     :task_newname ::strs-list}}}}]]
+
        ["/login" {:get {:handler hl/login-handler}
                   :post {:handler hl/login-post-handler
                          :parameters {:form {:username ::string

@@ -60,7 +60,7 @@
 (defn modify-task-view
   "always accessed with POST requests.
 
-  We receive a task-list but no values. Then we render page ready to be
+  We receive a list of task_ids but no values. Then we render page ready to be
   modified"
   [{exec-query :q-builder
     {{:keys [task_id]} :form
@@ -96,3 +96,36 @@
     (if (< 0 (num-updated (exec-query (q/move-task! newpage task_id))))
       (show-tasks-200 exec-query page-name page-id)
       (show-500 ":o"))))
+
+(defn defer-task-view
+  "always accessed with POST requests.
+
+  We receive a list of task_ids. We render a date selector for them to choose
+  when to defer to. "
+  [{exec-query :q-builder
+    {{:keys [task_id]} :form
+     {page-name :page-name} :path} :parameters :as request
+    f-token :anti-forgery-token}]
+  (let [page-id (get-page-id exec-query page-name)
+        categories (exec-query (q/list-defcats-named page-id))]
+    {:status 200
+     :headers {"Content-Type" "text/html"}
+     :body (-> (ph/render-defer-tasks task_id categories f-token page-name)
+               h/html
+               str)}))
+
+(defn defer-task-date-save
+  ""
+  []
+  true)
+
+(defn defer-task-category-save
+  ""
+  []
+  true)
+
+(defn defer-task-newcategory-save
+  ""
+  []
+  true)
+

@@ -146,11 +146,11 @@
                              :hx-post (str "/page/" page-name "/add-task")}
                     "add task"]]
                   [:div
-                   [:button {:type "submit"
+                   [:button {:type "button"
                              :hx-post (str "/page/" page-name "/delete-task")
                              :hx-include "[name='task_id']"}
                     "delete"]
-                   [:button {:type "submit"
+                   [:button {:type "button"
                              :hx-post (str "/page/" page-name "/modify-task-view")
                              :hx-include "[name='task_id']"}
                     "modify"]
@@ -160,28 +160,63 @@
                                      :hx-include "[name='task_id']"}
                             [:option {:value ""} "move"]]
                            (for [{:keys [page_name page_id]} other-task-pages]
-                             [:option {:value page_id} page_name])))]]])))
+                             [:option {:value page_id} page_name])))
+                   [:button {:type "button"
+                             :hx-post (str "/page/" page-name "/defer-task-view")
+                             :hx-include "[name='task_id']"}
+                    "defer"]
+                   ]]])))
 
 (defn render-modify-tasks
   "page to modify selected tasks"
   [tasks f-token page-name]
-  (list[:h2 "Modify tasks"]
-       [:form {:method "post"
-               :hx-post (str "/page/" page-name "/modify-task-save")
-               :hx-target "main"}
-        [:input {:name "__anti-forgery-token"
-                 :type "hidden"
-                 :value f-token}]
-        [:table
-         [:colgroup
-          [:col]]
-         [:tbody
-          ;; this is a kludge to force these inputs to always be a list
-          [:input {:type "hidden" :name "task_id" :value "-1"}]
-          [:input {:type "hidden" :name "task_newname" :value "59866220-59be-4143-90b3-63c2861eadca"}]
-          (for [{:keys [task_id task_name]} tasks]
-            [:tr
-             [:td
-              [:input {:type "hidden" :name "task_id" :value task_id}]
-              [:input {:type "text" :name "task_newname" :value task_name}]]])]]
-        [:button {:type "submit"} "Save changes"]]))
+  (list
+   [:h2 "Modify tasks"]
+   [:form {:method "post"
+           :hx-post (str "/page/" page-name "/modify-task-save")
+           :hx-target "main"}
+    [:input {:name "__anti-forgery-token"
+             :type "hidden"
+             :value f-token}]
+    [:table
+     [:colgroup
+      [:col]]
+     [:tbody
+      ;; this is a kludge to force these inputs to always be a list
+      [:input {:type "hidden" :name "task_id" :value "-1"}]
+      [:input {:type "hidden" :name "task_newname" :value "59866220-59be-4143-90b3-63c2861eadca"}]
+      (for [{:keys [task_id task_name]} tasks]
+        [:tr
+         [:td
+          [:input {:type "hidden" :name "task_id" :value task_id}]
+          [:input {:type "text" :name "task_newname" :value task_name}]]])]]
+    [:button {:type "submit"} "Save changes"]]))
+
+(defn render-defer-tasks
+  "page to defer tasks to either date or category"
+  [task_id categories f-token page-name]
+  (list
+   [:h2 "Defer to..."]
+   [:form {:method "post"
+           :hx-target "main"}
+    [:input {:name "__anti-forgery-token"
+             :type "hidden"
+             :value f-token}]
+    [:input {:type "hidden" :name "task_id" :value "-1"}]
+    (for [tid task_id]
+      [:input {:type "hidden" :name "task_id" :value tid}])
+    [:h3 "date"]
+    [:input {:type "date" :name "date"}]
+    [:h3 "existing category"]
+    (when (< 0 (count categories))
+      (into [:select {:name "catname"
+                      :hx-post (str "/page/" page-name "/defer-task-category-save")}
+             [:option "select category"]]
+            (for [{:keys [cat_id cat_name]} categories]
+              [:option {:value cat_id} cat_name]
+              )))
+    [:h3 "new category"]
+    [:input {:type "text" :name "new-catname"}]
+    [:button {:type "submit"
+              :hx-post (str "/page/" page-name "/defer-task-newcategory-save")}
+     "submit"]]))

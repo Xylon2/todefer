@@ -93,12 +93,23 @@
         {:middleware [wrap-auth
                       wrap-filter-dummy-values]
          :post {:parameters {:path {:page-name ::string}}}}
+
+        ;; single-request actions. these run a db query and re-display the
+        ;; normal page contents
         ["add-task"
          {:post {:handler tc/add-task-handler
                  :parameters {:form {:task_name ::string}}}}]
         ["delete-task"
          {:post {:handler tc/delete-task-handler
                  :parameters {:form {:task_id ::ints-list}}}}]
+        ["move-task"
+         {:post {:handler tc/move-task-handler
+                 :parameters {:form {:task_id ::ints-list
+                                     :newpage ::string}}}}]
+
+        ;; multi-request actions. these actions have a view page, where the user
+        ;; is asked for more input, and a save page, which will run a query and
+        ;; re-display the normal page contents
         ["modify-task-view"
          {:post {:handler tc/modify-task-view
                  :parameters {:form {:task_id ::ints-list}}}}]
@@ -106,10 +117,25 @@
          {:post {:handler tc/modify-task-save
                  :parameters {:form {:task_id ::ints-list
                                      :task_newname ::strs-list}}}}]
-        ["move-task"
-         {:post {:handler tc/move-task-handler
-                 :parameters {:form {:task_id ::ints-list
-                                     :newpage ::string}}}}]]
+
+        ;; the defer task page has three possible actions
+        ["defer-task-view"
+         {:post {:handler tc/defer-task-view
+                 :parameters {:form {:task_id ::ints-list}}}}]
+
+        ["defer-task-date-save"
+         {:post {:handler tc/defer-task-date-save
+                 :parameters {:form {:task_id ::ints-list}}}}]
+
+        ["defer-task-category-save"
+         {:post {:handler tc/defer-task-category-save
+                 :parameters {:form {:task_id ::ints-list}}}}]
+
+        ["defer-task-newcategory-save"
+         {:post {:handler tc/defer-task-newcategory-save
+                 :parameters {:form {:task_id ::ints-list}}}}]
+
+        ]
 
        ["/login" {:get {:handler hl/login-handler}
                   :post {:handler hl/login-post-handler

@@ -58,15 +58,15 @@
          :headers {"Location" (str "/login?redirect=" redirect-url)}
          :body ""}))))
 
-(defn wrap-filter-minus-one
+(defn wrap-filter-dummy-values
   "there is a kludge in-place to force certain form inputs to always be a list
   because otherwize coercion fails. here we remove the extra items"
   [handler]
   (fn [req]
-    (let [nuke-minus-one #(vec (remove #{-1 "-1"} %))
+    (let [nuke-values #(vec (remove #{-1 "59866220-59be-4143-90b3-63c2861eadca"} %))
           req' (-> req
-                (update-in [:parameters :form :task_id] nuke-minus-one)
-                (update-in [:parameters :form :task_newname] nuke-minus-one))]
+                (update-in [:parameters :form :task_id] nuke-values)
+                (update-in [:parameters :form :task_newname] nuke-values))]
       (handler req'))))
 
 (defn app
@@ -91,7 +91,7 @@
 
        ["/page/:page-name/"
         {:middleware [wrap-auth
-                      wrap-filter-minus-one]
+                      wrap-filter-dummy-values]
          :post {:parameters {:path {:page-name ::string}}}}
         ["add-task"
          {:post {:handler tc/add-task-handler

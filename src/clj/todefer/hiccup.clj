@@ -168,7 +168,7 @@
          [:tbody
            ;; this is a kludge to force these inputs to always be a list
            [:input {:type "hidden" :name "task_id" :value "-1"}]
-           [:input {:type "hidden" :name "task_newname" :value "-1"}]
+           [:input {:type "hidden" :name "task_newname" :value "59866220-59be-4143-90b3-63c2861eadca"}]
           (for [{:keys [task_id task_name]} tasks]
             [:tr
              [:td

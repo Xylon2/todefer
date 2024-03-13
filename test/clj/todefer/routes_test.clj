@@ -76,8 +76,8 @@
                          :cookies {"ring-session"
                                    {:value "testsession1"}}})))))
 
-(deftest test-wrap-filter-minus-one
+(deftest test-wrap-filter-dummy-values
   (expect {:parameters {:form {:task_id [123 42]}}}
-          ((wrap-filter-minus-one identity) {:parameters
-                                             {:form
-                                              {:task_id [-1 123 42]}}})))
+          ((wrap-filter-dummy-values identity) {:parameters
+                                                {:form
+                                                 {:task_id [-1 123 42]}}})))

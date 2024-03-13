@@ -32,13 +32,17 @@
    :headers {"Content-Type" "text/html"}
    :body message})
 
+(defn get-page-id
+  "given the page name, get page id"
+  [exec-query page-name]
+  (:page_id (exec-query (q/get-page page-name))))
+
 (defn add-task-handler
   "add task"
   [{exec-query :q-builder
     {{:keys [task_name]} :form
      {:keys [page-name]} :path} :parameters}]
-  (let [{page-type :page_type
-         page-id :page_id} (exec-query (q/get-page page-name))]
+  (let [page-id (get-page-id exec-query page-name)]
       (if (one-update? (exec-query (q/add-task! task_name page-id)))
         (show-tasks-200 exec-query page-name page-id)
         (show-500 ":o"))))
@@ -48,8 +52,7 @@
   [{exec-query :q-builder
     {{:keys [task_id]} :form
      {:keys [page-name]} :path} :parameters}]
-  (let [{page-type :page_type
-         page-id :page_id} (exec-query (q/get-page page-name))]
+  (let [page-id (get-page-id exec-query page-name)]
     (if (< 0 (num-updated (exec-query (q/delete-task! task_id))))
       (show-tasks-200 exec-query page-name page-id)
       (show-500 ":o"))))
@@ -79,8 +82,17 @@
     {{:keys [task_id task_newname]} :form
      {page-name :page-name} :path} :parameters :as request
     f-token :anti-forgery-token}]
-  (let [{page-type :page_type
-         page-id :page_id} (exec-query (q/get-page page-name))]
+  (let [page-id (get-page-id exec-query page-name)]
     (doseq [[tid tname] (map vector task_id task_newname)]  ;; pair them up
       (exec-query (q/modify-task! tid tname)))
    (show-tasks-200 exec-query page-name page-id)))
+
+(defn move-task-handler
+  "move one or more tasks to a different page"
+  [{exec-query :q-builder
+    {{:keys [task_id newpage]} :form
+     {:keys [page-name]} :path} :parameters}]
+  (let [page-id (get-page-id exec-query page-name)]
+    (if (< 0 (num-updated (exec-query (q/move-task! newpage task_id))))
+      (show-tasks-200 exec-query page-name page-id)
+      (show-500 ":o"))))

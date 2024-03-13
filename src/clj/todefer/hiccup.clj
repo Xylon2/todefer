@@ -123,7 +123,10 @@
 (defn tasks-page
   "renders a full page of tasks"
   [pagelist page-name page-id due-tasks defcats-named defcats-dated f-token]
-  (let [contents (render-tasks page-id due-tasks defcats-named defcats-dated)]
+  (let [contents (render-tasks page-id due-tasks defcats-named defcats-dated)
+        other-task-pages (filter #(and (= "task" (:page_type %))
+                                       (not= "Lorem ipsum" (:page_name %)))
+                                 pagelist)]
     (render-base
      (str page-name " tasks")
      contents
@@ -150,7 +153,14 @@
                    [:button {:type "submit"
                              :hx-post (str "/page/" page-name "/modify-task-view")
                              :hx-include "[name='task_id']"}
-                    "modify"]]]])))
+                    "modify"]
+                   (when (< 0 (count other-task-pages))
+                     (into [:select {:name "newpage"
+                                     :hx-post (str "/page/" page-name "/move-task")
+                                     :hx-include "[name='task_id']"}
+                            [:option {:value ""} "move"]]
+                           (for [{:keys [page_name page_id]} other-task-pages]
+                             [:option {:value page_id} page_name])))]]])))
 
 (defn render-modify-tasks
   "page to modify selected tasks"
@@ -166,9 +176,9 @@
          [:colgroup
           [:col]]
          [:tbody
-           ;; this is a kludge to force these inputs to always be a list
-           [:input {:type "hidden" :name "task_id" :value "-1"}]
-           [:input {:type "hidden" :name "task_newname" :value "59866220-59be-4143-90b3-63c2861eadca"}]
+          ;; this is a kludge to force these inputs to always be a list
+          [:input {:type "hidden" :name "task_id" :value "-1"}]
+          [:input {:type "hidden" :name "task_newname" :value "59866220-59be-4143-90b3-63c2861eadca"}]
           (for [{:keys [task_id task_name]} tasks]
             [:tr
              [:td

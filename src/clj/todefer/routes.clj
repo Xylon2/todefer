@@ -105,7 +105,11 @@
         ["modify-task-save"
          {:post {:handler tc/modify-task-save
                  :parameters {:form {:task_id ::ints-list
-                                     :task_newname ::strs-list}}}}]]
+                                     :task_newname ::strs-list}}}}]
+        ["move-task"
+         {:post {:handler tc/move-task-handler
+                 :parameters {:form {:task_id ::ints-list
+                                     :newpage ::string}}}}]]
 
        ["/login" {:get {:handler hl/login-handler}
                   :post {:handler hl/login-post-handler

@@ -206,7 +206,9 @@
     (for [tid task_id]
       [:input {:type "hidden" :name "task_id" :value tid}])
     [:h3 "date"]
-    [:input {:type "date" :name "date"}]
+    [:input {:type "date"
+             :name "date"
+             :hx-post (str "/page/" page-name "/defer-task-date-save")}]
     [:h3 "existing category"]
     (when (< 0 (count categories))
       (into [:select {:name "catname"

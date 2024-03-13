@@ -12,6 +12,8 @@
 
 (def one-update? #(check-num-updated 1 %))
 
+(def some-updated? #(< 0 (num-updated %)))
+
 (defn show-tasks-200
   [exec-query page-name page-id]
   (let [due-tasks (exec-query (q/list-due-tasks page-id))
@@ -53,7 +55,7 @@
     {{:keys [task_id]} :form
      {:keys [page-name]} :path} :parameters}]
   (let [page-id (get-page-id exec-query page-name)]
-    (if (< 0 (num-updated (exec-query (q/delete-task! task_id))))
+    (if (some-updated? (exec-query (q/delete-task! task_id)))
       (show-tasks-200 exec-query page-name page-id)
       (show-500 ":o"))))
 
@@ -93,7 +95,7 @@
     {{:keys [task_id newpage]} :form
      {:keys [page-name]} :path} :parameters}]
   (let [page-id (get-page-id exec-query page-name)]
-    (if (< 0 (num-updated (exec-query (q/move-task! newpage task_id))))
+    (if (some-updated? (exec-query (q/move-task! newpage task_id)))
       (show-tasks-200 exec-query page-name page-id)
       (show-500 ":o"))))
 
@@ -115,17 +117,26 @@
                str)}))
 
 (defn defer-task-date-save
-  ""
-  []
-  true)
+  "defer task(s) to a date"
+  [{exec-query :q-builder
+    {{:keys [task_id newpage date]} :form
+     {:keys [page-name]} :path} :parameters}]
+  (let [page-id (get-page-id exec-query page-name)
+        categories (exec-query (q/list-defcats-dated page-id date))
+        cat-id (if (= 1 (count categories))
+                 (:cat_id (first categories))
+                 (exec-query (q/create-defcat-dated! date)))]
+    (if (some-updated? (exec-query (q/defer-task-dated! cat-id task_id)))
+      (show-tasks-200 exec-query page-name page-id)
+      (show-500 ":o"))))
 
 (defn defer-task-category-save
-  ""
+  "defer task(s) to a named category"
   []
   true)
 
 (defn defer-task-newcategory-save
-  ""
+  "defer task(s) to a new category"
   []
   true)
 

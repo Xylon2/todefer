@@ -235,7 +235,7 @@
        (values [{:def_date [:cast def_date :date]}])
        (returning :cat_id))
    
-   identity])
+   (fn [[{cat_id :cat_id}]] cat_id)])
 
 (defn delete-defcat-named!
   "delete a defCatNamed"

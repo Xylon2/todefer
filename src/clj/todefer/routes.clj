@@ -23,6 +23,7 @@
 (s/def ::string string?)
 (s/def ::ints-list (s/coll-of int?))
 (s/def ::strs-list (s/coll-of string?))
+(s/def ::iso-date #(re-matches #"\d{4}-\d{2}-\d{2}" %))
 
 ;; the reason we put the session store in this atom is so we can log ourselfes
 ;; in when testing
@@ -122,15 +123,13 @@
         ["defer-task-view"
          {:post {:handler tc/defer-task-view
                  :parameters {:form {:task_id ::ints-list}}}}]
-
         ["defer-task-date-save"
          {:post {:handler tc/defer-task-date-save
-                 :parameters {:form {:task_id ::ints-list}}}}]
-
+                 :parameters {:form {:task_id ::ints-list
+                                     :date ::iso-date}}}}]
         ["defer-task-category-save"
          {:post {:handler tc/defer-task-category-save
                  :parameters {:form {:task_id ::ints-list}}}}]
-
         ["defer-task-newcategory-save"
          {:post {:handler tc/defer-task-newcategory-save
                  :parameters {:form {:task_id ::ints-list}}}}]

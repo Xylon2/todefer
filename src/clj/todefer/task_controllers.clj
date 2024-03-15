@@ -119,7 +119,7 @@
 (defn defer-task-date-save
   "defer task(s) to a date"
   [{exec-query :q-builder
-    {{:keys [task_id newpage date]} :form
+    {{:keys [task_id date]} :form
      {:keys [page-name]} :path} :parameters}]
   (let [page-id (get-page-id exec-query page-name)
         categories (exec-query (q/list-defcats-dated page-id date))

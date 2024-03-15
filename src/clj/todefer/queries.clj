@@ -226,7 +226,7 @@
        (values [{:cat_name cat_name}])
        (returning :cat_id))
    
-   identity])
+   (fn [[{cat_id :cat_id}]] cat_id)])
 
 (defn create-defcat-dated!
   "create a defCatDated"

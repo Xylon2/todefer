@@ -125,10 +125,8 @@
 
 (deftest test-create-defcat-named!
   (testing "create a defCatNamed with a name"
-    (is (integer? (-> ((tu/q-fn)
-                       (create-defcat-named! "foobar"))
-                      first
-                      :cat_id)))))
+    (is (integer? ((tu/q-fn)
+                   (create-defcat-named! "foobar"))))))
 
 (deftest test-create-defcat-dated!
   (testing "create a defCatDated"

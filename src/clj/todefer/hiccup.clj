@@ -211,7 +211,7 @@
              :hx-post (str "/page/" page-name "/defer-task-date-save")}]
     [:h3 "existing category"]
     (when (< 0 (count categories))
-      (into [:select {:name "catname"
+      (into [:select {:name "cat_id"
                       :hx-post (str "/page/" page-name "/defer-task-category-save")}
              [:option "select category"]]
             (for [{:keys [cat_id cat_name]} categories]

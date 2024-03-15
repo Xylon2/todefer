@@ -119,10 +119,12 @@
                                      :date ::iso-date}}}}]
         ["defer-task-category-save"
          {:post {:handler tc/defer-task-category-save
-                 :parameters {:form {:task_id ::ints-list}}}}]
+                 :parameters {:form {:task_id ::ints-list
+                                     :cat_id ::id}}}}]
         ["defer-task-newcategory-save"
          {:post {:handler tc/defer-task-newcategory-save
-                 :parameters {:form {:task_id ::ints-list}}}}]
+                 :parameters {:form {:task_id ::ints-list
+                                     :new-catname ::string}}}}]
 
         ]
 

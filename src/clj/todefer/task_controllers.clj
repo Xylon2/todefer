@@ -132,11 +132,26 @@
 
 (defn defer-task-category-save
   "defer task(s) to a named category"
-  []
-  true)
+  [{exec-query :q-builder
+    {{:keys [task_id cat_id]} :form
+     {:keys [page-name]} :path} :parameters}]
+  (let [page-id (get-page-id exec-query page-name)]
+    (if (some-updated? (exec-query (q/defer-task-named! cat_id task_id)))
+      (show-tasks-200 exec-query page-name page-id)
+      (show-500 ":o"))))
 
 (defn defer-task-newcategory-save
   "defer task(s) to a new category"
-  []
-  true)
+  [{exec-query :q-builder
+    {{:keys [task_id new-catname]} :form
+     {:keys [page-name]} :path} :parameters}]
+  (let [page-id (get-page-id exec-query page-name)
+        categories (exec-query (q/list-defcats-named page-id new-catname))
+        cat-id (if (< 0 (count categories))
+                 (:cat_id (first categories))
+                 (exec-query (q/create-defcat-named! new-catname)))]
+    (prn categories)
+    (if (some-updated? (exec-query (q/defer-task-named! cat-id task_id)))
+      (show-tasks-200 exec-query page-name page-id)
+      (show-500 ":o"))))
 

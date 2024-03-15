@@ -132,10 +132,8 @@
 
 (deftest test-create-defcat-dated!
   (testing "create a defCatDated"
-    (is (integer? (-> ((tu/q-fn)
-                       (create-defcat-dated! "2051-06-14"))
-                      first
-                      :cat_id)))))
+    (is (integer? ((tu/q-fn)
+                   (create-defcat-dated! "2051-06-14"))))))
 
 (deftest test-delete-defcat-named!
   (testing "delete a defCatNamed"

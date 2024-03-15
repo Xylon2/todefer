@@ -3,8 +3,13 @@
  :db.sql/connection {:db-credentials #ig/ref :credentials/db}
 
  :todefer/queries {:database #ig/ref :db.sql/connection}
+
+ :todefer/session-store {:redis-config {:pool {}
+                                        :spec {:host "127.0.0.1"
+                                               :port 6379}}}
  
- :todefer/handler {:q-builder #ig/ref :todefer/queries}
+ :todefer/handler {:q-builder #ig/ref :todefer/queries
+                   :session-store #ig/ref :todefer/session-store}
 
  :migratus/config (:database #ig/ref :db.sql/connection)
 

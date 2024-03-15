@@ -8,8 +8,8 @@
             [todefer.test-utils :as tu]
             [clojure.string :as string]))
 
-(use-fixtures :once (tu/system-fixture))
-(use-fixtures :once (tu/logged-in-fixture))
+(use-fixtures :once tu/system-fixture)
+(use-fixtures :once tu/logged-in-fixture)
 
 (defn handler [] (:todefer/handler (tu/system-state)))
 
@@ -61,7 +61,7 @@
                          :request-method :get
                          :headers {}
                          :cookies {"ring-session"
-                                   {:value "testsession1"}}}))))
+                                   {:value @tu/login-session}}}))))
 
   ;; page names are included in navbar
   (expect #(string/includes? % "<a href=\"/page/")
@@ -74,10 +74,19 @@
                          :request-method :get
                          :headers {}
                          :cookies {"ring-session"
-                                   {:value "testsession1"}}})))))
+                                   {:value @tu/login-session}}})))))
 
 (deftest test-wrap-filter-dummy-values
-  (expect {:parameters {:form {:task_id [123 42]}}}
-          ((wrap-filter-dummy-values identity) {:parameters
-                                                {:form
-                                                 {:task_id [-1 123 42]}}})))
+  (expect [123 42]
+          (-> ((wrap-filter-dummy-values identity) {:parameters
+                                                    {:form
+                                                     {:task_id [-1 123 42]}}})
+              :parameters
+              :form
+              :task_id)))
+
+;; the lines below mean, if starting a REPL from here, it uses devtest profile
+
+;; Local Variables:
+;; cider-clojure-cli-aliases: "devtest"
+;; End:

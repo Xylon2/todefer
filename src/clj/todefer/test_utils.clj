@@ -3,9 +3,10 @@
   running, or when run on command-line"
   (:require [todefer.core :as core]
             [integrant.repl.state :as state]
-            [todefer.routes :refer [session-atom]]))
+            [ring.redis.session :refer [read-redis-session write-redis-session]]))
 
 (def test-system (atom nil))
+(def login-session (atom nil))
 
 (defn system-state 
   []
@@ -23,14 +24,15 @@
   (let [{query-fn :todefer/queries} (system-state)]
     #(query-fn % true {:rollback-only true})))
 
-(defn system-fixture
-  []
-  (fn [f]
-    (reset! test-system (or (system-state) (core/start-system :test)))
-    (f)))
+(defn system-fixture [f]
+  (reset! test-system (or (system-state) (core/start-system :test)))
+  (f))
 
-(defn logged-in-fixture []
-  (swap! session-atom assoc "testsession1" {:user "foo"}))
+(defn logged-in-fixture [f]
+  (let [{session-store :todefer/session-store} (system-state)]
+    (reset! login-session
+            (write-redis-session session-store nil {:user "testuser"})))
+  (f))
 
 ;; the lines below mean, if starting a REPL from here, it uses devtest profile
 

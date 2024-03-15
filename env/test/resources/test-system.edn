@@ -4,4 +4,9 @@
 
  :todefer/queries {:database #ig/ref :db.sql/connection}
  
- :todefer/handler {:q-builder #ig/ref :todefer/queries}}
+ :todefer/session-store {:redis-config {:pool {}
+                                        :spec {:host "127.0.0.1"
+                                               :port 6379}}}
+ 
+ :todefer/handler {:q-builder #ig/ref :todefer/queries
+                   :session-store #ig/ref :todefer/session-store}}

@@ -5,7 +5,8 @@
             [integrant.core :as ig]
             [migratus.core :as migratus]
             [todefer.queries :as queries]
-            [todefer.routes :as routes])
+            [todefer.routes :as routes]
+            [ring.redis.session :refer [redis-store read-redis-session write-redis-session]])
   (:gen-class))
 
 (defn read-edn-file [file-path]
@@ -37,13 +38,17 @@
   (.close conn))
 
 ;; handler
-(defmethod ig/init-key :todefer/handler [_ {:keys [q-builder]}]
-  (routes/app q-builder))
+(defmethod ig/init-key :todefer/handler [_ {:keys [q-builder session-store]}]
+  (routes/app q-builder session-store))
 
 ;; query builder
 (defmethod ig/init-key :todefer/queries [_ {:keys [database]}]
   (fn [& args]
     (apply queries/execute-query database args)))
+
+;; session store
+(defmethod ig/init-key :todefer/session-store [_ {:keys [redis-config]}]
+  (redis-store redis-config))
 
 ;; jetty
 (defmethod ig/init-key :ring.adaptor/jetty [_ {:keys [handler opts]}]

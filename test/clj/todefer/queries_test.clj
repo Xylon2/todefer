@@ -4,7 +4,7 @@
             [todefer.queries :refer :all]
             [java-time :as jt]))
 
-(use-fixtures :once (tu/system-fixture))
+(use-fixtures :once tu/system-fixture)
 
 ;; the tests can use factory function tu/q-fn to run their queries
 

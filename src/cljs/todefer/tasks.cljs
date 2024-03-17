@@ -1,5 +1,5 @@
 (ns todefer.tasks
-  (:require [todefer.shared :refer [log byid byclass collapser]]))
+  (:require [todefer.shared :refer [log byid byclass setup-collapsibles]]))
 
 (set! (.-onkeyup js/document)
       (fn [e]
@@ -24,20 +24,6 @@
           (.setAttribute (byid "action_defer_existing") "name" "action")
           (.submit (byid "due_tasks_form")))))))
 
-(defn setup-collapsibles
-  "setup the collapsibles"
-  []
-  (let [elements (byclass "collapsible")]
+(setup-collapsibles)
 
-    ;; collapsibles
-    (doseq [elem elements]
-      (.addEventListener elem "click" collapser))))
-
-(let [deferbutton (byid "deferbutton")]
-
-  (setup-collapsibles)
-
-  (.onLoad js/htmx setup-collapsibles)
-
-  ;; defer button handler
-  (.addEventListener deferbutton "change" deferhandler))
+(.onLoad js/htmx setup-collapsibles)

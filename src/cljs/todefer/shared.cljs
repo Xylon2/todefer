@@ -1,5 +1,7 @@
 (ns todefer.shared)
 
+(def expanded-collapsibles (atom #{}))
+
 (defn log
   "concatenate and print to console"
   [& strings]
@@ -15,16 +17,42 @@
   [name]
   (.getElementsByClassName js/document name))
 
+(defn toggle-element
+  "toggle the presence of something in a set. return true or false to indicate"
+  [elem]
+  (if (contains? @expanded-collapsibles elem)
+    (do
+      (swap! expanded-collapsibles disj elem)
+      false)
+    (do
+      (swap! expanded-collapsibles conj elem)
+      true)))
+
+(defn expand-it [elem]
+  (let [contentstyle (.-style (.-nextElementSibling elem))]
+    (.add (.-classList elem) "active")
+    (set! (.-display contentstyle) "block")))
+
+(defn collapse-it [elem]
+  (let [contentstyle (.-style (.-nextElementSibling elem))]
+    (.remove (.-classList elem) "active")
+    (set! (.-display contentstyle) "none")))
+
 (defn collapser
   "toggles the collapsed state of a collapsible"
   []
   (this-as this
-    (do
-      ;; set color and symbol on the collapsible button
-      (.toggle (.-classList this) "active")
+    (if (toggle-element (.-id this))
+      (expand-it this)
+      (collapse-it this))))
 
-      ;; (un)collapse the contents of the collapsible
-      (let [contentstyle (.-style (.-nextElementSibling this))]
-        (case (.-display contentstyle)
-          "block" (set! (.-display contentstyle) "none")
-          (set! (.-display contentstyle) "block"))))))
+(defn setup-collapsibles
+  "add the event listener, and restore the state of the collapsibles"
+  []
+  (let [elements (byclass "collapsible")]
+
+    ;; collapsibles
+    (doseq [elem elements]
+      (.addEventListener elem "click" collapser)
+      (when (contains? @expanded-collapsibles (.-id elem))
+        (expand-it elem)))))

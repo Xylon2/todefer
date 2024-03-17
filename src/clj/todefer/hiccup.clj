@@ -86,8 +86,8 @@
          [:br]]
         dnamedhiccup
         (apply concat
-               (for [{:keys [cat_name tasks]} defcats-named]
-                 [[:button.collapsible {:type "button"} cat_name]
+               (for [{:keys [cat_name tasks cat_id]} defcats-named]
+                 [[:button.collapsible {:type "button" :id cat_id} cat_name]
                   [:div.collapsiblecontent
                    [:table
                     [:colgroup
@@ -101,7 +101,7 @@
                        )]]]
                   [:div [:br]]]))
         ddatedhiccup
-        [[:button.collapsible {:type "button"} "Upcoming"]
+        [[:button.collapsible {:type "button" :id "dated"} "Upcoming"]
          [:div.collapsiblecontent
           [:table
            [:colgroup

@@ -112,10 +112,6 @@
       ;; {:status 200
       ;;  :headers {"Content-Type" "text/html"}
       ;;  :body (ph/agenda-page page-list page-name page-id)}
-      ;; nil
-      ;; {:status 404
-      ;;  :headers {"Content-Type" "text/html"}
-      ;;  :body (ph/render-message "Page Not Found")}
       (not-found-handler request)
       )))
 

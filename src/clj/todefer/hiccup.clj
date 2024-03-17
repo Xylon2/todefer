@@ -151,11 +151,10 @@
               [:tr (when highlight {:style (str "background-color: " highlight)})
                [:td [:input {:type "checkbox" :name "habit_id" :value habit_id}]]
                [:td habit_name
-               [:span.habit-info (str "every " freq_value " " freq_unit ", due " prettydue)]]]
-              )]]]
-
-
-         ]]
+               [:span.habit-info (str "every " freq_value " " freq_unit ", due " prettydue)]]])]]]
+         [:div [:br]]]
+        ]
+    
     (concat duehiccup upcominghiccup)))
 
 (defn tasks-page

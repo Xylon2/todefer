@@ -162,7 +162,7 @@
   [pagelist page-name page-id due-tasks defcats-named defcats-dated f-token]
   (let [contents (render-tasks page-id due-tasks defcats-named defcats-dated)
         other-task-pages (filter #(and (= "task" (:page_type %))
-                                       (not= "Lorem ipsum" (:page_name %)))
+                                       (not= page-name (:page_name %)))
                                  pagelist)]
     (render-base
      (str page-name " tasks")
@@ -206,13 +206,50 @@
 
 (defn habits-page
   "renders a full page of habits"
-  [page-list page-name page-id due-habits upcoming-habits]
-  (let [contents (render-habits page-id due-habits upcoming-habits)]
+  [page-list page-name page-id due-habits upcoming-habits f-token]
+  (let [contents (render-habits page-id due-habits upcoming-habits)
+        other-habit-pages (filter #(and (= "habit" (:page_type %))
+                                        (not= page-name (:page_name %)))
+                                  page-list)]
     (render-base
      (str page-name " habits")
      contents
-     :scripts ["/public/cljs/shared.js" "/public/cljs/tasks.js"]
-     :pagelist page-list)))
+     :scripts ["/public/cljs/shared.js" "/public/cljs/habits.js"]
+     :pagelist page-list
+     :actionbar [[:form {:method "post"
+                         :style "padding-left: 0;"
+                         :hx-target "main"
+                         :hx-on:htmx:after-request "this.reset()"}
+                  [:input {:name "__anti-forgery-token"
+                           :type "hidden"
+                           :value f-token}]
+                  [:div.t-container
+                   [:input#add_new.flex-input {:type "text"
+                                               :name "habit_name"}]
+                   [:button {:type "submit"
+                             :hx-post (str "/page/" page-name "/add-habit")}
+                    "add habit"]]
+                  [:div
+                   [:button {:type "button"
+                             :hx-post (str "/page/" page-name "/delete-habit")
+                             :hx-include "[name='habit_id']"}
+                    "delete"]
+                   [:button {:type "button"
+                             :hx-post (str "/page/" page-name "/modify-habit-view")
+                             :hx-include "[name='habit_id']"}
+                    "modify"]
+                   (when (< 0 (count other-habit-pages))
+                     (into [:select {:name "newpage"
+                                     :hx-post (str "/page/" page-name "/move-habit")
+                                     :hx-include "[name='habit_id']"}
+                            [:option {:value ""} "move"]]
+                           (for [{:keys [page_name page_id]} other-habit-pages]
+                             [:option {:value page_id} page_name])))
+                   [:button {:type "button"
+                             :hx-post (str "/page/" page-name "/defer-habit-view")
+                             :hx-include "[name='habit_id']"}
+                    "defer"]
+                   ]]])))
 
 (defn render-modify-tasks
   "page to modify selected tasks"

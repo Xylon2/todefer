@@ -117,7 +117,8 @@
                   page-name
                   page-id
                   duehabits
-                  upcominghabits))}
+                  upcominghabits
+                  f-token))}
       ;; "agenda"
       ;; {:status 200
       ;;  :headers {"Content-Type" "text/html"}

@@ -104,10 +104,20 @@
                 defcatsnamed
                 defcatsdated
                 f-token))}
-      ;; "habit"
-      ;; {:status 200
-      ;;  :headers {"Content-Type" "text/html"}
-      ;;  :body (ph/habits-page page-list page-name page-id)}
+      "habit"
+      {:status 200
+       :headers {"Content-Type" "text/html"}
+       :body (let [duehabits (map #(prettify-due % :date_scheduled)
+                                  (exec-query (q/list-due-habits page-id)))
+                   upcominghabits (map #(prettify-due % :date_scheduled)
+                                       (exec-query (q/list-upcoming-habits page-id)))]
+
+                 (ph/habits-page
+                  page-list
+                  page-name
+                  page-id
+                  duehabits
+                  upcominghabits))}
       ;; "agenda"
       ;; {:status 200
       ;;  :headers {"Content-Type" "text/html"}

@@ -120,6 +120,44 @@
         ]
     (concat duehiccup dnamedhiccup ddatedhiccup)))
 
+(defn render-habits
+  "the meat of a habits page. used both in initial page-load and by AJAX"
+  [page-id due-habits upcoming-habits]
+  (let [duehiccup
+        [[:h2 "Due"]
+         [:table
+          [:colgroup
+           [:col {:style "width: 2em;"}]
+           [:col {:style "width: 100%;"}]]
+          [:tbody
+           ;; this is a kludge to force habit_id to always be a list
+           [:input {:type "hidden" :name "habit_id" :value "-1"}]
+           (for [{:keys [highlight habit_id habit_name freq_value freq_unit prettydue]} due-habits]
+             [:tr (when highlight {:style (str "background-color: " highlight)})
+              [:td [:input {:type "checkbox" :name "habit_id" :value habit_id}]]
+              [:td habit_name
+               [:span.habit-info (str "every " freq_value " " freq_unit ", due " prettydue)]]]
+             )]]
+         [:br]]
+        upcominghiccup
+        [[:button.collapsible {:type "button" :id "upcoming"} "Upcoming"]
+         [:div.collapsiblecontent
+          [:table
+           [:colgroup
+            [:col {:style "width: 2em;"}]
+            [:col {:style "width: 100%;"}]]
+           [:tbody
+            (for [{:keys [highlight habit_id habit_name freq_value freq_unit prettydue]} upcoming-habits]
+              [:tr (when highlight {:style (str "background-color: " highlight)})
+               [:td [:input {:type "checkbox" :name "habit_id" :value habit_id}]]
+               [:td habit_name
+               [:span.habit-info (str "every " freq_value " " freq_unit ", due " prettydue)]]]
+              )]]]
+
+
+         ]]
+    (concat duehiccup upcominghiccup)))
+
 (defn tasks-page
   "renders a full page of tasks"
   [pagelist page-name page-id due-tasks defcats-named defcats-dated f-token]
@@ -130,7 +168,7 @@
     (render-base
      (str page-name " tasks")
      contents
-     :scripts ["/public/cljs/todefer.js"]
+     :scripts ["/public/cljs/shared.js" "/public/cljs/tasks.js"]
      :pagelist pagelist
      :actionbar [[:form {:method "post"
                          :style "padding-left: 0;"
@@ -166,6 +204,16 @@
                              :hx-include "[name='task_id']"}
                     "defer"]
                    ]]])))
+
+(defn habits-page
+  "renders a full page of habits"
+  [page-list page-name page-id due-habits upcoming-habits]
+  (let [contents (render-habits page-id due-habits upcoming-habits)]
+    (render-base
+     (str page-name " habits")
+     contents
+     :scripts ["/public/cljs/shared.js" "/public/cljs/tasks.js"]
+     :pagelist page-list)))
 
 (defn render-modify-tasks
   "page to modify selected tasks"

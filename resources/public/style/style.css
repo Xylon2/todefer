@@ -134,3 +134,8 @@ tr {
 button {
   white-space: nowrap; /* Prevents text wrapping inside the button */
 }
+
+.habit-info {
+    float: right;
+    font-size: smaller;
+}

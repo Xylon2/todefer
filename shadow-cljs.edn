@@ -4,4 +4,8 @@
  :builds {:app {:output-dir "resources/public/cljs/"
                 :asset-path "."
                 :target :browser
-                :modules {:todefer {:entries [todefer.tasks]}}}}}
+                :modules {:shared {:entries []}
+                          :tasks {:entries [todefer.tasks]
+                                  :depends-on #{:shared}}
+                          :habits {:entries [todefer.habits]
+                                   :depends-on #{:shared}}}}}}

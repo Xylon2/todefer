@@ -226,6 +226,12 @@
                   [:div.t-container
                    [:input#add_new.flex-input {:type "text"
                                                :name "habit_name"}]
+                   [:input {:type "number" :name "freq_value" :style "width: 3em"}]
+                   [:select {:name "freq_unit"}
+                    [:option {:value "days"} "days"]
+                    [:option {:value "weeks"} "weeks"]
+                    [:option {:value "months"} "months"]
+                    [:option {:value "years"} "years"]]
                    [:button {:type "submit"
                              :hx-post (str "/page/" page-name "/add-habit")}
                     "add habit"]]

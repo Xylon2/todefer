@@ -7,15 +7,11 @@
 (defn num-updated [x]
   (:next.jdbc/update-count (first x)))
 
-(defn check-num-updated [n x]
-  (= n (num-updated x)))
-
-(def one-update? #(check-num-updated 1 %))
-
+(def one-update?   #(= 1 (num-updated %)))
 (def some-updated? #(< 0 (num-updated %)))
 
 (defn show-tasks-200
-  [exec-query page-name page-id]
+  [exec-query page-id]
   (let [due-tasks (exec-query (q/list-due-tasks page-id))
         defcats-named (map #(hl/add-tasks-named exec-query %)
                            (exec-query (q/list-defcats-named page-id)))
@@ -46,7 +42,7 @@
      {:keys [page-name]} :path} :parameters}]
   (let [page-id (get-page-id exec-query page-name)]
       (if (one-update? (exec-query (q/add-task! task_name page-id)))
-        (show-tasks-200 exec-query page-name page-id)
+        (show-tasks-200 exec-query page-id)
         (show-500 ":o"))))
 
 (defn delete-task-handler
@@ -56,7 +52,7 @@
      {:keys [page-name]} :path} :parameters}]
   (let [page-id (get-page-id exec-query page-name)]
     (if (some-updated? (exec-query (q/delete-task! task_id)))
-      (show-tasks-200 exec-query page-name page-id)
+      (show-tasks-200 exec-query page-id)
       (show-500 ":o"))))
 
 (defn modify-task-view
@@ -87,7 +83,7 @@
   (let [page-id (get-page-id exec-query page-name)]
     (doseq [[tid tname] (map vector task_id task_newname)]  ;; pair them up
       (exec-query (q/modify-task! tid tname)))
-   (show-tasks-200 exec-query page-name page-id)))
+   (show-tasks-200 exec-query page-id)))
 
 (defn move-task-handler
   "move one or more tasks to a different page"
@@ -96,7 +92,7 @@
      {:keys [page-name]} :path} :parameters}]
   (let [page-id (get-page-id exec-query page-name)]
     (if (some-updated? (exec-query (q/move-task! newpage task_id)))
-      (show-tasks-200 exec-query page-name page-id)
+      (show-tasks-200 exec-query page-id)
       (show-500 ":o"))))
 
 (defn defer-task-view
@@ -127,7 +123,7 @@
                  (:cat_id (first categories))
                  (exec-query (q/create-defcat-dated! date)))]
     (if (some-updated? (exec-query (q/defer-task-dated! cat-id task_id)))
-      (show-tasks-200 exec-query page-name page-id)
+      (show-tasks-200 exec-query page-id)
       (show-500 ":o"))))
 
 (defn defer-task-category-save
@@ -137,7 +133,7 @@
      {:keys [page-name]} :path} :parameters}]
   (let [page-id (get-page-id exec-query page-name)]
     (if (some-updated? (exec-query (q/defer-task-named! cat_id task_id)))
-      (show-tasks-200 exec-query page-name page-id)
+      (show-tasks-200 exec-query page-id)
       (show-500 ":o"))))
 
 (defn defer-task-newcategory-save
@@ -152,6 +148,6 @@
                  (exec-query (q/create-defcat-named! new-catname)))]
     (prn categories)
     (if (some-updated? (exec-query (q/defer-task-named! cat-id task_id)))
-      (show-tasks-200 exec-query page-name page-id)
+      (show-tasks-200 exec-query page-id)
       (show-500 ":o"))))
 

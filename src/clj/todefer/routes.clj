@@ -14,16 +14,18 @@
             [clojure.spec.alpha :as s]
             [todefer.handlers :as hl]
             [todefer.task-controllers :as tc]
+            [todefer.habit-controllers :as hc]
             [ring.logger :as logger]
             [clojure.string :as string]
             [clojure.pprint]
             [clojure.java.io]))
 
-(s/def ::id int?)
+(s/def ::int int?)
 (s/def ::string string?)
 (s/def ::ints-list (s/coll-of int?))
 (s/def ::strs-list (s/coll-of string?))
 (s/def ::iso-date #(re-matches #"\d{4}-\d{2}-\d{2}" %))
+(s/def ::freq_unit #{"days" "weeks" "months" "years"})
 
 (defn wrap-debug-reqmap
   "debug middleware to save the requestmap to a file so we can analyze"
@@ -90,6 +92,12 @@
         ["add-task"
          {:post {:handler tc/add-task-handler
                  :parameters {:form {:task_name ::string}}}}]
+        ["add-habit"
+         {:post {:handler hc/add-habit-handler
+                 :parameters {:form {:habit_name ::string
+                                     :freq_value ::int
+                                     :freq_unit ::freq_unit}}}}]
+
         ["delete-task"
          {:post {:handler tc/delete-task-handler
                  :parameters {:form {:task_id ::ints-list}}}}]
@@ -120,7 +128,7 @@
         ["defer-task-category-save"
          {:post {:handler tc/defer-task-category-save
                  :parameters {:form {:task_id ::ints-list
-                                     :cat_id ::id}}}}]
+                                     :cat_id ::int}}}}]
         ["defer-task-newcategory-save"
          {:post {:handler tc/defer-task-newcategory-save
                  :parameters {:form {:task_id ::ints-list

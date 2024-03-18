@@ -108,6 +108,10 @@
         ["delete-task"
          {:post {:handler tc/delete-task-handler
                  :parameters {:form {:task_id ::ints-list}}}}]
+        ["delete-habit"
+         {:post {:handler hc/delete-habit-handler
+                 :parameters {:form {:habit_id ::ints-list}}}}]
+
         ["move-task"
          {:post {:handler tc/move-task-handler
                  :parameters {:form {:task_id ::ints-list

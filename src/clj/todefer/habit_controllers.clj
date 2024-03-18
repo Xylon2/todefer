@@ -67,3 +67,13 @@
                                                          "yesturday" 1)))]
     (run! done-habit' habit_id)
     (show-habits-200 exec-query page-id)))
+
+(defn delete-habit-handler
+  "delete one or more habits"
+  [{exec-query :q-builder
+    {{:keys [habit_id]} :form
+     {:keys [page-name]} :path} :parameters}]
+  (let [page-id (get-page-id exec-query page-name)]
+    (if (some-updated? (exec-query (q/delete-habit! habit_id)))
+      (show-habits-200 exec-query page-id)
+      (show-500 ":o"))))

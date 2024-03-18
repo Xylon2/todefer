@@ -26,6 +26,7 @@
 (s/def ::strs-list (s/coll-of string?))
 (s/def ::iso-date #(re-matches #"\d{4}-\d{2}-\d{2}" %))
 (s/def ::freq_unit #{"days" "weeks" "months" "years"})
+(s/def ::donewhen #{"today" "yesturday"})
 
 (defn wrap-debug-reqmap
   "debug middleware to save the requestmap to a file so we can analyze"
@@ -61,6 +62,7 @@
     (let [nuke-values #(vec (remove #{-1 "59866220-59be-4143-90b3-63c2861eadca"} %))
           req' (-> req
                 (update-in [:parameters :form :task_id] nuke-values)
+                (update-in [:parameters :form :habit_id] nuke-values)
                 (update-in [:parameters :form :task_newname] nuke-values))]
       (handler req'))))
 
@@ -97,6 +99,11 @@
                  :parameters {:form {:habit_name ::string
                                      :freq_value ::int
                                      :freq_unit ::freq_unit}}}}]
+
+        ["done-habit"
+         {:post {:handler hc/done-habit-handler
+                 :parameters {:form {:habit_id ::ints-list
+                                     :donewhen ::donewhen}}}}]
 
         ["delete-task"
          {:post {:handler tc/delete-task-handler

@@ -34,6 +34,7 @@
   ;; debug is truthy or falsy
   ;; t-opts is option-map for jdbc/with-transaction
   ([conn [query processor] debug t-opts]
+   (when debug (println (str "raw-query: " query)))
    (let [formatted-query (sql/format query)]
      (when debug (println (str "formatted-query: " formatted-query)))
      (jdbc/with-transaction [t-conn conn t-opts]

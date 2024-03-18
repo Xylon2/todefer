@@ -2,7 +2,8 @@
   (:require [todefer.queries :as q]
             [todefer.hiccup :as ph]
             [todefer.handlers :as hl]
-            [hiccup2.core :as h]))
+            [hiccup2.core :as h]
+            [java-time :as jt]))
 
 (defn num-updated [x]
   (:next.jdbc/update-count (first x)))
@@ -33,6 +34,18 @@
   [exec-query page-name]
   (:page_id (exec-query (q/get-page page-name))))
 
+(def timeunit-multipliers
+  {"days" 1
+   "weeks" 7
+   "months" 28
+   "years" 365})
+
+(defn done-habit [exec-query habit_id offset]
+  (let [{:keys [freq_unit freq_value]} (first (exec-query (q/get-habit-info [habit_id])))
+        dayshence (jt/days (* (get timeunit-multipliers freq_unit) freq_value))
+        now (jt/minus (jt/local-date) (jt/days offset))]
+    (some-updated? (exec-query (q/defer-habit! [habit_id] (jt/plus now dayshence) true)))))
+
 (defn add-habit-handler
   "add habit"
   [{exec-query :q-builder
@@ -43,3 +56,14 @@
         (show-habits-200 exec-query page-id)
         (show-500 ":o"))))
 
+(defn done-habit-handler
+  "mark a habit as done, today or yesturday"
+  [{exec-query :q-builder
+    {{:keys [habit_id donewhen]} :form
+     {:keys [page-name]} :path} :parameters}]
+  (let [page-id (get-page-id exec-query page-name)
+        done-habit' (fn [id] (done-habit exec-query id (case donewhen
+                                                         "today" 0
+                                                         "yesturday" 1)))]
+    (run! done-habit' habit_id)
+    (show-habits-200 exec-query page-id)))

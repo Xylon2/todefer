@@ -236,7 +236,9 @@
                              :hx-post (str "/page/" page-name "/add-habit")}
                     "add habit"]]
                   [:div
-                   [:select {:name "donewhen"}
+                   [:select {:name "donewhen"
+                             :hx-post (str "/page/" page-name "/done-habit")
+                             :hx-include "[name='habit_id']"}
                     [:option {:value ""} "done"]
                     [:option {:value "today"} "today"]
                     [:option {:value "yesturday"} "yesturday"]]

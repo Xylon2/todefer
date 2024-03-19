@@ -294,7 +294,7 @@
 
 (defn move-task!
   "moves one-or-more tasks to a new page"
-  [newpage task_ids]
+  [task_ids newpage]
   [(-> (update :task)
        (set {:page_ref [:cast newpage :integer]})
        (where [:= :task_id [:any [:array task_ids :integer]]]))

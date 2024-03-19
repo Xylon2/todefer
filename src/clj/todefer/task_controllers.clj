@@ -91,7 +91,7 @@
     {{:keys [task_id newpage]} :form
      {:keys [page-name]} :path} :parameters}]
   (let [page-id (get-page-id exec-query page-name)]
-    (if (some-updated? (exec-query (q/move-task! newpage task_id)))
+    (if (some-updated? (exec-query (q/move-task! task_id newpage)))
       (show-tasks-200 exec-query page-id)
       (show-500 ":o"))))
 

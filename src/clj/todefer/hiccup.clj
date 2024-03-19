@@ -324,8 +324,7 @@
                 (for [unit ["days" "weeks" "months" "years"]]
                   [:option {:value unit :selected (if (= unit freq_unit)
                                                     "selected"
-                                                    nil)} unit]))
-          ]
+                                                    nil)} unit]))]
          [:td
           [:input {:type "date" :name "due_new" :value date_scheduled}]]])]]
     [:button {:type "submit"} "Save changes"]]))

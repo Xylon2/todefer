@@ -131,6 +131,10 @@
          {:post {:handler tc/move-task-handler
                  :parameters {:form {:task_id ::ints-list
                                      :newpage ::string}}}}]
+        ["move-habit"
+         {:post {:handler hc/move-habit-handler
+                 :parameters {:form {:habit_id ::ints-list
+                                     :newpage ::string}}}}]
 
         ;; multi-request actions. these actions have a view page, where the user
         ;; is asked for more input, and a save page, which will run a query and

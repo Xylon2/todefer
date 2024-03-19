@@ -166,7 +166,7 @@
 (deftest test-move-task!
   (testing "move tasks to a new page"
     (is (two-updates? ((tu/q-fn)
-                      (move-task! 14 [1799 1791]))))))
+                      (move-task! [1799 1791] 14))))))
 
 (deftest test-add-habit!
   (testing "add a habit"

@@ -107,3 +107,13 @@
     (doseq [[hid hname hvalue hunit hdue] (map vector habit_id habit_name_new freq_value_new freq_unit_new due_new)] ;; pair them up
       (exec-query (q/modify-habit! hid hname hvalue hunit hdue)))
     (show-habits-200 exec-query page-id)))
+
+(defn move-habit-handler
+  "move one or more habits to a different page"
+  [{exec-query :q-builder
+    {{:keys [habit_id newpage]} :form
+     {:keys [page-name]} :path} :parameters}]
+  (let [page-id (get-page-id exec-query page-name)]
+    (if (some-updated? (exec-query (q/move-habit! habit_id newpage)))
+      (show-habits-200 exec-query page-id)
+      (show-500 ":o"))))

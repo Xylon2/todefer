@@ -77,3 +77,33 @@
     (if (some-updated? (exec-query (q/delete-habit! habit_id)))
       (show-habits-200 exec-query page-id)
       (show-500 ":o"))))
+
+(defn modify-habit-view
+  "always accessed with POST requests.
+
+  We receive a list of habit_ids but no values. Then we render page ready to be
+  modified"
+  [{exec-query :q-builder
+    {{:keys [habit_id]} :form
+     {page-name :page-name} :path} :parameters :as request
+    f-token :anti-forgery-token}]
+  (let [habits (exec-query (q/get-habit-info habit_id))]
+    {:status 200
+     :headers {"Content-Type" "text/html"}
+     :body (-> (ph/render-modify-habits habits f-token page-name)
+               h/html
+               str)}))
+
+(defn modify-habit-save
+  "always accessed with POST requests. 
+
+  We receive a habit-list and values for each. We save the changes and redirect
+  to the original page."
+  [{exec-query :q-builder
+    {{:keys [habit_id habit_name_new freq_value_new freq_unit_new due_new]} :form
+     {page-name :page-name} :path} :parameters :as request
+    f-token :anti-forgery-token}]
+  (let [page-id (get-page-id exec-query page-name)]
+    (doseq [[hid hname hvalue hunit hdue] (map vector habit_id habit_name_new freq_value_new freq_unit_new due_new)] ;; pair them up
+      (exec-query (q/modify-habit! hid hname hvalue hunit hdue)))
+    (show-habits-200 exec-query page-id)))

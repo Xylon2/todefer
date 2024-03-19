@@ -22,11 +22,15 @@
 
 (s/def ::int int?)
 (s/def ::string string?)
-(s/def ::ints-list (s/coll-of int?))
-(s/def ::strs-list (s/coll-of string?))
+
 (s/def ::iso-date #(re-matches #"\d{4}-\d{2}-\d{2}" %))
 (s/def ::freq_unit #{"days" "weeks" "months" "years"})
 (s/def ::donewhen #{"today" "yesturday"})
+
+(s/def ::ints-list (s/coll-of ::int      :kind vector?))
+(s/def ::strs-list (s/coll-of ::string   :kind vector?))
+(s/def ::date-list (s/coll-of ::iso-date :kind vector?))
+(s/def ::freq_unit-list (s/coll-of ::freq_unit :kind vector?))
 
 (defn wrap-debug-reqmap
   "debug middleware to save the requestmap to a file so we can analyze"
@@ -59,12 +63,23 @@
   because otherwize coercion fails. here we remove the extra items"
   [handler]
   (fn [req]
-    (let [nuke-values #(vec (remove #{-1 "59866220-59be-4143-90b3-63c2861eadca"} %))
-          req' (-> req
-                (update-in [:parameters :form :task_id] nuke-values)
-                (update-in [:parameters :form :habit_id] nuke-values)
-                (update-in [:parameters :form :task_newname] nuke-values))]
-      (handler req'))))
+    (let [;; nuke-values #(vec (remove #{-1 "59866220-59be-4143-90b3-63c2861eadca"} %))
+          nuke-values #(vec (rest %))
+          req-cleaned 
+          (loop [xs req, keys [:task_id
+                               :habit_id
+                               :task_newname
+                               :habit_name_new
+                               :freq_value_new
+                               :freq_unit_new
+                               :due_new]]
+            (if (empty? keys)
+              xs
+              (let [[key & keys'] keys
+                    xs' (update-in xs [:parameters :form key] nuke-values)]
+                (recur xs' keys'))))]
+      
+      (handler req-cleaned))))
 
 (defn app
   "reitit with format negotiation and input & output coercion"
@@ -127,6 +142,18 @@
          {:post {:handler tc/modify-task-save
                  :parameters {:form {:task_id ::ints-list
                                      :task_newname ::strs-list}}}}]
+
+        ["modify-habit-view"
+         {:post {:handler hc/modify-habit-view
+                 :parameters {:form {:habit_id ::ints-list}}}}]
+        ["modify-habit-save"
+         {:post {:handler hc/modify-habit-save
+                 :parameters {:form {:habit_id ::ints-list
+                                     :habit_name_new ::strs-list
+                                     :freq_value_new ::ints-list
+                                     :freq_unit_new ::freq_unit-list
+                                     :due_new ::date-list
+                                     }}}}]
 
         ;; the defer task page has three possible actions
         ["defer-task-view"

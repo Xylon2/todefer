@@ -242,10 +242,11 @@
                     [:option {:value ""} "done"]
                     [:option {:value "today"} "today"]
                     [:option {:value "yesturday"} "yesturday"]]
-                   [:button {:type "button"
+                   [:select {:name "really"
                              :hx-post (str "/page/" page-name "/delete-habit")
                              :hx-include "[name='habit_id']"}
-                    "delete"]
+                    [:option {:value ""} "delete"]
+                    [:option {:value "really"} "really?"]]
                    [:button {:type "button"
                              :hx-post (str "/page/" page-name "/modify-habit-view")
                              :hx-include "[name='habit_id']"}
@@ -286,6 +287,47 @@
          [:td
           [:input {:type "hidden" :name "task_id" :value task_id}]
           [:input {:type "text" :name "task_newname" :value task_name}]]])]]
+    [:button {:type "submit"} "Save changes"]]))
+
+(defn render-modify-habits
+  "page to modify selected habits"
+  [habits f-token page-name]
+  (list
+   [:h2 "Modify habits"]
+   [:form {:method "post"
+           :hx-post (str "/page/" page-name "/modify-habit-save")
+           :hx-target "main"}
+    [:input {:name "__anti-forgery-token"
+             :type "hidden"
+             :value f-token}]
+    [:table
+     [:colgroup
+      [:col {:style "width: 100%;"}]
+      [:col]]
+     [:tbody
+      ;; this is a kludge to force these inputs to always be a list
+      [:input {:type "hidden" :name "habit_id" :value "-1"}]
+      [:input {:type "hidden" :name "habit_name_new" :value "59866220-59be-4143-90b3-63c2861eadca"}]
+      [:input {:type "hidden" :name "freq_value_new" :value "-1"}]
+      [:input {:type "hidden" :name "freq_unit_new" :value "days"}]
+      [:input {:type "hidden" :name "due_new" :value "1970-01-01"}]
+      (for [{:keys [habit_id habit_name freq_value freq_unit date_scheduled]} habits]
+        [:tr
+         [:td
+          [:input {:type "hidden" :name "habit_id" :value habit_id}]
+          [:input.wide-input {:type "text" :name "habit_name_new" :value habit_name}]]
+         [:td
+          [:input {:type "number" :name "freq_value_new"
+                   :value freq_value :style "width: 3em"}]]
+         [:td
+          (into [:select {:name "freq_unit_new"}]
+                (for [unit ["days" "weeks" "months" "years"]]
+                  [:option {:value unit :selected (if (= unit freq_unit)
+                                                    "selected"
+                                                    nil)} unit]))
+          ]
+         [:td
+          [:input {:type "date" :name "due_new" :value date_scheduled}]]])]]
     [:button {:type "submit"} "Save changes"]]))
 
 (defn render-defer-tasks

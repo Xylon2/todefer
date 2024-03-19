@@ -83,56 +83,61 @@ tr {
 }
 
 /* Style the button that is used to open and close the collapsible content */
- .collapsible {
-  background-color: #eee;
-  color: #444;
-  cursor: pointer;
-  padding: 18px;
-  width: 100%;
-  border: none;
-  text-align: left;
-  outline: none;
-  font-size: 15px;
+.collapsible {
+    background-color: #eee;
+    color: #444;
+    cursor: pointer;
+    padding: 18px;
+    width: 100%;
+    border: none;
+    text-align: left;
+    outline: none;
+    font-size: 15px;
 }
 
 /* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
 .active, .collapsible:hover {
-  background-color: #ccc;
+    background-color: #ccc;
 }
 
 /* Style the collapsible content. Note: hidden by default */
 .collapsiblecontent {
-  padding: 1em 1em;
-  display: none;
-  overflow: hidden;
-  background-color: #f1f1f1;
+    padding: 1em 1em;
+    display: none;
+    overflow: hidden;
+    background-color: #f1f1f1;
 }
 
 .collapsible:after {
-  content: '\02795'; /* Unicode character for "plus" sign (+) */
-  font-size: 13px;
-  color: white;
-  float: right;
-  margin-left: 5px;
+    content: '\02795'; /* Unicode character for "plus" sign (+) */
+    font-size: 13px;
+    color: white;
+    float: right;
+    margin-left: 5px;
 }
 
 .active:after {
-  content: "\2796"; /* Unicode character for "minus" sign (-) */
+    content: "\2796"; /* Unicode character for "minus" sign (-) */
 }
 
 .t-container {
-  display: flex; /* Establishes a flex container */
-  justify-content: space-between; /* Distributes space between the children */
-  align-items: center; /* Aligns children vertically in the middle */
+    display: flex; /* Establishes a flex container */
+    justify-content: space-between; /* Distributes space between the children */
+    align-items: center; /* Aligns children vertically in the middle */
 }
 
 .flex-input {
-  flex-grow: 1; /* Allows the input to grow and fill the available space */
-  margin-right: 10px; /* Adds some space between the input and the button */
+    flex-grow: 1; /* Allows the input to grow and fill the available space */
+    margin-right: 5px; /* Adds some space between the input and the button */
+}
+
+.wide-input {
+    width: 100%;
+    box-sizing: border-box;
 }
 
 button {
-  white-space: nowrap; /* Prevents text wrapping inside the button */
+    white-space: nowrap; /* Prevents text wrapping inside the button */
 }
 
 .habit-info {

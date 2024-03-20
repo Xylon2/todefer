@@ -48,7 +48,7 @@ h1,h2,h3{
 }
 
 #navbar a:hover {
-    background-color: #cbcbcb;
+    background-color: #bbb;
 }
 
 .hero-header {
@@ -143,4 +143,8 @@ button {
 .habit-info {
     float: right;
     font-size: smaller;
+}
+
+#selected-page a {
+    background-color: #bbb;
 }

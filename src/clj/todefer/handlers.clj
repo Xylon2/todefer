@@ -83,6 +83,9 @@
 
   ;; check the page_name is legit and find out what type of page it is
   (let [page-list (exec-query (q/list-pages))
+        page-list' (map #(if (= (:page_name %) page-name)
+                           (assoc % :selected true)
+                           %) page-list)
         {page-type :page_type
          page-id :page_id} (exec-query (q/get-page page-name))]
 
@@ -97,7 +100,7 @@
                                      (map #(prettify-due % :def_date)
                                           (list-defcats-dated-undefer exec-query page-id)))]
                (ph/tasks-page
-                page-list
+                page-list'
                 page-name
                 page-id
                 due-tasks
@@ -113,7 +116,7 @@
                                        (exec-query (q/list-upcoming-habits page-id)))]
 
                  (ph/habits-page
-                  page-list
+                  page-list'
                   page-name
                   page-id
                   duehabits

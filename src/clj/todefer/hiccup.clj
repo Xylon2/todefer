@@ -12,6 +12,7 @@
          [:title title]
          [:meta {:name "viewport"
                  :content "width=device-width, initial-scale=1.0"}]
+         [:meta {:charset "UTF-8"}]
          [:link {:rel "stylesheet" :href "/public/style/style.css"}]
          [:script {:src "https://unpkg.com/htmx.org@1.9.10"
           :integrity "sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC"
@@ -24,7 +25,9 @@
              (into [:ul]
                    (for [{:keys [page_name selected]} pagelist]
                      [:li (when selected {:id "selected-page"})
-                      [:a {:href (str "/page/" page_name)} page_name]])))]]
+                      [:a {:href (str "/page/" page_name)} page_name]])))
+           [:div
+            [:a {:href "/"} "⚙"]]]]
          (when-not (empty? actionbar)
            [:div#actionbar.hero-header
             (into [:div.width] actionbar)])

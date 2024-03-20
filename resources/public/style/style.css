@@ -16,6 +16,8 @@ h1,h2,h3{
 }
 
 #navbar {
+    display: flex;
+    justify-content: space-between;
     top: 0;
     left: 0;
     right: 0;
@@ -35,7 +37,7 @@ h1,h2,h3{
 }
 
 /* Responsive styles specific to navbar */
-@media (max-width: 600px) {
+@media (max-width: 700px) {
     #navbar li {
         display: block; /* Stack list items vertically on small screens */
     }

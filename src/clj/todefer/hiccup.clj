@@ -359,3 +359,20 @@
     [:button {:type "submit"
               :hx-post (str "/page/" page-name "/defer-task-newcategory-save")}
      "submit"]]))
+
+(defn render-defer-habits
+  "page to defer habits to a date"
+  [habit_id f-token page-name]
+  (list
+   [:h2 "Defer until..."]
+   [:form {:method "post"
+           :hx-target "main"}
+    [:input {:name "__anti-forgery-token"
+             :type "hidden"
+             :value f-token}]
+    [:input {:type "hidden" :name "habit_id" :value "-1"}]
+    (for [tid habit_id]
+      [:input {:type "hidden" :name "habit_id" :value tid}])
+    [:input {:type "date"
+             :name "date"
+             :hx-post (str "/page/" page-name "/defer-habit-date-save")}]]))

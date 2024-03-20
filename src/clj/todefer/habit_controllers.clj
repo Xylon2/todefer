@@ -117,3 +117,29 @@
     (if (some-updated? (exec-query (q/move-habit! habit_id newpage)))
       (show-habits-200 exec-query page-id)
       (show-500 ":o"))))
+
+(defn defer-habit-view
+  "always accessed with POST requests.
+
+  We receive a list of habit_ids. We render a date selector for them to choose
+  when to defer to. "
+  [{exec-query :q-builder
+    {{:keys [habit_id]} :form
+     {page-name :page-name} :path} :parameters :as request
+    f-token :anti-forgery-token}]
+  (let [page-id (get-page-id exec-query page-name)]
+    {:status 200
+     :headers {"Content-Type" "text/html"}
+     :body (-> (ph/render-defer-habits habit_id f-token page-name)
+               h/html
+               str)}))
+
+(defn defer-habit-date-save
+  "defer habit(s) to a date"
+  [{exec-query :q-builder
+    {{:keys [habit_id date]} :form
+     {:keys [page-name]} :path} :parameters}]
+  (let [page-id (get-page-id exec-query page-name)]
+    (if (some-updated? (exec-query (q/defer-habit! habit_id date)))
+      (show-habits-200 exec-query page-id)
+      (show-500 ":o"))))

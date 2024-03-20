@@ -176,6 +176,14 @@
                  :parameters {:form {:task_id ::ints-list
                                      :new-catname ::string}}}}]
 
+        ;; defer habit only has one submit option
+        ["defer-habit-view"
+         {:post {:handler hc/defer-habit-view
+                 :parameters {:form {:habit_id ::ints-list}}}}]
+        ["defer-habit-date-save"
+         {:post {:handler hc/defer-habit-date-save
+                 :parameters {:form {:habit_id ::ints-list
+                                     :date ::iso-date}}}}]
         ]
 
        ["/login" {:get {:handler hl/login-handler}

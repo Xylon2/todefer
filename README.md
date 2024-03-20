@@ -22,3 +22,5 @@ Don't forget to build your js:
 ```
 npx shadow-cljs compile app
 ```
+
+If wanting to check dependencies, use: https://github.com/liquidz/antq

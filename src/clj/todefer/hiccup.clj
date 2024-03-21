@@ -385,11 +385,9 @@
   "we need a way of knowing if the element is first or last."
   [coll]
   (let [coll-count (count coll)]
-    (map-indexed (fn [idx elem]
-                   [elem (cond
-                           (= idx 0) :first
-                           (= idx (dec coll-count)) :last
-                           :else :middle)])
+    (map-indexed (fn [idx item]
+                   [item {:first (zero? idx)
+                          :last (= idx (dec coll-count))}])
                  coll)))
 
 (defn settings-page
@@ -411,14 +409,14 @@
          [:col]
          [:col]]
         [:tbody
-         (for [[{:keys [page_id page_name page_type]} pos] (annotate-positions page-list)]
+         (for [[{:keys [page_id page_name page_type]} {:keys [first last]}] (annotate-positions page-list)]
            [:tr
             [:td page_name]
             [:td page_type]
             [:td [:button {:type "submit" :name "page_id" :value page_id} "delete"]]
-            [:td (when (not= pos :first)
+            [:td (when (not first)
                    [:button {:type "submit" :name "page_id" :value page_id} "⇧"])]
-            [:td (when (not= pos :last)
+            [:td (when (not last)
                    [:button {:type "submit" :name "page_id" :value page_id} "⇩"])]])]]]]
      :pagelist page-list
      :settings? true)))

@@ -6,7 +6,7 @@
   elements
 
   The pagelist is a list of maps, each containing page_link & page_title."
-  [title contents & {:keys [pagelist scripts actionbar]}]
+  [title contents & {:keys [pagelist scripts actionbar settings?]}]
   (->> [:html {:lang "en"}
         [:head
          [:title title]
@@ -26,12 +26,12 @@
                    (for [{:keys [page_name selected]} pagelist]
                      [:li (when selected {:id "selected-page"})
                       [:a {:href (str "/page/" page_name)} page_name]])))
-           [:div
-            [:a {:href "/"} "⚙"]]]]
+           [:div (when settings? {:id "selected-page"})
+            [:a {:href "/settings/"} "⚙"]]]]
          (when-not (empty? actionbar)
            [:div#actionbar.hero-header
             (into [:div.width] actionbar)])
-         
+
          (into [:main.width]
                contents)
          (when-not (empty? scripts)
@@ -380,3 +380,45 @@
     [:input {:type "date"
              :name "date"
              :hx-post (str "/page/" page-name "/defer-habit-date-save")}]]))
+
+(defn annotate-positions
+  "we need a way of knowing if the element is first or last."
+  [coll]
+  (let [coll-count (count coll)]
+    (map-indexed (fn [idx elem]
+                   [elem (cond
+                           (= idx 0) :first
+                           (= idx (dec coll-count)) :last
+                           :else :middle)])
+                 coll)))
+
+(defn settings-page
+  "renders a the settings"
+  [page-list f-token]
+  (let []
+    (render-base
+     (str "Settings")
+     [[:h2 "Pages"]
+      [:form {:method "post"}
+       [:input {:name "__anti-forgery-token"
+                :type "hidden"
+                :value f-token}]
+       [:table
+        [:colgroup
+         [:col {:style "width: 100%;"}]
+         [:col]
+         [:col]
+         [:col]
+         [:col]]
+        [:tbody
+         (for [[{:keys [page_id page_name page_type]} pos] (annotate-positions page-list)]
+           [:tr
+            [:td page_name]
+            [:td page_type]
+            [:td [:button {:type "submit" :name "page_id" :value page_id} "delete"]]
+            [:td (when (not= pos :first)
+                   [:button {:type "submit" :name "page_id" :value page_id} "⇧"])]
+            [:td (when (not= pos :last)
+                   [:button {:type "submit" :name "page_id" :value page_id} "⇩"])]])]]]]
+     :pagelist page-list
+     :settings? true)))

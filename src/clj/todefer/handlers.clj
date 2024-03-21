@@ -145,7 +145,7 @@
     {redirect "redirect" :or {redirect "/"}} :query-params
     session :session
     {{:keys [username password]} :form} :parameters
-   f-token :anti-forgery-token}]
+    f-token :anti-forgery-token}]
   (if (exec-query (q/authenticate-user username password))
     ;; login success
     {:status 303
@@ -158,3 +158,11 @@
      :headers {"Content-Type" "text/html"}
      :body (ph/render-login redirect f-token "Login failed")}))
 
+(defn settings-handler
+  "show the settings page"
+  [{exec-query :q-builder
+    f-token :anti-forgery-token}]
+  (let [page-list (exec-query (q/list-pages))]
+    {:status 200
+     :headers {"Content-Type" "text/html"}
+     :body (ph/settings-page page-list f-token)}))

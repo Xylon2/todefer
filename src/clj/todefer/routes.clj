@@ -186,6 +186,10 @@
                                      :date ::iso-date}}}}]
         ]
 
+       ["/settings/"
+        {:middleware [wrap-auth]
+         :get {:handler hl/settings-handler}}]
+
        ["/login" {:get {:handler hl/login-handler}
                   :post {:handler hl/login-post-handler
                          :parameters {:form {:username ::string

@@ -28,7 +28,7 @@
     (settings-200 page-list f-token)))
 
 (defn add-page-handler
-  "add task"
+  "add page"
   [{exec-query :q-builder
     f-token :anti-forgery-token
     {{:keys [new_pagename new_pagetype]} :form} :parameters}]
@@ -37,3 +37,15 @@
     (if qresult
       (settings-200 page-list f-token)
       (show-500 ":o"))))
+
+(defn delete-page-handler
+  "delete page"
+  [{exec-query :q-builder
+    f-token :anti-forgery-token
+    {{:keys [page_id]} :form} :parameters}]
+  (let [qresult (one-update? (exec-query (q/delete-page! page_id)))
+        page-list (exec-query (q/list-pages))]
+    (if qresult
+      (settings-200 page-list f-token)
+      (show-500 ":o"))))
+

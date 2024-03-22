@@ -197,7 +197,10 @@
         ["add-page"
          {:post {:handler sc/add-page-handler
                  :parameters {:form {:new_pagename ::string
-                                     :new_pagetype ::pagetype}}}}]]
+                                     :new_pagetype ::pagetype}}}}]
+        ["delete"
+         {:post {:handler sc/delete-page-handler
+                 :parameters {:form {:page_id ::int}}}}]]
 
        ["/login" {:get {:handler hl/login-handler}
                   :post {:handler hl/login-post-handler

@@ -15,6 +15,7 @@
             [todefer.handlers :as hl]
             [todefer.task-controllers :as tc]
             [todefer.habit-controllers :as hc]
+            [todefer.settings-controllers :as sc]
             [ring.logger :as logger]
             [clojure.string :as string]
             [clojure.pprint]
@@ -26,6 +27,7 @@
 (s/def ::iso-date #(re-matches #"\d{4}-\d{2}-\d{2}" %))
 (s/def ::freq_unit #{"days" "weeks" "months" "years"})
 (s/def ::donewhen #{"today" "yesturday"})
+(s/def ::pagetype #{"task" "habit" "agenda"})
 
 (s/def ::ints-list (s/coll-of ::int      :kind vector?))
 (s/def ::strs-list (s/coll-of ::string   :kind vector?))
@@ -186,9 +188,16 @@
                                      :date ::iso-date}}}}]
         ]
 
-       ["/settings/"
+       ["/settings"
         {:middleware [wrap-auth]
-         :get {:handler hl/settings-handler}}]
+         :get {:handler sc/settings-handler}}]
+
+       ["/settings/"
+        {:middleware [wrap-auth]}
+        ["add-page"
+         {:post {:handler sc/add-page-handler
+                 :parameters {:form {:new_pagename ::string
+                                     :new_pagetype ::pagetype}}}}]]
 
        ["/login" {:get {:handler hl/login-handler}
                   :post {:handler hl/login-post-handler

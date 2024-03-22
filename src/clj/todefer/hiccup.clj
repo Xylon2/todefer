@@ -27,7 +27,7 @@
                      [:li (when selected {:id "selected-page"})
                       [:a {:href (str "/page/" page_name)} page_name]])))
            [:div (when settings? {:id "selected-page"})
-            [:a {:href "/settings/"} "⚙"]]]]
+            [:a {:href "/settings"} "⚙"]]]]
          (when-not (empty? actionbar)
            [:div#actionbar.hero-header
             (into [:div.width] actionbar)])
@@ -413,19 +413,19 @@
            [:tr
             [:td page_name]
             [:td page_type]
-            [:td [:button {:type "submit" :name "page_id" :value page_id} "delete"]]
+            [:td [:button {:type "submit" :formaction "/settings/delete" :name "page_id" :value page_id} "delete"]]
             [:td (when (not first)
-                   [:button {:type "submit" :name "page_id" :value page_id} "⇧"])]
+                   [:button {:type "submit" :formaction "/settings/page_up" :name "page_id" :value page_id} "⇧"])]
             [:td (when (not last)
-                   [:button {:type "submit" :name "page_id" :value page_id} "⇩"])]])]]]
+                   [:button {:type "submit" :formaction "/settings/page_down" :name "page_id" :value page_id} "⇩"])]])]]]
       [:h2 "Add Page"]
-      [:form {:method "post" :action "add_page"}
+      [:form {:method "post" :action "/settings/add-page"}
        [:input {:name "__anti-forgery-token"
                 :type "hidden"
                 :value f-token}]
        [:input {:type "text"
-                :name "add_page"}]
-       [:select {:name "page_type"}
+                :name "new_pagename"}]
+       [:select {:name "new_pagetype"}
         [:option {:value "task"} "tasks page"]
         [:option {:value "habit"} "habits page"]
         [:option {:value "agenda"} "agenda page"]]

@@ -417,6 +417,22 @@
             [:td (when (not first)
                    [:button {:type "submit" :name "page_id" :value page_id} "⇧"])]
             [:td (when (not last)
-                   [:button {:type "submit" :name "page_id" :value page_id} "⇩"])]])]]]]
+                   [:button {:type "submit" :name "page_id" :value page_id} "⇩"])]])]]]
+      [:h2 "Add Page"]
+      [:form {:method "post" :action "add_page"}
+       [:input {:name "__anti-forgery-token"
+                :type "hidden"
+                :value f-token}]
+       [:input {:type "text"
+                :name "add_page"}]
+       [:select {:name "page_type"}
+        [:option {:value "task"} "tasks page"]
+        [:option {:value "habit"} "habits page"]
+        [:option {:value "agenda"} "agenda page"]]
+       [:button {:type "submit"} "add page"]]
+      [:h2 "Add Page"]
+      [:form {:method "get" :action "/logout"}
+       [:button {:type "submit"} "Logout"]]
+      ]
      :pagelist page-list
      :settings? true)))

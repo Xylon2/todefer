@@ -208,15 +208,14 @@
 
         ["page_up"
          {:post {:handler sc/page-up-handler
-                 :parameters {:form {:page_id ::int}}}}]
-
-
-        ]
+                 :parameters {:form {:page_id ::int}}}}]]
 
        ["/login" {:get {:handler hl/login-handler}
                   :post {:handler hl/login-post-handler
                          :parameters {:form {:username ::string
                                              :password ::string}}}}]
+       ["/logout" {:get {:handler hl/logout-handler}}]
+
        ["/public/*path" {:get {:middleware [wrap-content-type
                                             [wrap-resource ""]]
                                :handler hl/not-found-handler}}]]

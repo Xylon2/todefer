@@ -158,3 +158,11 @@
      :headers {"Content-Type" "text/html"}
      :body (ph/render-login redirect f-token "Login failed")}))
 
+(defn logout-handler
+  "log out and redirect to /"
+  [{session :session}]
+
+  {:status 303
+     :headers {"Location" "/"}
+     :body ""
+     :session (dissoc session :user)})

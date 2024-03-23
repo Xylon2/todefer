@@ -49,3 +49,46 @@
       (settings-200 page-list f-token)
       (show-500 ":o"))))
 
+(defn reorderfunc
+  "reducing function. when we find the page we want, we swap it with the next one
+
+  first param is a map of:
+   - swap-id - this is to remember the id of the page we want to swap
+   - state   - essentially have we found the one to swap yet
+   - newvec  - the vector we're building"
+  [{:keys [swap-id state newvec]} page-id]
+  (case state
+    "returning" (if (not= page-id swap-id)
+                  {:swap-id swap-id :state "returning" :newvec (conj newvec page-id)}
+                  {:swap-id swap-id :state "swapping"  :newvec newvec})
+    "swapping"    {:swap-id swap-id :state "returning" :newvec (conj newvec page-id swap-id)}))
+
+(defn apply-order
+  "given the list of page ids in a vector, generate them new order ids and apply"
+  [exec-query idlist]
+  (doseq [[order-key page_id] (map-indexed vector idlist)]
+    (exec-query (q/reorder-page! page_id order-key))))
+
+(defn page-down-handler
+  "page up"
+  [{exec-query :q-builder
+    f-token :anti-forgery-token
+    {{:keys [page_id]} :form} :parameters}]
+  (let [page-id-list (mapv :page_id (exec-query (q/list-pages)))
+        {reordered_list :newvec} (reduce reorderfunc {:swap-id page_id :state "returning" :newvec []} page-id-list)]
+
+    (apply-order exec-query reordered_list)
+    (let [page-list (exec-query (q/list-pages))]
+      (settings-200 page-list f-token))))
+
+(defn page-up-handler
+  "page up"
+  [{exec-query :q-builder
+    f-token :anti-forgery-token
+    {{:keys [page_id]} :form} :parameters}]
+  (let [page-id-list (rseq (mapv :page_id (exec-query (q/list-pages))))
+        {reordered_list :newvec} (reduce reorderfunc {:swap-id page_id :state "returning" :newvec []} page-id-list)]
+
+    (apply-order exec-query (rseq reordered_list))
+    (let [page-list (exec-query (q/list-pages))]
+      (settings-200 page-list f-token))))

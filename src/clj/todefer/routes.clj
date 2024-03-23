@@ -200,7 +200,18 @@
                                      :new_pagetype ::pagetype}}}}]
         ["delete"
          {:post {:handler sc/delete-page-handler
-                 :parameters {:form {:page_id ::int}}}}]]
+                 :parameters {:form {:page_id ::int}}}}]
+
+        ["page_down"
+         {:post {:handler sc/page-down-handler
+                 :parameters {:form {:page_id ::int}}}}]
+
+        ["page_up"
+         {:post {:handler sc/page-up-handler
+                 :parameters {:form {:page_id ::int}}}}]
+
+
+        ]
 
        ["/login" {:get {:handler hl/login-handler}
                   :post {:handler hl/login-post-handler

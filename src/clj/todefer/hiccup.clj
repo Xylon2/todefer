@@ -164,10 +164,10 @@
 (defn render-agenda
   "the meat of the agenda page. used both in initial page-load and by AJAX"
   [page-id]
-  (let [today [[:h2 "Today"]]
-        tomorrow [[:h2 "Tomorrow"]]]
+  (let [tomorrow [[:h2 "Tomorrow"]]
+        today [[:h2 "Today"]]]
 
-    (concat today tomorrow)))
+    (concat tomorrow today)))
 
 (defn tasks-page
   "renders a full page of tasks"
@@ -195,14 +195,20 @@
                              :hx-post (str "/page/" page-name "/add-task")}
                     "add task"]]
                   [:div
-                   [:button {:type "button"
+                   ;; delete
+                   [:select {:name "really"
                              :hx-post (str "/page/" page-name "/delete-task")
                              :hx-include "[name='task_id']"}
-                    "delete"]
+                    [:option {:value ""} "delete"]
+                    [:option {:value "really"} "really?"]]
+
+                   ;; modify
                    [:button {:type "button"
                              :hx-post (str "/page/" page-name "/modify-task-view")
                              :hx-include "[name='task_id']"}
                     "modify"]
+
+                   ;; move
                    (when (< 0 (count other-task-pages))
                      (into [:select {:name "newpage"
                                      :hx-post (str "/page/" page-name "/move-task")
@@ -210,6 +216,16 @@
                             [:option {:value ""} "move"]]
                            (for [{:keys [page_name page_id]} other-task-pages]
                              [:option {:value page_id} page_name])))
+
+                   ;; todo
+                   [:select {:name "action"
+                             :hx-post (str "/page/" page-name "/todo-task")
+                             :hx-include "[name='task_id']"}
+                    [:option {:value ""} "todo"]
+                    [:option {:value "tomorrow"} "tomorrow"]
+                    [:option {:value "today"} "today"]]
+
+                   ;; defer
                    [:button {:type "button"
                              :hx-post (str "/page/" page-name "/defer-task-view")
                              :hx-include "[name='task_id']"}
@@ -248,21 +264,28 @@
                              :hx-post (str "/page/" page-name "/add-habit")}
                     "add habit"]]
                   [:div
+                   ;; done
                    [:select {:name "donewhen"
                              :hx-post (str "/page/" page-name "/done-habit")
                              :hx-include "[name='habit_id']"}
                     [:option {:value ""} "done"]
                     [:option {:value "today"} "today"]
                     [:option {:value "yesturday"} "yesturday"]]
+
+                   ;; delete
                    [:select {:name "really"
                              :hx-post (str "/page/" page-name "/delete-habit")
                              :hx-include "[name='habit_id']"}
                     [:option {:value ""} "delete"]
                     [:option {:value "really"} "really?"]]
+
+                   ;; modify
                    [:button {:type "button"
                              :hx-post (str "/page/" page-name "/modify-habit-view")
                              :hx-include "[name='habit_id']"}
                     "modify"]
+
+                   ;; move
                    (when (< 0 (count other-habit-pages))
                      (into [:select {:name "newpage"
                                      :hx-post (str "/page/" page-name "/move-habit")
@@ -270,6 +293,16 @@
                             [:option {:value ""} "move"]]
                            (for [{:keys [page_name page_id]} other-habit-pages]
                              [:option {:value page_id} page_name])))
+
+                   ;; todo
+                   [:select {:name "action"
+                             :hx-post (str "/page/" page-name "/todo-habit")
+                             :hx-include "[name='task_id']"}
+                    [:option {:value ""} "todo"]
+                    [:option {:value "tomorrow"} "tomorrow"]
+                    [:option {:value "today"} "today"]]
+
+                   ;; defer
                    [:button {:type "button"
                              :hx-post (str "/page/" page-name "/defer-habit-view")
                              :hx-include "[name='habit_id']"}
@@ -430,6 +463,8 @@
            [:tr
             [:td page_name]
             [:td page_type]
+
+            ;; agenda page selection
             (into [:td]
                   (when (= page_type "agenda")
                     [[:input {:type "hidden" :name "linkedpage" :value "-1"}]
@@ -437,9 +472,15 @@
                       (for [{:keys [page_id page_name page_type]} (filter #(not= (:page_type %) "agenda") page-list)]
                         [:option (into {:value page_id} (when (some #{page_id} linked-pages) {:selected true})) (str page_name " " page_type)])]
                      [:button {:type "submit" :formaction "/settings/update_agenda_pages" :name "page_id" :value page_id} "update"]]))
+
+            ;; delete
             [:td [:button {:type "submit" :formaction "/settings/delete" :name "page_id" :value page_id} "delete"]]
+
+            ;; move up
             [:td (when (not first)
                    [:button {:type "submit" :formaction "/settings/page_up" :name "page_id" :value page_id} "⇧"])]
+
+            ;; move down
             [:td (when (not last)
                    [:button {:type "submit" :formaction "/settings/page_down" :name "page_id" :value page_id} "⇩"])]])]]]
       [:h2 "Add Page"]

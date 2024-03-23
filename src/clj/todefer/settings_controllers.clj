@@ -9,17 +9,6 @@
 (def one-update?   #(= 1 (num-updated %)))
 (def some-updated? #(< 0 (num-updated %)))
 
-(defn settings-200 [page-list f-token]
-  {:status 200
-   :headers {"Content-Type" "text/html"}
-   :body (ph/settings-page page-list f-token)})
-
-(defn show-500
-  [message]
-  {:status 500
-   :headers {"Content-Type" "text/html"}
-   :body message})
-
 (defn add-linked-pages
   "for agenda pages, we add a list of the linked pages"
   [page-list exec-query]
@@ -28,23 +17,33 @@
            (assoc page :linked-pages (exec-query (q/list-linked-pages (:page_id page))))
            page)) page-list))
 
+(defn settings-200 [exec-query f-token]
+  (let [page-list (exec-query (q/list-pages))
+        page-list' (add-linked-pages page-list exec-query)]
+    {:status 200
+     :headers {"Content-Type" "text/html"}
+     :body (ph/settings-page page-list' f-token)}))
+
+(defn show-500
+  [message]
+  {:status 500
+   :headers {"Content-Type" "text/html"}
+   :body message})
+
 (defn settings-handler
   "show the settings page"
   [{exec-query :q-builder
     f-token :anti-forgery-token}]
-  (let [page-list (exec-query (q/list-pages))
-        page-list' (add-linked-pages page-list exec-query)]
-    (settings-200 page-list' f-token)))
+  (settings-200 exec-query f-token))
 
 (defn add-page-handler
   "add page"
   [{exec-query :q-builder
     f-token :anti-forgery-token
     {{:keys [new_pagename new_pagetype]} :form} :parameters}]
-  (let [qresult (one-update? (exec-query (q/create-page! new_pagename new_pagetype)))
-        page-list (exec-query (q/list-pages))]
+  (let [qresult (one-update? (exec-query (q/create-page! new_pagename new_pagetype)))]
     (if qresult
-      (settings-200 page-list f-token)
+      (settings-200 exec-query f-token)
       (show-500 ":o"))))
 
 (defn delete-page-handler
@@ -52,10 +51,9 @@
   [{exec-query :q-builder
     f-token :anti-forgery-token
     {{:keys [page_id]} :form} :parameters}]
-  (let [qresult (one-update? (exec-query (q/delete-page! page_id)))
-        page-list (exec-query (q/list-pages))]
+  (let [qresult (one-update? (exec-query (q/delete-page! page_id)))]
     (if qresult
-      (settings-200 page-list f-token)
+      (settings-200 exec-query f-token)
       (show-500 ":o"))))
 
 (defn reorderfunc
@@ -87,8 +85,7 @@
         {reordered_list :newvec} (reduce reorderfunc {:swap-id page_id :state "returning" :newvec []} page-id-list)]
 
     (apply-order exec-query reordered_list)
-    (let [page-list (exec-query (q/list-pages))]
-      (settings-200 page-list f-token))))
+    (settings-200 exec-query f-token)))
 
 (defn page-up-handler
   "page up"
@@ -99,5 +96,17 @@
         {reordered_list :newvec} (reduce reorderfunc {:swap-id page_id :state "returning" :newvec []} page-id-list)]
 
     (apply-order exec-query (rseq reordered_list))
-    (let [page-list (exec-query (q/list-pages))]
-      (settings-200 page-list f-token))))
+    (settings-200 exec-query f-token)))
+
+(defn update-agenda-handler
+  [{exec-query :q-builder
+    f-token :anti-forgery-token
+    {{:keys [page_id linkedpage]} :form} :parameters}]
+
+  ;; our list contains only positives so we have to nuke the old values before
+  ;; adding them all back again
+  (exec-query (q/nuke-linked-pages! page_id))
+  (doseq [lpg linkedpage]
+    (exec-query (q/update-linked-pages! page_id lpg)))
+
+  (settings-200 exec-query f-token))

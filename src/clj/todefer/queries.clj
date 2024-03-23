@@ -125,6 +125,23 @@
 
    #(map :page_id %)])
 
+(defn nuke-linked-pages!
+  "nuke all linked pages for a given agenda page"
+  [page_id]
+  [(-> (delete-from :pageagenda)
+       (where [:= :agenda_id page_id]))
+
+   identity])
+
+(defn update-linked-pages!
+  "update the linked pages of an Agenda page"
+  [page_id linkedpage]
+  [(-> (insert-into :pageagenda)
+       (values [{:agenda_id page_id :page_id linkedpage}])
+       (on-conflict (do-nothing)))
+
+   identity])
+
 (defn get-page
   "gets the info for a single page"
   [page_name]

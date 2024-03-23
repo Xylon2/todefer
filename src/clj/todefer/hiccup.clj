@@ -430,11 +430,13 @@
            [:tr
             [:td page_name]
             [:td page_type]
-            [:td
-             (when (= page_type "agenda")
-                 [:select {:name "linkedpage" :multiple true}
-                  (for [{:keys [page_id page_name page_type]} (filter #(not= (:page_type %) "agenda") page-list)]
-                    [:option (into {:value page_id} (when (some #{page_id} linked-pages) {:selected true})) (str page_name " " page_type)])])]
+            (into [:td]
+                  (when (= page_type "agenda")
+                    [[:input {:type "hidden" :name "linkedpage" :value "-1"}]
+                     [:select {:name "linkedpage" :multiple true}
+                      (for [{:keys [page_id page_name page_type]} (filter #(not= (:page_type %) "agenda") page-list)]
+                        [:option (into {:value page_id} (when (some #{page_id} linked-pages) {:selected true})) (str page_name " " page_type)])]
+                     [:button {:type "submit" :formaction "/settings/update_agenda_pages" :name "page_id" :value page_id} "update"]]))
             [:td [:button {:type "submit" :formaction "/settings/delete" :name "page_id" :value page_id} "delete"]]
             [:td (when (not first)
                    [:button {:type "submit" :formaction "/settings/page_up" :name "page_id" :value page_id} "⇧"])]

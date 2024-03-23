@@ -74,7 +74,8 @@
                                :habit_name_new
                                :freq_value_new
                                :freq_unit_new
-                               :due_new]]
+                               :due_new
+                               :linkedpage]]
             (if (empty? keys)
               xs
               (let [[key & keys'] keys
@@ -208,7 +209,13 @@
 
         ["page_up"
          {:post {:handler sc/page-up-handler
-                 :parameters {:form {:page_id ::int}}}}]]
+                 :parameters {:form {:page_id ::int}}}}]
+
+        ["update_agenda_pages"
+         {:post {:handler sc/update-agenda-handler
+                 :middleware [wrap-filter-dummy-values]
+                 :parameters {:form {:page_id ::int
+                                     :linkedpage ::ints-list}}}}]]
 
        ["/login" {:get {:handler hl/login-handler}
                   :post {:handler hl/login-post-handler

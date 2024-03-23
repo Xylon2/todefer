@@ -20,12 +20,21 @@
    :headers {"Content-Type" "text/html"}
    :body message})
 
+(defn add-linked-pages
+  "for agenda pages, we add a list of the linked pages"
+  [page-list exec-query]
+  (map (fn [page]
+         (if (= (:page_type page) "agenda")
+           (assoc page :linked-pages (exec-query (q/list-linked-pages (:page_id page))))
+           page)) page-list))
+
 (defn settings-handler
   "show the settings page"
   [{exec-query :q-builder
     f-token :anti-forgery-token}]
-  (let [page-list (exec-query (q/list-pages))]
-    (settings-200 page-list f-token)))
+  (let [page-list (exec-query (q/list-pages))
+        page-list' (add-linked-pages page-list exec-query)]
+    (settings-200 page-list' f-token)))
 
 (defn add-page-handler
   "add page"

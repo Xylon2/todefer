@@ -115,17 +115,21 @@
                    upcominghabits (map #(prettify-due % :date_scheduled)
                                        (exec-query (q/list-upcoming-habits page-id)))]
 
-                 (ph/habits-page
-                  page-list'
-                  page-name
-                  page-id
-                  duehabits
-                  upcominghabits
-                  f-token))}
-      ;; "agenda"
-      ;; {:status 200
-      ;;  :headers {"Content-Type" "text/html"}
-      ;;  :body (ph/agenda-page page-list page-name page-id)}
+               (ph/habits-page
+                page-list'
+                page-name
+                page-id
+                duehabits
+                upcominghabits
+                f-token))}
+      "agenda"
+      {:status 200
+       :headers {"Content-Type" "text/html"}
+       :body (let []
+               (ph/agenda-page
+                page-list'
+                page-name
+                page-id))}
       (not-found-handler request)
       )))
 

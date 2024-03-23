@@ -115,6 +115,16 @@
 
    identity])
 
+(defn list-linked-pages
+  "to be used on Agenda pages only"
+  [agenda_id]
+  [(-> (select :appPage.page_id)
+       (from :appPage)
+       (join :pageagenda [:= :appPage.page_id :pageagenda.page_id])
+       (where [:= :agenda_id agenda_id]))
+
+   #(map :page_id %)])
+
 (defn get-page
   "gets the info for a single page"
   [page_name]

@@ -161,6 +161,14 @@
     
     (concat duehiccup upcominghiccup)))
 
+(defn render-agenda
+  "the meat of the agenda page. used both in initial page-load and by AJAX"
+  [page-id]
+  (let [today [[:h2 "Today"]]
+        tomorrow [[:h2 "Tomorrow"]]]
+
+    (concat today tomorrow)))
+
 (defn tasks-page
   "renders a full page of tasks"
   [pagelist page-name page-id due-tasks defcats-named defcats-dated f-token]
@@ -267,6 +275,15 @@
                              :hx-include "[name='habit_id']"}
                     "defer"]
                    ]]])))
+
+(defn agenda-page
+  "render a full agenda page"
+  [page-list page-name page-id]
+  (let [contents (render-agenda page-id)]
+    (render-base
+     (str page-name " agenda")
+     contents
+     :pagelist page-list)))
 
 (defn render-modify-tasks
   "page to modify selected tasks"
@@ -409,10 +426,15 @@
          [:col]
          [:col]]
         [:tbody
-         (for [[{:keys [page_id page_name page_type]} {:keys [first last]}] (annotate-positions page-list)]
+         (for [[{:keys [page_id page_name page_type linked-pages]} {:keys [first last]}] (annotate-positions page-list)]
            [:tr
             [:td page_name]
             [:td page_type]
+            [:td
+             (when (= page_type "agenda")
+                 [:select {:name "linkedpage" :multiple true}
+                  (for [{:keys [page_id page_name page_type]} (filter #(not= (:page_type %) "agenda") page-list)]
+                    [:option (into {:value page_id} (when (some #{page_id} linked-pages) {:selected true})) (str page_name " " page_type)])])]
             [:td [:button {:type "submit" :formaction "/settings/delete" :name "page_id" :value page_id} "delete"]]
             [:td (when (not first)
                    [:button {:type "submit" :formaction "/settings/page_up" :name "page_id" :value page_id} "⇧"])]

@@ -301,7 +301,7 @@
                    ;; todo
                    [:select {:name "action"
                              :hx-post (str "/page/" page-name "/todo-habit")
-                             :hx-include "[name='task_id']"}
+                             :hx-include "[name='habit_id']"}
                     [:option {:value ""} "todo"]
                     [:option {:value "tomorrow"} "tomorrow"]
                     [:option {:value "today"} "today"]]

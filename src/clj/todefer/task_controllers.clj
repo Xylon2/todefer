@@ -95,6 +95,21 @@
       (show-tasks-200 exec-query page-id)
       (show-500 ":o"))))
 
+(defn todo-task-handler
+  "update one or more tasks todo field"
+  [{exec-query :q-builder
+    {{:keys [task_id action]} :form
+     {:keys [page-name]} :path} :parameters}]
+  (let [page-id (get-page-id exec-query page-name)]
+    (if (and
+         (some-updated? (exec-query (case action
+                                      "today" (q/task-today! task_id)
+                                      "tomorrow" (q/task-tomorrow! task_id))))
+         (some-updated? (exec-query (q/undefer-task-named! task_id)))
+         (some-updated? (exec-query (q/undefer-task-dated! task_id))))
+      (show-tasks-200 exec-query page-id)
+      (show-500 ":o"))))
+
 (defn defer-task-view
   "always accessed with POST requests.
 

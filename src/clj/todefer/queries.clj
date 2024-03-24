@@ -478,6 +478,42 @@
 
    identity])
 
+(defn thing-today!
+  "update the todo field of thing(s) to today's date"
+  [table fname thing_ids]
+  [(-> (update table)
+       (set {:todo :CURRENT_DATE})
+       (where [:= fname [:any [:array thing_ids :integer]]]))
+
+   identity])
+
+(def task-today! #(thing-today! :task :task_id %))
+(def habit-today! #(thing-today! :habit :habit_id %))
+
+(defn thing-tomorrow!
+  "update the todo field of thing(s) to tomorrow's date"
+  [table fname thing_ids]
+  [(-> (update table)
+       (set {:todo [:+ :CURRENT_DATE [:interval "1 day"]]})
+       (where [:= fname [:any [:array thing_ids :integer]]]))
+
+   identity])
+
+(def task-tomorrow! #(thing-tomorrow! :task :task_id %))
+(def habit-tomorrow! #(thing-tomorrow! :habit :habit_id %))
+
+(defn thing-untodo!
+  "set the todo field of thing(s) to nil"
+  [table fname thing_ids]
+  [(-> (update table)
+       (set {:todo nil})
+       (where [:= fname [:any [:array thing_ids :integer]]]))
+
+   identity])
+
+(def task-untodo! #(thing-untodo! :task :task_id %))
+(def habit-untodo! #(thing-untodo! :habit :habit_id %))
+
 (comment
 (defn query-name
   ""

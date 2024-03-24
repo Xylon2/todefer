@@ -16,7 +16,8 @@
   (let [due-habits (map #(hl/prettify-due % :date_scheduled)
                        (exec-query (q/list-due-habits page-id)))
         upcoming-habits (map #(hl/prettify-due % :date_scheduled)
-                            (exec-query (q/list-upcoming-habits page-id)))]
+                             (filter #(= (:todo %) nil)
+                                     (exec-query (q/list-upcoming-habits page-id))))]
     {:status 200
      :headers {"Content-Type" "text/html"}
      :body (-> (ph/render-habits page-id due-habits upcoming-habits)
@@ -44,7 +45,9 @@
   (let [{:keys [freq_unit freq_value]} (first (exec-query (q/get-habit-info [habit_id])))
         dayshence (jt/days (* (get timeunit-multipliers freq_unit) freq_value))
         now (jt/minus (jt/local-date) (jt/days offset))]
-    (some-updated? (exec-query (q/defer-habit! [habit_id] (jt/plus now dayshence) true)))))
+    (and
+     (some-updated? (exec-query (q/defer-habit! [habit_id] (jt/plus now dayshence) true)))
+     (some-updated? (exec-query (q/habit-untodo! [habit_id]))))))
 
 (defn add-habit-handler
   "add habit"
@@ -115,6 +118,18 @@
      {:keys [page-name]} :path} :parameters}]
   (let [page-id (get-page-id exec-query page-name)]
     (if (some-updated? (exec-query (q/move-habit! habit_id newpage)))
+      (show-habits-200 exec-query page-id)
+      (show-500 ":o"))))
+
+(defn todo-habit-handler
+  "update one or more habits todo field"
+  [{exec-query :q-builder
+    {{:keys [habit_id action]} :form
+     {:keys [page-name]} :path} :parameters}]
+  (let [page-id (get-page-id exec-query page-name)]
+    (if (some-updated? (exec-query (case action
+                                     "today" (q/habit-today! habit_id)
+                                     "tomorrow" (q/habit-tomorrow! habit_id))))
       (show-habits-200 exec-query page-id)
       (show-500 ":o"))))
 

@@ -28,6 +28,7 @@
 (s/def ::freq_unit #{"days" "weeks" "months" "years"})
 (s/def ::donewhen #{"today" "yesturday"})
 (s/def ::pagetype #{"task" "habit" "agenda"})
+(s/def ::todo-actions #{"today" "tomorrow"})
 
 (s/def ::ints-list (s/coll-of ::int      :kind vector?))
 (s/def ::strs-list (s/coll-of ::string   :kind vector?))
@@ -138,6 +139,16 @@
          {:post {:handler hc/move-habit-handler
                  :parameters {:form {:habit_id ::ints-list
                                      :newpage ::string}}}}]
+
+        ["todo-task"
+         {:post {:handler tc/todo-task-handler
+                 :parameters {:form {:task_id ::ints-list
+                                     :action ::todo-actions}}}}]
+
+        ["todo-habit"
+         {:post {:handler hc/todo-habit-handler
+                 :parameters {:form {:habit_id ::ints-list
+                                     :action ::todo-actions}}}}]
 
         ;; multi-request actions. these actions have a view page, where the user
         ;; is asked for more input, and a save page, which will run a query and

@@ -113,7 +113,8 @@
        :body (let [duehabits (map #(prettify-due % :date_scheduled)
                                   (exec-query (q/list-due-habits page-id)))
                    upcominghabits (map #(prettify-due % :date_scheduled)
-                                       (exec-query (q/list-upcoming-habits page-id)))]
+                                       (filter #(= (:todo %) nil)
+                                               (exec-query (q/list-upcoming-habits page-id))))]
 
                (ph/habits-page
                 page-list'

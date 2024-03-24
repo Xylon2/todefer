@@ -2,7 +2,8 @@
   (:require [todefer.queries :as q]
             [todefer.hiccup :as ph]
             [hiccup2.core :as h]
-            [java-time :as jt]))
+            [java-time :as jt]
+            [clojure.pprint :refer [pprint]]))
 
 (def days {"Mon" "Monday"
            "Tue" "Tuesday"
@@ -13,22 +14,26 @@
            "Sun" "Sunday"})
 
 (defn prettify-due
-  "we take a map, and we add a :prettydue based off of the key in datekey"
+  "we take a vector of maps, and we add a :prettydue to each map based off of the key in datekey"
   [taskdata datekey]
-  (let [{date_scheduled datekey} taskdata
-        date_scheduled' (.toLocalDate date_scheduled)
-        now (jt/local-date)]
-    (conj taskdata {:prettydue (cond
-                                  (= date_scheduled' now)
-                                    "today"
-                                  (= date_scheduled' (jt/plus now (jt/days 1)))
-                                    "tomorrow"
-                                  (= date_scheduled' (jt/minus now (jt/days 1)))
-                                    "yesturday"
-                                  (jt/before? (jt/minus now (jt/days 6)) date_scheduled' (jt/plus now (jt/days 6)))
-                                    (days (jt/format "E" date_scheduled'))
-                                  :else
-                                    date_scheduled')})))
+  (mapv
+   (fn [task]
+     (let [{date_scheduled datekey} task
+           date_scheduled' (.toLocalDate date_scheduled)
+           now (jt/local-date)]
+       (assoc task :prettydue
+              (cond
+                (= date_scheduled' now)
+                "today"
+                (= date_scheduled' (jt/plus now (jt/days 1)))
+                "tomorrow"
+                (= date_scheduled' (jt/minus now (jt/days 1)))
+                "yesterday"
+                (jt/before? (jt/minus now (jt/days 6)) date_scheduled' (jt/plus now (jt/days 6)))
+                (days (jt/format "E" date_scheduled'))
+                :else
+                date_scheduled'))))
+   taskdata))
 
 (defn undefer-due
   "to be used by reduce to either return a category back or undefer it"
@@ -43,6 +48,29 @@
           buildme)
       (conj buildme defcat))))
 
+(defn add-color [task-data]
+  (mapv
+   (fn [task]
+     (let [todo (:todo task)
+           now (jt/local-date)
+           tomorrow (jt/plus now (jt/days 1))]
+       (if (nil? todo)
+         task
+         (let [todo' (.toLocalDate todo)]
+           (cond
+             (jt/before? todo' tomorrow) (assoc task :color "today")
+             (= todo' tomorrow) (assoc task :color "tomorrow")
+             :else task)))))
+   task-data))
+
+(defn vector-fn-keys
+  "given a vector of maps, a key and a function, transform the value of that key
+  in each map"
+  [vec-of-maps key f]
+  (mapv (fn [map]
+          (update map key f))
+        vec-of-maps))
+
 (defn list-defcats-dated-undefer
   "basically a wrapper for q/list-defcats-dated that undefers categories as appropriate"
   [exec-query page_id]
@@ -50,14 +78,18 @@
     (reduce #(undefer-due exec-query %1 %2) [] defcats_dated)))
 
 (defn add-tasks-named
-  "given a map of cat info, add a new key called :tasks, with all the task info"
-  [exec-query defcat]
-  (conj defcat {:tasks (exec-query (q/tasks-defcat-named (defcat :cat_id)))}))
+  "given a vector of cat info maps, add a new key called :tasks to each map, with all the task info"
+  [defcats exec-query]
+  (mapv (fn [defcat]
+          (conj defcat {:tasks (exec-query (q/tasks-defcat-named (defcat :cat_id)))}))
+        defcats))
 
 (defn add-tasks-dated
-  "given a map of cat info, add a new key called :tasks, with all the task info"
-  [exec-query defcat]
-  (conj defcat {:tasks (exec-query (q/tasks-defcat-dated (defcat :cat_id)))}))
+  "given a vector of cat info maps, add a new key called :tasks to each map, with all the task info"
+  [defcats exec-query]
+  (mapv (fn [defcat]
+          (conj defcat {:tasks (exec-query (q/tasks-defcat-dated (defcat :cat_id)))}))
+        defcats))
 
 (defn not-found-handler
   "display not found page"
@@ -74,6 +106,12 @@
   {:status 200
    :headers {"Content-Type" "text/html"}
    :body (ph/render-message "Select a page" (exec-query (q/list-pages)))})
+
+(defn mapdebugger
+  [x annotation]
+  (println annotation)
+  (pprint x)
+  x)
 
 (defn display-page
   "displays a task, habit or agenda page"
@@ -93,12 +131,15 @@
       "task"
       {:status 200
        :headers {"Content-Type" "text/html"}
-       :body (let [due-tasks (exec-query (q/list-due-tasks page-id))
-                   defcatsnamed (map #(add-tasks-named exec-query %)
-                                     (exec-query (q/list-defcats-named page-id)))
-                   defcatsdated (map #(add-tasks-dated exec-query %)
-                                     (map #(prettify-due % :def_date)
-                                          (list-defcats-dated-undefer exec-query page-id)))]
+       :body (let [due-tasks (-> (exec-query (q/list-due-tasks page-id))
+                                 add-color)
+                   defcatsnamed (-> (exec-query (q/list-defcats-named page-id))
+                                    (add-tasks-named exec-query)
+                                    (vector-fn-keys :tasks add-color))
+                   defcatsdated (-> (list-defcats-dated-undefer exec-query page-id)
+                                    (prettify-due :def_date)
+                                    (add-tasks-dated exec-query)
+                                    (vector-fn-keys :tasks add-color))]
                (ph/tasks-page
                 page-list'
                 page-name
@@ -110,11 +151,12 @@
       "habit"
       {:status 200
        :headers {"Content-Type" "text/html"}
-       :body (let [duehabits (map #(prettify-due % :date_scheduled)
-                                  (exec-query (q/list-due-habits page-id)))
-                   upcominghabits (map #(prettify-due % :date_scheduled)
-                                       (exec-query (q/list-upcoming-habits page-id)))]
-
+       :body (let [duehabits (-> (exec-query (q/list-due-habits page-id))
+                                 (prettify-due :date_scheduled)
+                                 add-color)
+                   upcominghabits (-> (exec-query (q/list-upcoming-habits page-id))
+                                      (prettify-due :date_scheduled)
+                                      add-color)]
                (ph/habits-page
                 page-list'
                 page-name

@@ -70,6 +70,13 @@
                     [:input {:type "submit" :value "Login"}]]]
     (render-base "Login" [errorprint login-form])))
 
+(defn render-color
+  [color]
+  (when color
+    {:style (str "background-color: " (case color
+                                        "today" "lightgreen"
+                                        "tomorrow" "lightblue"))}))
+
 (defn render-tasks
   "the meat of a tasks page. used both in initial page-load and by AJAX"
   [page-id due-tasks defcats-named defcats-dated]
@@ -84,8 +91,8 @@
            [:tbody
             ;; this is a kludge to force task_id to always be a list
             [:input {:type "hidden" :name "task_id" :value "-1"}]
-            (for [{:keys [highlight task_id task_name]} due-tasks]
-              [:tr (when highlight {:style (str "background-color: " highlight)})
+            (for [{:keys [color task_id task_name]} due-tasks]
+              [:tr (render-color color)
                [:td [:input {:type "checkbox" :name "task_id" :value task_id}]]
                [:td task_name]]
               )]]]
@@ -100,8 +107,8 @@
                      [:col {:style "width: 2em;"}]
                      [:col {:style "width: 100%;"}]]
                     [:tbody
-                     (for [{:keys [highlight task_id task_name]} tasks]
-                       [:tr (when highlight {:style (str "background-color: " highlight)})
+                     (for [{:keys [color task_id task_name]} tasks]
+                       [:tr (render-color color)
                         [:td [:input {:type "checkbox" :name "task_id" :value task_id}]]
                         [:td task_name]]
                        )]]]
@@ -116,8 +123,8 @@
             [:col]]
            [:tbody
             (for [{:keys [tasks prettydue]} defcats-dated]
-              (for [{:keys [highlight task_id task_name]} tasks]
-                [:tr (when highlight {:style (str "background-color: " highlight)})
+              (for [{:keys [color task_id task_name]} tasks]
+                [:tr (render-color color)
                  [:td [:input {:type "checkbox" :name "task_id" :value task_id}]]
                  [:td task_name]
                  [:td prettydue]]
@@ -140,8 +147,8 @@
            [:tbody
             ;; this is a kludge to force habit_id to always be a list
             [:input {:type "hidden" :name "habit_id" :value "-1"}]
-            (for [{:keys [highlight habit_id habit_name freq_value freq_unit prettydue]} due-habits]
-              [:tr (when highlight {:style (str "background-color: " highlight)})
+            (for [{:keys [color habit_id habit_name freq_value freq_unit prettydue]} due-habits]
+              [:tr (render-color color)
                [:td [:input {:type "checkbox" :name "habit_id" :value habit_id}]]
                [:td habit_name
                 [:span.habit-info (str "every " freq_value " " freq_unit ", due " prettydue)]]]
@@ -155,8 +162,8 @@
             [:col {:style "width: 2em;"}]
             [:col {:style "width: 100%;"}]]
            [:tbody
-            (for [{:keys [highlight habit_id habit_name freq_value freq_unit prettydue]} upcoming-habits]
-              [:tr (when highlight {:style (str "background-color: " highlight)})
+            (for [{:keys [color habit_id habit_name freq_value freq_unit prettydue]} upcoming-habits]
+              [:tr (render-color color)
                [:td [:input {:type "checkbox" :name "habit_id" :value habit_id}]]
                [:td habit_name
                [:span.habit-info (str "every " freq_value " " freq_unit ", due " prettydue)]]])]]]

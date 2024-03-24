@@ -16,8 +16,7 @@
   (let [due-habits (map #(hl/prettify-due % :date_scheduled)
                        (exec-query (q/list-due-habits page-id)))
         upcoming-habits (map #(hl/prettify-due % :date_scheduled)
-                             (filter #(= (:todo %) nil)
-                                     (exec-query (q/list-upcoming-habits page-id))))]
+                             (exec-query (q/list-upcoming-habits page-id)))]
     {:status 200
      :headers {"Content-Type" "text/html"}
      :body (-> (ph/render-habits page-id due-habits upcoming-habits)

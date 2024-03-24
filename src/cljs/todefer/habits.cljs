@@ -1,5 +1,8 @@
 (ns todefer.habits
-  (:require [todefer.shared :refer [log byid byclass setup-collapsibles]]))
+  (:require [todefer.shared :refer [log byid byclass
+                                    setup-collapsibles
+                                    expand-it
+                                    toggle-element]]))
 
 ;; (set! (.-onkeyup js/document)
 ;;       (fn [e]
@@ -23,6 +26,12 @@
 ;;         (do
 ;;           (.setAttribute (byid "action_defer_existing") "name" "action")
 ;;           (.submit (byid "due_tasks_form")))))))
+
+;; want to expand the due section by default
+(let [elementname "due"
+      duesection (.getElementById js/document elementname)]
+  (toggle-element elementname)
+  (expand-it duesection))
 
 (setup-collapsibles)
 

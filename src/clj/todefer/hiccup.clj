@@ -74,20 +74,22 @@
   "the meat of a tasks page. used both in initial page-load and by AJAX"
   [page-id due-tasks defcats-named defcats-dated]
   (let [duehiccup
-        [[:h2 "Due"]
-         [:table
-          [:colgroup
-           [:col {:style "width: 2em;"}]
-           [:col {:style "width: 100%;"}]]
-          [:tbody
-           ;; this is a kludge to force task_id to always be a list
-           [:input {:type "hidden" :name "task_id" :value "-1"}]
-           (for [{:keys [highlight task_id task_name]} due-tasks]
-             [:tr (when highlight {:style (str "background-color: " highlight)})
-              [:td [:input {:type "checkbox" :name "task_id" :value task_id}]]
-              [:td task_name]]
-             )]]
-         [:br]]
+        [[:br]
+         [:button.collapsible {:type "button" :id "due"} "Due"]
+         [:div.collapsiblecontent
+          [:table
+           [:colgroup
+            [:col {:style "width: 2em;"}]
+            [:col {:style "width: 100%;"}]]
+           [:tbody
+            ;; this is a kludge to force task_id to always be a list
+            [:input {:type "hidden" :name "task_id" :value "-1"}]
+            (for [{:keys [highlight task_id task_name]} due-tasks]
+              [:tr (when highlight {:style (str "background-color: " highlight)})
+               [:td [:input {:type "checkbox" :name "task_id" :value task_id}]]
+               [:td task_name]]
+              )]]]
+         [:div [:br]]]
         dnamedhiccup
         (apply concat
                (for [{:keys [cat_name tasks cat_id]} defcats-named]
@@ -128,21 +130,23 @@
   "the meat of a habits page. used both in initial page-load and by AJAX"
   [page-id due-habits upcoming-habits]
   (let [duehiccup
-        [[:h2 "Due"]
-         [:table
-          [:colgroup
-           [:col {:style "width: 2em;"}]
-           [:col {:style "width: 100%;"}]]
-          [:tbody
-           ;; this is a kludge to force habit_id to always be a list
-           [:input {:type "hidden" :name "habit_id" :value "-1"}]
-           (for [{:keys [highlight habit_id habit_name freq_value freq_unit prettydue]} due-habits]
-             [:tr (when highlight {:style (str "background-color: " highlight)})
-              [:td [:input {:type "checkbox" :name "habit_id" :value habit_id}]]
-              [:td habit_name
-               [:span.habit-info (str "every " freq_value " " freq_unit ", due " prettydue)]]]
-             )]]
-         [:br]]
+        [[:br]
+         [:button.collapsible {:type "button" :id "due"} "Due"]
+         [:div.collapsiblecontent
+          [:table
+           [:colgroup
+            [:col {:style "width: 2em;"}]
+            [:col {:style "width: 100%;"}]]
+           [:tbody
+            ;; this is a kludge to force habit_id to always be a list
+            [:input {:type "hidden" :name "habit_id" :value "-1"}]
+            (for [{:keys [highlight habit_id habit_name freq_value freq_unit prettydue]} due-habits]
+              [:tr (when highlight {:style (str "background-color: " highlight)})
+               [:td [:input {:type "checkbox" :name "habit_id" :value habit_id}]]
+               [:td habit_name
+                [:span.habit-info (str "every " freq_value " " freq_unit ", due " prettydue)]]]
+              )]]]
+         [:div [:br]]]
         upcominghiccup
         [[:button.collapsible {:type "button" :id "upcoming"} "Upcoming"]
          [:div.collapsiblecontent

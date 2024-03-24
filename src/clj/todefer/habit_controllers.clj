@@ -130,7 +130,8 @@
   (let [page-id (get-page-id exec-query page-name)]
     (if (some-updated? (exec-query (case action
                                      "today" (q/habit-today! habit_id)
-                                     "tomorrow" (q/habit-tomorrow! habit_id))))
+                                     "tomorrow" (q/habit-tomorrow! habit_id)
+                                     "not" (q/habit-untodo! habit_id))))
       (show-habits-200 exec-query page-id)
       (show-500 ":o"))))
 

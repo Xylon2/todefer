@@ -234,7 +234,8 @@
                              :hx-include "[name='task_id']"}
                     [:option {:value ""} "todo"]
                     [:option {:value "tomorrow"} "tomorrow"]
-                    [:option {:value "today"} "today"]]
+                    [:option {:value "today"} "today"]
+                    [:option {:value "not"} "not"]]
 
                    ;; defer
                    [:button {:type "button"
@@ -311,7 +312,8 @@
                              :hx-include "[name='habit_id']"}
                     [:option {:value ""} "todo"]
                     [:option {:value "tomorrow"} "tomorrow"]
-                    [:option {:value "today"} "today"]]
+                    [:option {:value "today"} "today"]
+                    [:option {:value "not"} "not"]]
 
                    ;; defer
                    [:button {:type "button"

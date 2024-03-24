@@ -106,7 +106,8 @@
   (let [page-id (get-page-id exec-query page-name)]
     (if (some-updated? (exec-query (case action
                                      "today" (q/task-today! task_id)
-                                     "tomorrow" (q/task-tomorrow! task_id))))
+                                     "tomorrow" (q/task-tomorrow! task_id)
+                                     "not" (q/task-untodo! task_id))))
 
       (show-tasks-200 exec-query page-id)
       (show-500 ":o"))))

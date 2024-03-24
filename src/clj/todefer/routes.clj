@@ -28,7 +28,7 @@
 (s/def ::freq_unit #{"days" "weeks" "months" "years"})
 (s/def ::donewhen #{"today" "yesturday"})
 (s/def ::pagetype #{"task" "habit" "agenda"})
-(s/def ::todo-actions #{"today" "tomorrow"})
+(s/def ::todo-actions #{"today" "tomorrow" "not"})
 
 (s/def ::ints-list (s/coll-of ::int      :kind vector?))
 (s/def ::strs-list (s/coll-of ::string   :kind vector?))

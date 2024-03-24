@@ -48,29 +48,6 @@
           buildme)
       (conj buildme defcat))))
 
-(defn add-color [task-data]
-  (mapv
-   (fn [task]
-     (let [todo (:todo task)
-           now (jt/local-date)
-           tomorrow (jt/plus now (jt/days 1))]
-       (if (nil? todo)
-         task
-         (let [todo' (.toLocalDate todo)]
-           (cond
-             (jt/before? todo' tomorrow) (assoc task :color "today")
-             (= todo' tomorrow) (assoc task :color "tomorrow")
-             :else task)))))
-   task-data))
-
-(defn vector-fn-keys
-  "given a vector of maps, a key and a function, transform the value of that key
-  in each map"
-  [vec-of-maps key f]
-  (mapv (fn [map]
-          (update map key f))
-        vec-of-maps))
-
 (defn list-defcats-dated-undefer
   "basically a wrapper for q/list-defcats-dated that undefers categories as appropriate"
   [exec-query page_id]
@@ -131,15 +108,12 @@
       "task"
       {:status 200
        :headers {"Content-Type" "text/html"}
-       :body (let [due-tasks (-> (exec-query (q/list-due-tasks page-id))
-                                 add-color)
+       :body (let [due-tasks (exec-query (q/list-due-tasks page-id))
                    defcatsnamed (-> (exec-query (q/list-defcats-named page-id))
-                                    (add-tasks-named exec-query)
-                                    (vector-fn-keys :tasks add-color))
+                                    (add-tasks-named exec-query))
                    defcatsdated (-> (list-defcats-dated-undefer exec-query page-id)
                                     (prettify-due :def_date)
-                                    (add-tasks-dated exec-query)
-                                    (vector-fn-keys :tasks add-color))]
+                                    (add-tasks-dated exec-query))]
                (ph/tasks-page
                 page-list'
                 page-name
@@ -152,11 +126,9 @@
       {:status 200
        :headers {"Content-Type" "text/html"}
        :body (let [duehabits (-> (exec-query (q/list-due-habits page-id))
-                                 (prettify-due :date_scheduled)
-                                 add-color)
+                                 (prettify-due :date_scheduled))
                    upcominghabits (-> (exec-query (q/list-upcoming-habits page-id))
-                                      (prettify-due :date_scheduled)
-                                      add-color)]
+                                      (prettify-due :date_scheduled))]
                (ph/habits-page
                 page-list'
                 page-name

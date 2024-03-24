@@ -12,15 +12,12 @@
 
 (defn show-tasks-200
   [exec-query page-id]
-  (let [due-tasks (-> (exec-query (q/list-due-tasks page-id))
-                      hl/add-color)
+  (let [due-tasks (exec-query (q/list-due-tasks page-id))
         defcats-named (-> (exec-query (q/list-defcats-named page-id))
-                          (hl/add-tasks-named exec-query)
-                          (hl/vector-fn-keys :tasks hl/add-color))
+                          (hl/add-tasks-named exec-query))
         defcats-dated (-> (hl/list-defcats-dated-undefer exec-query page-id)
                           (hl/prettify-due :def_date)
-                          (hl/add-tasks-dated exec-query)
-                          (hl/vector-fn-keys :tasks hl/add-color))]
+                          (hl/add-tasks-dated exec-query))]
     {:status 200
      :headers {"Content-Type" "text/html"}
      :body (-> (ph/render-tasks page-id due-tasks defcats-named defcats-dated)

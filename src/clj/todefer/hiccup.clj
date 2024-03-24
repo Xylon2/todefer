@@ -1,5 +1,6 @@
 (ns todefer.hiccup
-    (:require [hiccup2.core :as h]))
+    (:require [hiccup2.core :as h]
+              [java-time :as jt]))
 
 (defn render-base
   "the basic structure of an html document. takes a title and list of
@@ -71,11 +72,15 @@
     (render-base "Login" [errorprint login-form])))
 
 (defn render-color
-  [color]
-  (when color
-    {:style (str "background-color: " (case color
-                                        "today" "lightgreen"
-                                        "tomorrow" "lightblue"))}))
+  [todo]
+  (when-not (nil? todo)
+    (let [now (jt/local-date)
+          tomorrow (jt/plus now (jt/days 1))
+          todo' (.toLocalDate todo)]
+      (cond
+        (jt/before? todo' tomorrow) {:style "background-color: lightgreen"}
+        (= todo' tomorrow) {:style "background-color: lightblue"}
+        :else nil))))
 
 (defn render-tasks
   "the meat of a tasks page. used both in initial page-load and by AJAX"
@@ -91,8 +96,8 @@
            [:tbody
             ;; this is a kludge to force task_id to always be a list
             [:input {:type "hidden" :name "task_id" :value "-1"}]
-            (for [{:keys [color task_id task_name]} due-tasks]
-              [:tr (render-color color)
+            (for [{:keys [todo task_id task_name]} due-tasks]
+              [:tr (render-color todo)
                [:td [:input {:type "checkbox" :name "task_id" :value task_id}]]
                [:td task_name]]
               )]]]
@@ -107,8 +112,8 @@
                      [:col {:style "width: 2em;"}]
                      [:col {:style "width: 100%;"}]]
                     [:tbody
-                     (for [{:keys [color task_id task_name]} tasks]
-                       [:tr (render-color color)
+                     (for [{:keys [todo task_id task_name]} tasks]
+                       [:tr (render-color todo)
                         [:td [:input {:type "checkbox" :name "task_id" :value task_id}]]
                         [:td task_name]]
                        )]]]
@@ -123,8 +128,8 @@
             [:col]]
            [:tbody
             (for [{:keys [tasks prettydue]} defcats-dated]
-              (for [{:keys [color task_id task_name]} tasks]
-                [:tr (render-color color)
+              (for [{:keys [todo task_id task_name]} tasks]
+                [:tr (render-color todo)
                  [:td [:input {:type "checkbox" :name "task_id" :value task_id}]]
                  [:td task_name]
                  [:td prettydue]]
@@ -147,8 +152,8 @@
            [:tbody
             ;; this is a kludge to force habit_id to always be a list
             [:input {:type "hidden" :name "habit_id" :value "-1"}]
-            (for [{:keys [color habit_id habit_name freq_value freq_unit prettydue]} due-habits]
-              [:tr (render-color color)
+            (for [{:keys [todo habit_id habit_name freq_value freq_unit prettydue]} due-habits]
+              [:tr (render-color todo)
                [:td [:input {:type "checkbox" :name "habit_id" :value habit_id}]]
                [:td habit_name
                 [:span.habit-info (str "every " freq_value " " freq_unit ", due " prettydue)]]]
@@ -162,8 +167,8 @@
             [:col {:style "width: 2em;"}]
             [:col {:style "width: 100%;"}]]
            [:tbody
-            (for [{:keys [color habit_id habit_name freq_value freq_unit prettydue]} upcoming-habits]
-              [:tr (render-color color)
+            (for [{:keys [todo habit_id habit_name freq_value freq_unit prettydue]} upcoming-habits]
+              [:tr (render-color todo)
                [:td [:input {:type "checkbox" :name "habit_id" :value habit_id}]]
                [:td habit_name
                [:span.habit-info (str "every " freq_value " " freq_unit ", due " prettydue)]]])]]]

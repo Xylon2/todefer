@@ -115,12 +115,8 @@
                                     (prettify-due :def_date)
                                     (add-tasks-dated exec-query))]
                (ph/tasks-page
-                page-list'
-                page-name
-                page-id
-                due-tasks
-                defcatsnamed
-                defcatsdated
+                page-list' page-name page-id
+                due-tasks defcatsnamed defcatsdated
                 f-token))}
       "habit"
       {:status 200
@@ -130,20 +126,27 @@
                    upcominghabits (-> (exec-query (q/list-upcoming-habits page-id))
                                       (prettify-due :date_scheduled))]
                (ph/habits-page
-                page-list'
-                page-name
-                page-id
-                duehabits
-                upcominghabits
+                page-list' page-name page-id
+                duehabits upcominghabits
                 f-token))}
       "agenda"
       {:status 200
        :headers {"Content-Type" "text/html"}
-       :body (let []
+       :body (let [agenda-pages (exec-query (q/list-linked-pages page-id))
+                   todo-tasks-today (exec-query (q/list-todo-tasks-today agenda-pages))
+                   todo-habits-today (exec-query (q/list-todo-habits-today agenda-pages))
+                   todo-today (into
+                               (map #(assoc % :ttype "task") todo-tasks-today)
+                               (map #(assoc % :ttype "habit") todo-habits-today))
+                   todo-tasks-tomorrow (exec-query (q/list-todo-tasks-tomorrow agenda-pages))
+                   todo-habits-tomorrow (exec-query (q/list-todo-habits-tomorrow agenda-pages))
+                   todo-tomorrow (into
+                                  (map #(assoc % :ttype "task") todo-tasks-tomorrow)
+                                  (map #(assoc % :ttype "habit") todo-habits-tomorrow))]
                (ph/agenda-page
-                page-list'
-                page-name
-                page-id))}
+                page-list' page-name page-id
+                todo-today todo-tomorrow
+                f-token))}
       (not-found-handler request)
       )))
 

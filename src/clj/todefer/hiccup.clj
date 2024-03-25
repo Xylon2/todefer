@@ -1,6 +1,7 @@
 (ns todefer.hiccup
     (:require [hiccup2.core :as h]
-              [java-time :as jt]))
+              [java-time :as jt]
+              [clojure.pprint :refer [pprint]]))
 
 (defn render-base
   "the basic structure of an html document. takes a title and list of
@@ -179,11 +180,38 @@
 
 (defn render-agenda
   "the meat of the agenda page. used both in initial page-load and by AJAX"
-  [page-id]
-  (let [tomorrow [[:h2 "Tomorrow"]]
-        today [[:h2 "Today"]]]
+  [page-id todo-today todo-tomorrow]
+  (let [renderer
+        (fn [section-id section-name todos]
+          [[:br]
+           [:button.collapsible {:type "button" :id section-id} section-name]
+           [:div.collapsiblecontent
+            [:table
+             [:colgroup
+              [:col {:style "width: 2em;"}]
+              [:col {:style "width: 100%;"}]]
+             [:tbody
+              ;; this is a kludge to force thing_id to always be a list
+              [:input {:type "hidden" :name "thing_id" :value "-1"}]
+              (for [{ttype :ttype :as todo-item} todos]
+                (case ttype
+                  "task"
+                  (let [{:keys [task_id task_name]} todo-item]
+                    [:tr
+                     [:td [:input {:type "checkbox" :name "thing_id"
+                                   :value (str "task/" task_id)}]]
+                     [:td task_name]])
+                  "habit"
+                  (let [{:keys [habit_id habit_name]} todo-item]
+                    [:tr
+                     [:td [:input {:type "checkbox" :name "thing_id"
+                                   :value (str "habit/" habit_id)}]]
+                     [:td habit_name]])
+                  ))]]]])
+        today (renderer "today" "Today" todo-today)
+        tomorrow (renderer "tomorrow" "Tomorrow" todo-tomorrow)]
 
-    (concat tomorrow today)))
+    (concat today tomorrow)))
 
 (defn tasks-page
   "renders a full page of tasks"
@@ -238,8 +266,8 @@
                              :hx-post (str "/page/" page-name "/todo-task")
                              :hx-include "[name='task_id']"}
                     [:option {:value ""} "todo"]
-                    [:option {:value "tomorrow"} "tomorrow"]
                     [:option {:value "today"} "today"]
+                    [:option {:value "tomorrow"} "tomorrow"]
                     [:option {:value "not"} "not"]]
 
                    ;; defer
@@ -316,8 +344,8 @@
                              :hx-post (str "/page/" page-name "/todo-habit")
                              :hx-include "[name='habit_id']"}
                     [:option {:value ""} "todo"]
-                    [:option {:value "tomorrow"} "tomorrow"]
                     [:option {:value "today"} "today"]
+                    [:option {:value "tomorrow"} "tomorrow"]
                     [:option {:value "not"} "not"]]
 
                    ;; defer
@@ -329,11 +357,12 @@
 
 (defn agenda-page
   "render a full agenda page"
-  [page-list page-name page-id]
-  (let [contents (render-agenda page-id)]
+  [page-list page-name page-id todo-today todo-tomorrow f-token]
+  (let [contents (render-agenda page-id todo-today todo-tomorrow)]
     (render-base
      (str page-name " agenda")
      contents
+     :scripts ["/public/cljs/shared.js" "/public/cljs/agenda.js"]
      :pagelist page-list)))
 
 (defn render-modify-tasks

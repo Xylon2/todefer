@@ -8,4 +8,6 @@
                           :tasks {:entries [todefer.tasks]
                                   :depends-on #{:shared}}
                           :habits {:entries [todefer.habits]
+                                   :depends-on #{:shared}}
+                          :agenda {:entries [todefer.agenda]
                                    :depends-on #{:shared}}}}}}

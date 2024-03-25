@@ -173,6 +173,26 @@
 
    identity])
 
+(defn list-todo-things
+  "lists the todo tasks for a list of pages"
+  [table ;; table name
+   fname ;; id field
+   op    ;; date comparrison operator
+   page_refs]
+  [(-> (select :*)
+       (from table)
+       (where [:and
+               [:= :page_ref [:any [:array page_refs :integer]]]
+               [op :todo :CURRENT_DATE]])
+       (order-by [:sort_id :asc] [fname :asc]))
+
+   identity])
+
+(def list-todo-tasks-today #(list-todo-things :task :task_id :<= %))
+(def list-todo-habits-today #(list-todo-things :habit :habit_id :<= %))
+(def list-todo-tasks-tomorrow #(list-todo-things :task :task_id :> %))
+(def list-todo-habits-tomorrow #(list-todo-things :habit :habit_id :> %))
+
 (defn list-defcats-named
   "get all the defcats that need to be displayed on a page
 

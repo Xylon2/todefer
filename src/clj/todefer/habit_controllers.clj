@@ -13,10 +13,8 @@
 
 (defn show-habits-200
   [exec-query page-id]
-  (let [due-habits (-> (exec-query (q/list-due-habits page-id))
-                       (hl/prettify-due :date_scheduled))
-        upcoming-habits (-> (exec-query (q/list-upcoming-habits page-id))
-                            (hl/prettify-due :date_scheduled))]
+  (let [{:keys [due-habits upcoming-habits]}
+        (hl/assemble-habit-page-info exec-query page-id)]
     {:status 200
      :headers {"Content-Type" "text/html"}
      :body (-> (ph/render-habits page-id due-habits upcoming-habits)

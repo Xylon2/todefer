@@ -90,6 +90,49 @@
   (pprint x)
   x)
 
+(defmacro map-of
+  [& xs]
+  `(hash-map ~@(mapcat (juxt keyword identity) xs)))
+
+(defn assemble-task-page-info
+  ""
+  [exec-query page-id]
+  (let [due-tasks (exec-query (q/list-due-tasks page-id))
+        defcats-named (-> (exec-query (q/list-defcats-named page-id))
+                         (add-tasks-named exec-query))
+        defcats-dated (-> (list-defcats-dated-undefer exec-query page-id)
+                         (prettify-due :def_date)
+                         (add-tasks-dated exec-query))]
+    (map-of due-tasks defcats-named defcats-dated)))
+
+(defn assemble-habit-page-info
+  ""
+  [exec-query page-id]
+  (let [due-habits (-> (exec-query (q/list-due-habits page-id))
+                      (prettify-due :date_scheduled))
+        upcoming-habits (-> (exec-query (q/list-upcoming-habits page-id))
+                           (prettify-due :date_scheduled))]
+    (map-of due-habits upcoming-habits)))
+
+(defn assemble-agenda-page-info
+  ""
+  [exec-query page-id]
+  (let [agenda-pages (exec-query (q/list-linked-pages page-id))
+        todo-tasks-today (exec-query (q/list-todo-tasks-today agenda-pages))
+        todo-habits-today (-> (exec-query (q/list-todo-habits-today agenda-pages))
+                              (prettify-due :date_scheduled))
+        todo-today (into
+                    (map #(assoc % :ttype "task") todo-tasks-today)
+                    (map #(assoc % :ttype "habit") todo-habits-today))
+
+        todo-tasks-tomorrow (exec-query (q/list-todo-tasks-tomorrow agenda-pages))
+        todo-habits-tomorrow (-> (exec-query (q/list-todo-habits-tomorrow agenda-pages))
+                                 (prettify-due :date_scheduled))
+        todo-tomorrow (into
+                       (map #(assoc % :ttype "task") todo-tasks-tomorrow)
+                       (map #(assoc % :ttype "habit") todo-habits-tomorrow))]
+    (map-of todo-today todo-tomorrow)))
+
 (defn display-page
   "displays a task, habit or agenda page"
   [{exec-query :q-builder
@@ -108,49 +151,31 @@
       "task"
       {:status 200
        :headers {"Content-Type" "text/html"}
-       :body (let [due-tasks (exec-query (q/list-due-tasks page-id))
-                   defcatsnamed (-> (exec-query (q/list-defcats-named page-id))
-                                    (add-tasks-named exec-query))
-                   defcatsdated (-> (list-defcats-dated-undefer exec-query page-id)
-                                    (prettify-due :def_date)
-                                    (add-tasks-dated exec-query))]
+       :body (let [{:keys [due-tasks defcats-named defcats-dated]}
+                   (assemble-task-page-info exec-query page-id)]
                (ph/tasks-page
                 page-list' page-name page-id
-                due-tasks defcatsnamed defcatsdated
+                due-tasks defcats-named defcats-dated
                 f-token))}
       "habit"
       {:status 200
        :headers {"Content-Type" "text/html"}
-       :body (let [duehabits (-> (exec-query (q/list-due-habits page-id))
-                                 (prettify-due :date_scheduled))
-                   upcominghabits (-> (exec-query (q/list-upcoming-habits page-id))
-                                      (prettify-due :date_scheduled))]
+       :body (let [{:keys [due-habits upcoming-habits]}
+                   (assemble-habit-page-info exec-query page-id)]
                (ph/habits-page
                 page-list' page-name page-id
-                duehabits upcominghabits
+                due-habits upcoming-habits
                 f-token))}
       "agenda"
       {:status 200
        :headers {"Content-Type" "text/html"}
-       :body (let [agenda-pages (exec-query (q/list-linked-pages page-id))
-                   todo-tasks-today (exec-query (q/list-todo-tasks-today agenda-pages))
-                   todo-habits-today (-> (exec-query (q/list-todo-habits-today agenda-pages))
-                                         (prettify-due :date_scheduled))
-                   todo-today (into
-                               (map #(assoc % :ttype "task") todo-tasks-today)
-                               (map #(assoc % :ttype "habit") todo-habits-today))
-                   todo-tasks-tomorrow (exec-query (q/list-todo-tasks-tomorrow agenda-pages))
-                   todo-habits-tomorrow (-> (exec-query (q/list-todo-habits-tomorrow agenda-pages))
-                                            (prettify-due :date_scheduled))
-                   todo-tomorrow (into
-                                  (map #(assoc % :ttype "task") todo-tasks-tomorrow)
-                                  (map #(assoc % :ttype "habit") todo-habits-tomorrow))]
+       :body (let [{:keys [todo-today todo-tomorrow]}
+                   (assemble-agenda-page-info exec-query page-id)]
                (ph/agenda-page
                 page-list' page-name page-id
                 todo-today todo-tomorrow
                 f-token))}
-      (not-found-handler request)
-      )))
+      (not-found-handler request))))
 
 (defn login-handler
   "show the login prompt. the parameter variable holds the url the user was trying

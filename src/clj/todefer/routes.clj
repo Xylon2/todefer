@@ -15,6 +15,7 @@
             [todefer.handlers :as hl]
             [todefer.task-controllers :as tc]
             [todefer.habit-controllers :as hc]
+            [todefer.agenda-controllers :as ac]
             [todefer.settings-controllers :as sc]
             [ring.logger :as logger]
             [clojure.string :as string]
@@ -34,6 +35,14 @@
 (s/def ::strs-list (s/coll-of ::string   :kind vector?))
 (s/def ::date-list (s/coll-of ::iso-date :kind vector?))
 (s/def ::freq_unit-list (s/coll-of ::freq_unit :kind vector?))
+
+;; examples
+;; - habit/34
+;; - task/23
+(s/def ::thing-id
+  (s/and string?
+         #(re-matches #"^(habit|task)/" %)
+         #(re-find #"\d+$" %)))
 
 (defn wrap-debug-reqmap
   "debug middleware to save the requestmap to a file so we can analyze"
@@ -198,6 +207,17 @@
          {:post {:handler hc/defer-habit-date-save
                  :parameters {:form {:habit_id ::ints-list
                                      :date ::iso-date}}}}]
+
+        ;; actions for the agenda page
+        ["done-delete"
+         {:post {:handler ac/done-delete-handler
+                 :parameters {:form {:thing_id ::thing-id}}}}]
+
+        ["todo-thing"
+         {:post {:handler ac/todo-thing-handler
+                 :parameters {:form {:thing_id ::thing-id
+                                     :action ::todo-actions}}}}]
+
         ]
 
        ["/settings"

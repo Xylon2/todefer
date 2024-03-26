@@ -116,8 +116,7 @@
                      (for [{:keys [todo task_id task_name]} tasks]
                        [:tr (render-color todo)
                         [:td [:input {:type "checkbox" :name "task_id" :value task_id}]]
-                        [:td task_name]]
-                       )]]]
+                        [:td task_name]])]]]
                   [:div [:br]]]))
         ddatedhiccup
         [[:button.collapsible {:type "button" :id "dated"} "Upcoming"]
@@ -133,8 +132,7 @@
                 [:tr (render-color todo)
                  [:td [:input {:type "checkbox" :name "task_id" :value task_id}]]
                  [:td task_name]
-                 [:td prettydue]]
-                ))]]]
+                 [:td prettydue]]))]]]
          [:div [:br]]]
         ]
     (concat duehiccup dnamedhiccup ddatedhiccup)))
@@ -183,8 +181,7 @@
   [page-id todo-today todo-tomorrow]
   (let [renderer
         (fn [section-id section-name todos]
-          [[:br]
-           [:button.collapsible {:type "button" :id section-id} section-name]
+          [[:button.collapsible {:type "button" :id section-id} section-name]
            [:div.collapsiblecontent
             [:table
              [:colgroup
@@ -202,16 +199,17 @@
                                    :value (str "task/" task_id)}]]
                      [:td task_name]])
                   "habit"
-                  (let [{:keys [habit_id habit_name]} todo-item]
+                  (let [{:keys [habit_id habit_name freq_value freq_unit prettydue]} todo-item]
                     [:tr
                      [:td [:input {:type "checkbox" :name "thing_id"
                                    :value (str "habit/" habit_id)}]]
-                     [:td habit_name]])
-                  ))]]]])
+                     [:td habit_name
+                      [:span.habit-info (str "every " freq_value " " freq_unit ", due " prettydue)]]])))]]]
+           [:div [:br]]])
         today (renderer "today" "Today" todo-today)
         tomorrow (renderer "tomorrow" "Tomorrow" todo-tomorrow)]
 
-    (concat today tomorrow)))
+    (concat [[:br]] today tomorrow)))
 
 (defn tasks-page
   "renders a full page of tasks"
@@ -363,7 +361,30 @@
      (str page-name " agenda")
      contents
      :scripts ["/public/cljs/shared.js" "/public/cljs/agenda.js"]
-     :pagelist page-list)))
+     :pagelist page-list
+     :actionbar [[:form {:method "post"
+                         :style "padding-left: 0;"
+                         :hx-target "main"
+                         :hx-on:htmx:after-request "this.reset()"}
+                  [:input {:name "__anti-forgery-token"
+                           :type "hidden"
+                           :value f-token}]
+                  [:div
+                   ;; done/delete
+                   [:select {:name "really"
+                             :hx-post (str "/page/" page-name "/done-delete")
+                             :hx-include "[name='thing_id']"}
+                    [:option {:value ""} "done/delete"]
+                    [:option {:value "really"} "really?"]]
+
+                   ;; todo
+                   [:select {:name "action"
+                             :hx-post (str "/page/" page-name "/todo-thing")
+                             :hx-include "[name='thing_id']"}
+                    [:option {:value ""} "todo"]
+                    [:option {:value "today"} "today"]
+                    [:option {:value "tomorrow"} "tomorrow"]
+                    [:option {:value "not"} "not"]]]]])))
 
 (defn render-modify-tasks
   "page to modify selected tasks"

@@ -134,12 +134,14 @@
        :headers {"Content-Type" "text/html"}
        :body (let [agenda-pages (exec-query (q/list-linked-pages page-id))
                    todo-tasks-today (exec-query (q/list-todo-tasks-today agenda-pages))
-                   todo-habits-today (exec-query (q/list-todo-habits-today agenda-pages))
+                   todo-habits-today (-> (exec-query (q/list-todo-habits-today agenda-pages))
+                                         (prettify-due :date_scheduled))
                    todo-today (into
                                (map #(assoc % :ttype "task") todo-tasks-today)
                                (map #(assoc % :ttype "habit") todo-habits-today))
                    todo-tasks-tomorrow (exec-query (q/list-todo-tasks-tomorrow agenda-pages))
-                   todo-habits-tomorrow (exec-query (q/list-todo-habits-tomorrow agenda-pages))
+                   todo-habits-tomorrow (-> (exec-query (q/list-todo-habits-tomorrow agenda-pages))
+                                            (prettify-due :date_scheduled))
                    todo-tomorrow (into
                                   (map #(assoc % :ttype "task") todo-tasks-tomorrow)
                                   (map #(assoc % :ttype "habit") todo-habits-tomorrow))]

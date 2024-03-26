@@ -563,7 +563,7 @@
         [:option {:value "habit"} "habits page"]
         [:option {:value "agenda"} "agenda page"]]
        [:button {:type "submit"} "add page"]]
-      [:h2 "Add Page"]
+      [:h2 "Logout"]
       [:form {:method "get" :action "/logout"}
        [:button {:type "submit"} "Logout"]]
       ]

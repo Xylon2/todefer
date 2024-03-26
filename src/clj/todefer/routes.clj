@@ -121,41 +121,50 @@
         ;; normal page contents
         ["add-task"
          {:post {:handler tc/add-task-handler
+                 :middleware [tc/wrap-show-tasks]
                  :parameters {:form {:task_name ::string}}}}]
         ["add-habit"
          {:post {:handler hc/add-habit-handler
+                 :middleware [hc/wrap-show-habits]
                  :parameters {:form {:habit_name ::string
                                      :freq_value ::int
                                      :freq_unit ::freq_unit}}}}]
 
         ["done-habit"
          {:post {:handler hc/done-habit-handler
+                 :middleware [hc/wrap-show-habits]
                  :parameters {:form {:habit_id ::ints-list
                                      :donewhen ::donewhen}}}}]
 
         ["delete-task"
          {:post {:handler tc/delete-task-handler
+                 :middleware [tc/wrap-show-tasks]
                  :parameters {:form {:task_id ::ints-list}}}}]
         ["delete-habit"
          {:post {:handler hc/delete-habit-handler
+                 :middleware [hc/wrap-show-habits]
                  :parameters {:form {:habit_id ::ints-list}}}}]
 
         ["move-task"
          {:post {:handler tc/move-task-handler
+                 :middleware [tc/wrap-show-tasks]
                  :parameters {:form {:task_id ::ints-list
                                      :newpage ::string}}}}]
         ["move-habit"
          {:post {:handler hc/move-habit-handler
+                 :middleware [hc/wrap-show-habits]
                  :parameters {:form {:habit_id ::ints-list
                                      :newpage ::string}}}}]
 
         ["todo-task"
          {:post {:handler tc/todo-task-handler
+                 :middleware [tc/wrap-show-tasks]
                  :parameters {:form {:task_id ::ints-list
                                      :action ::todo-actions}}}}]
 
         ["todo-habit"
          {:post {:handler hc/todo-habit-handler
+                 :middleware [hc/wrap-show-habits]
                  :parameters {:form {:habit_id ::ints-list
                                      :action ::todo-actions}}}}]
 
@@ -167,6 +176,7 @@
                  :parameters {:form {:task_id ::ints-list}}}}]
         ["modify-task-save"
          {:post {:handler tc/modify-task-save
+                 :middleware [tc/wrap-show-tasks]
                  :parameters {:form {:task_id ::ints-list
                                      :task_newname ::strs-list}}}}]
 
@@ -175,6 +185,7 @@
                  :parameters {:form {:habit_id ::ints-list}}}}]
         ["modify-habit-save"
          {:post {:handler hc/modify-habit-save
+                 :middleware [hc/wrap-show-habits]
                  :parameters {:form {:habit_id ::ints-list
                                      :habit_name_new ::strs-list
                                      :freq_value_new ::ints-list
@@ -188,14 +199,17 @@
                  :parameters {:form {:task_id ::ints-list}}}}]
         ["defer-task-date-save"
          {:post {:handler tc/defer-task-date-save
+                 :middleware [tc/wrap-show-tasks]
                  :parameters {:form {:task_id ::ints-list
                                      :date ::iso-date}}}}]
         ["defer-task-category-save"
          {:post {:handler tc/defer-task-category-save
+                 :middleware [tc/wrap-show-tasks]
                  :parameters {:form {:task_id ::ints-list
                                      :cat_id ::int}}}}]
         ["defer-task-newcategory-save"
          {:post {:handler tc/defer-task-newcategory-save
+                 :middleware [tc/wrap-show-tasks]
                  :parameters {:form {:task_id ::ints-list
                                      :new-catname ::string}}}}]
 
@@ -205,6 +219,7 @@
                  :parameters {:form {:habit_id ::ints-list}}}}]
         ["defer-habit-date-save"
          {:post {:handler hc/defer-habit-date-save
+                 :middleware [hc/wrap-show-habits]
                  :parameters {:form {:habit_id ::ints-list
                                      :date ::iso-date}}}}]
 
@@ -228,23 +243,28 @@
         {:middleware [wrap-auth]}
         ["add-page"
          {:post {:handler sc/add-page-handler
+                 :middleware [sc/wrap-settings-page]
                  :parameters {:form {:new_pagename ::string
                                      :new_pagetype ::pagetype}}}}]
         ["delete"
          {:post {:handler sc/delete-page-handler
+                 :middleware [sc/wrap-settings-page]
                  :parameters {:form {:page_id ::int}}}}]
 
         ["page_down"
          {:post {:handler sc/page-down-handler
+                 :middleware [sc/wrap-settings-page]
                  :parameters {:form {:page_id ::int}}}}]
 
         ["page_up"
          {:post {:handler sc/page-up-handler
+                 :middleware [sc/wrap-settings-page]
                  :parameters {:form {:page_id ::int}}}}]
 
         ["update_agenda_pages"
          {:post {:handler sc/update-agenda-handler
-                 :middleware [wrap-filter-dummy-values]
+                 :middleware [wrap-filter-dummy-values
+                              sc/wrap-settings-page]
                  :parameters {:form {:page_id ::int
                                      :linkedpage ::ints-list}}}}]]
 

@@ -36,25 +36,26 @@
     f-token :anti-forgery-token}]
   (settings-200 exec-query f-token))
 
+(defn wrap-settings-page
+  "this is a middleware. wrap it around the action handlers."
+  [handler]
+  (fn [{exec-query :q-builder
+        f-token :anti-forgery-token :as req}]
+    (if (handler req)
+      (settings-200 exec-query f-token)
+      (show-500 ":o"))))
+
 (defn add-page-handler
   "add page"
   [{exec-query :q-builder
-    f-token :anti-forgery-token
     {{:keys [new_pagename new_pagetype]} :form} :parameters}]
-  (let [qresult (one-update? (exec-query (q/create-page! new_pagename new_pagetype)))]
-    (if qresult
-      (settings-200 exec-query f-token)
-      (show-500 ":o"))))
+  (one-update? (exec-query (q/create-page! new_pagename new_pagetype))))
 
 (defn delete-page-handler
   "delete page"
   [{exec-query :q-builder
-    f-token :anti-forgery-token
     {{:keys [page_id]} :form} :parameters}]
-  (let [qresult (one-update? (exec-query (q/delete-page! page_id)))]
-    (if qresult
-      (settings-200 exec-query f-token)
-      (show-500 ":o"))))
+  (one-update? (exec-query (q/delete-page! page_id))))
 
 (defn reorderfunc
   "reducing function. when we find the page we want, we swap it with the next one
@@ -74,33 +75,29 @@
   "given the list of page ids in a vector, generate them new order ids and apply"
   [exec-query idlist]
   (doseq [[order-key page_id] (map-indexed vector idlist)]
-    (exec-query (q/reorder-page! page_id order-key))))
+    (exec-query (q/reorder-page! page_id order-key)))
+  true)
 
 (defn page-down-handler
   "page up"
   [{exec-query :q-builder
-    f-token :anti-forgery-token
     {{:keys [page_id]} :form} :parameters}]
   (let [page-id-list (mapv :page_id (exec-query (q/list-pages)))
         {reordered_list :newvec} (reduce reorderfunc {:swap-id page_id :state "returning" :newvec []} page-id-list)]
 
-    (apply-order exec-query reordered_list)
-    (settings-200 exec-query f-token)))
+    (apply-order exec-query reordered_list)))
 
 (defn page-up-handler
   "page up"
   [{exec-query :q-builder
-    f-token :anti-forgery-token
     {{:keys [page_id]} :form} :parameters}]
   (let [page-id-list (rseq (mapv :page_id (exec-query (q/list-pages))))
         {reordered_list :newvec} (reduce reorderfunc {:swap-id page_id :state "returning" :newvec []} page-id-list)]
 
-    (apply-order exec-query (rseq reordered_list))
-    (settings-200 exec-query f-token)))
+    (apply-order exec-query (rseq reordered_list))))
 
 (defn update-agenda-handler
   [{exec-query :q-builder
-    f-token :anti-forgery-token
     {{:keys [page_id linkedpage]} :form} :parameters}]
 
   ;; our list contains only positives so we have to nuke the old values before
@@ -108,5 +105,4 @@
   (exec-query (q/nuke-linked-pages! page_id))
   (doseq [lpg linkedpage]
     (exec-query (q/update-linked-pages! page_id lpg)))
-
-  (settings-200 exec-query f-token))
+  true)

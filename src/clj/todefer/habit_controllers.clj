@@ -66,7 +66,7 @@
 
 (defn done-habit-handler
   "mark a habit as done, today or yesturday"
-  [page-id
+  [_
    {exec-query :q-builder
     {{:keys [habit_id donewhen]} :form
      {:keys [page-name]} :path} :parameters}]

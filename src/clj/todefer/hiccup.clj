@@ -188,8 +188,6 @@
               [:col {:style "width: 2em;"}]
               [:col {:style "width: 100%;"}]]
              [:tbody
-              ;; this is a kludge to force thing_id to always be a list
-              [:input {:type "hidden" :name "thing_id" :value "-1"}]
               (for [{ttype :ttype :as todo-item} todos]
                 (case ttype
                   "task"
@@ -209,7 +207,8 @@
         today (renderer "today" "Today" todo-today)
         tomorrow (renderer "tomorrow" "Tomorrow" todo-tomorrow)]
 
-    (concat [[:br]] today tomorrow)))
+    (concat [[:input {:type "hidden" :name "thing_id" :value "kludge/123"}]
+             [:br]] today tomorrow)))
 
 (defn tasks-page
   "renders a full page of tasks"

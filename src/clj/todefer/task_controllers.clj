@@ -51,7 +51,7 @@
 
 (defn delete-task-handler
   "delete one or more tasks"
-  [page-id
+  [_
    {exec-query :q-builder
     {{:keys [task_id]} :form
      {:keys [page-name]} :path} :parameters}]

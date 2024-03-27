@@ -41,8 +41,9 @@
 ;; - task/23
 (s/def ::thing-id
   (s/and string?
-         #(re-matches #"^(habit|task)/" %)
-         #(re-find #"\d+$" %)))
+         #(re-matches #"^(habit|task|kludge)/\d+$" %)))
+(s/def ::thing-list
+  (s/coll-of ::thing-id :kind vector?))
 
 (defn wrap-debug-reqmap
   "debug middleware to save the requestmap to a file so we can analyze"
@@ -80,6 +81,7 @@
           req-cleaned 
           (loop [xs req, keys [:task_id
                                :habit_id
+                               :thing_id
                                :task_newname
                                :habit_name_new
                                :freq_value_new
@@ -226,11 +228,12 @@
         ;; actions for the agenda page
         ["done-delete"
          {:post {:handler ac/done-delete-handler
-                 :parameters {:form {:thing_id ::thing-id}}}}]
+                 :middleware [ac/wrap-show-agenda]
+                 :parameters {:form {:thing_id ::thing-list}}}}]
 
         ["todo-thing"
          {:post {:handler ac/todo-thing-handler
-                 :parameters {:form {:thing_id ::thing-id
+                 :parameters {:form {:thing_id ::thing-list
                                      :action ::todo-actions}}}}]
 
         ]

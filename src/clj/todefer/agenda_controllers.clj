@@ -2,6 +2,9 @@
   (:require [todefer.queries :as q]
             [todefer.hiccup :as ph]
             [todefer.handlers :as hl]
+            [todefer.task-controllers :as tc]
+            [todefer.habit-controllers :as hc]
+            [clojure.string :as string]
             [hiccup2.core :as h]))
 
 (defn num-updated [x]
@@ -31,13 +34,38 @@
   [exec-query page-name]
   (:page_id (exec-query (q/get-page page-name))))
 
-;; done-delete-handler :thing_id
-;; todo-thing-handler :thing_id :action
+(defn wrap-show-agenda
+  "this is a middleware. wrap it around the action handlers."
+  [handler]
+  (fn [{exec-query :q-builder
+        {{:keys [page-name]} :path} :parameters :as req}]
+    (let [page-id (get-page-id exec-query page-name)]
+        (if (handler page-id req)
+          (show-agenda-200 exec-query page-id)
+          (show-500 ":o")))))
+
+(defn parse-id
+  "habit/12 or task/34"
+  [s]
+  (let [[type id] (string/split s #"/")]
+    {:type (keyword type)
+     :id (parse-long id)}))
 
 (defn done-delete-handler
-  []
+  [page-id
+   {exec-query :q-builder
+    {{:keys [thing_id]} :form
+     {:keys [page-name]} :path} :parameters :as req}]
+  (doseq [thing thing_id]
+   (let [{:keys [type id]} (parse-id thing)]
+     (case type
+       :task (tc/delete-task-handler -1 (assoc-in req [:parameters :form :task_id] [id]))
+       :habit (hc/done-habit-handler -1 (-> req
+                                         (assoc-in [:parameters :form :habit_id] [id])
+                                         (assoc-in [:parameters :form :donewhen] "today"))))))
   true)
 
 (defn todo-thing-handler
-  []
+  [page-id
+   req]
   true)

@@ -233,6 +233,7 @@
 
         ["todo-thing"
          {:post {:handler ac/todo-thing-handler
+                 :middleware [ac/wrap-show-agenda]
                  :parameters {:form {:thing_id ::thing-list
                                      :action ::todo-actions}}}}]
 

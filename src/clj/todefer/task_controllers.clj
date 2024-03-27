@@ -98,7 +98,7 @@
 
 (defn todo-task-handler
   "update one or more tasks todo field"
-  [page-id
+  [_
    {exec-query :q-builder
     {{:keys [task_id action]} :form
      {:keys [page-name]} :path} :parameters}]

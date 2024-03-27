@@ -44,12 +44,15 @@
           (show-agenda-200 exec-query page-id)
           (show-500 ":o")))))
 
-(defn parse-id
-  "habit/12 or task/34"
-  [s]
-  (let [[type id] (string/split s #"/")]
-    {:type (keyword type)
-     :id (parse-long id)}))
+(defn dispatch-case
+  "essentially a custom case function which passes the id into the provided fn"
+  [thing & {:as cases}]
+  (let [[type id] (string/split thing #"/")
+        type (keyword type)
+        id (parse-long id)]
+    (if-let [handler (get cases type)]
+      (handler id)
+      (throw (ex-info "Invalid type" {:type type})))))
 
 (defn done-delete-handler
   [page-id
@@ -57,15 +60,24 @@
     {{:keys [thing_id]} :form
      {:keys [page-name]} :path} :parameters :as req}]
   (doseq [thing thing_id]
-   (let [{:keys [type id]} (parse-id thing)]
-     (case type
-       :task (tc/delete-task-handler -1 (assoc-in req [:parameters :form :task_id] [id]))
-       :habit (hc/done-habit-handler -1 (-> req
-                                         (assoc-in [:parameters :form :habit_id] [id])
-                                         (assoc-in [:parameters :form :donewhen] "today"))))))
+   (dispatch-case thing
+      :task (fn [id]
+              (tc/delete-task-handler -1 (assoc-in req [:parameters :form :task_id] [id])))
+      :habit (fn [id]
+               (hc/done-habit-handler -1 (-> req
+                                             (assoc-in [:parameters :form :habit_id] [id])
+                                             (assoc-in [:parameters :form :donewhen] "today"))))))
   true)
 
 (defn todo-thing-handler
   [page-id
-   req]
+   {exec-query :q-builder
+    {{:keys [thing_id]} :form
+     {:keys [page-name]} :path} :parameters :as req}]
+  (doseq [thing thing_id]
+    (dispatch-case thing
+                   :task (fn [id]
+                           (tc/todo-task-handler -1 (assoc-in req [:parameters :form :task_id] [id])))
+                   :habit (fn [id]
+                            (hc/todo-habit-handler -1 (assoc-in req [:parameters :form :habit_id] [id])))))
   true)

@@ -76,15 +76,6 @@
                          :cookies {"ring-session"
                                    {:value @tu/login-session}}})))))
 
-(deftest test-wrap-filter-dummy-values
-  (expect [123 42]
-          (-> ((wrap-filter-dummy-values identity) {:parameters
-                                                    {:form
-                                                     {:task_id [-1 123 42]}}})
-              :parameters
-              :form
-              :task_id)))
-
 ;; the lines below mean, if starting a REPL from here, it uses devtest profile
 
 ;; Local Variables:

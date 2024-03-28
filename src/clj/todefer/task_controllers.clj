@@ -86,7 +86,8 @@
      {page-name :page-name} :path} :parameters :as request
     f-token :anti-forgery-token}]
   (doseq [[tid tname] (map vector task_id task_newname)]  ;; pair them up
-    (exec-query (q/modify-task! tid tname))))
+    (exec-query (q/modify-task! tid tname)))
+  true)
 
 (defn move-task-handler
   "move one or more tasks to a different page"

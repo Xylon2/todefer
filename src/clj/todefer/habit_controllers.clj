@@ -73,7 +73,8 @@
   (let [done-habit' (fn [id] (done-habit exec-query id (case donewhen
                                                          "today" 0
                                                          "yesturday" 1)))]
-    (run! done-habit' habit_id)))
+    (run! done-habit' habit_id)
+    true))
 
 (defn delete-habit-handler
   "delete one or more habits"
@@ -112,7 +113,8 @@
      {page-name :page-name} :path} :parameters :as request
     f-token :anti-forgery-token}]
   (doseq [[hid hname hvalue hunit hdue] (map vector habit_id habit_name_new freq_value_new freq_unit_new due_new)] ;; pair them up
-    (exec-query (q/modify-habit! hid hname hvalue hunit hdue))))
+    (exec-query (q/modify-habit! hid hname hvalue hunit hdue)))
+  true)
 
 (defn move-habit-handler
   "move one or more habits to a different page"

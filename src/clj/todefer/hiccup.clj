@@ -95,8 +95,6 @@
             [:col {:style "width: 2em;"}]
             [:col {:style "width: 100%;"}]]
            [:tbody
-            ;; this is a kludge to force task_id to always be a list
-            [:input {:type "hidden" :name "task_id" :value "-1"}]
             (for [{:keys [todo task_id task_name]} due-tasks]
               [:tr (render-color todo)
                [:td [:input {:type "checkbox" :name "task_id" :value task_id}]]
@@ -149,8 +147,6 @@
             [:col {:style "width: 2em;"}]
             [:col {:style "width: 100%;"}]]
            [:tbody
-            ;; this is a kludge to force habit_id to always be a list
-            [:input {:type "hidden" :name "habit_id" :value "-1"}]
             (for [{:keys [todo habit_id habit_name freq_value freq_unit prettydue]} due-habits]
               [:tr (render-color todo)
                [:td [:input {:type "checkbox" :name "habit_id" :value habit_id}]]
@@ -207,8 +203,7 @@
         today (renderer "today" "Today" todo-today)
         tomorrow (renderer "tomorrow" "Tomorrow" todo-tomorrow)]
 
-    (concat [[:input {:type "hidden" :name "thing_id" :value "kludge/123"}]
-             [:br]] today tomorrow)))
+    (concat [[:br]] today tomorrow)))
 
 (defn tasks-page
   "renders a full page of tasks"
@@ -400,9 +395,6 @@
      [:colgroup
       [:col]]
      [:tbody
-      ;; this is a kludge to force these inputs to always be a list
-      [:input {:type "hidden" :name "task_id" :value "-1"}]
-      [:input {:type "hidden" :name "task_newname" :value "59866220-59be-4143-90b3-63c2861eadca"}]
       (for [{:keys [task_id task_name]} tasks]
         [:tr
          [:td
@@ -426,12 +418,6 @@
       [:col {:style "width: 100%;"}]
       [:col]]
      [:tbody
-      ;; this is a kludge to force these inputs to always be a list
-      [:input {:type "hidden" :name "habit_id" :value "-1"}]
-      [:input {:type "hidden" :name "habit_name_new" :value "59866220-59be-4143-90b3-63c2861eadca"}]
-      [:input {:type "hidden" :name "freq_value_new" :value "-1"}]
-      [:input {:type "hidden" :name "freq_unit_new" :value "days"}]
-      [:input {:type "hidden" :name "due_new" :value "1970-01-01"}]
       (for [{:keys [habit_id habit_name freq_value freq_unit date_scheduled]} habits]
         [:tr
          [:td
@@ -460,7 +446,6 @@
     [:input {:name "__anti-forgery-token"
              :type "hidden"
              :value f-token}]
-    [:input {:type "hidden" :name "task_id" :value "-1"}]
     (for [tid task_id]
       [:input {:type "hidden" :name "task_id" :value tid}])
     [:h3 "date"]
@@ -491,7 +476,6 @@
     [:input {:name "__anti-forgery-token"
              :type "hidden"
              :value f-token}]
-    [:input {:type "hidden" :name "habit_id" :value "-1"}]
     (for [tid habit_id]
       [:input {:type "hidden" :name "habit_id" :value tid}])
     [:input {:type "date"
@@ -534,8 +518,7 @@
             ;; agenda page selection
             (into [:td]
                   (when (= page_type "agenda")
-                    [[:input {:type "hidden" :name "linkedpage" :value "-1"}]
-                     [:select {:name "linkedpage" :multiple true}
+                    [[:select {:name "linkedpage" :multiple true}
                       (for [{:keys [page_id page_name page_type]} (filter #(not= (:page_type %) "agenda") page-list)]
                         [:option (into {:value page_id} (when (some #{page_id} linked-pages) {:selected true})) (str page_name " " page_type)])]
                      [:button {:type "submit" :formaction "/settings/update_agenda_pages" :name "page_id" :value page_id} "update"]]))

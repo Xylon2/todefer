@@ -24,17 +24,17 @@
 
 (s/def ::int int?)
 (s/def ::string string?)
-
 (s/def ::iso-date #(re-matches #"\d{4}-\d{2}-\d{2}" %))
 (s/def ::freq_unit #{"days" "weeks" "months" "years"})
-(s/def ::donewhen #{"today" "yesturday"})
-(s/def ::pagetype #{"task" "habit" "agenda"})
-(s/def ::todo-actions #{"today" "tomorrow" "not"})
 
 (s/def ::ints-list (s/coll-of ::int      :kind vector?))
 (s/def ::strs-list (s/coll-of ::string   :kind vector?))
 (s/def ::date-list (s/coll-of ::iso-date :kind vector?))
 (s/def ::freq_unit-list (s/coll-of ::freq_unit :kind vector?))
+
+(s/def ::donewhen #{"today" "yesturday"})
+(s/def ::pagetype #{"task" "habit" "agenda"})
+(s/def ::todo-actions #{"today" "tomorrow" "not"})
 
 ;; examples
 ;; - habit/34
@@ -71,30 +71,33 @@
          :headers {"Location" (str "/login?redirect=" redirect-url)}
          :body ""}))))
 
-(defn wrap-filter-dummy-values
-  "there is a kludge in-place to force certain form inputs to always be a list
-  because otherwize coercion fails. here we remove the extra items"
-  [handler]
-  (fn [req]
-    (let [;; nuke-values #(vec (remove #{-1 "59866220-59be-4143-90b3-63c2861eadca"} %))
-          nuke-values #(vec (rest %))
-          req-cleaned 
-          (loop [xs req, keys [:task_id
-                               :habit_id
-                               :thing_id
-                               :task_newname
-                               :habit_name_new
-                               :freq_value_new
-                               :freq_unit_new
-                               :due_new
-                               :linkedpage]]
-            (if (empty? keys)
-              xs
-              (let [[key & keys'] keys
-                    xs' (update-in xs [:parameters :form key] nuke-values)]
-                (recur xs' keys'))))]
-      
-      (handler req-cleaned))))
+(defn conform-to-vector [x]
+  (if (vector? x)
+    x
+    [x]))
+
+(defn wrap-vector
+  "for some reason the coercion does not update these to vectors"
+  [handler mapkey]
+  (fn [request]
+    (let [form-params (mapkey request)
+          transform-keys ["task_id"
+                          "habit_id"
+                          "thing_id"
+                          "task_newname"
+                          "habit_name_new"
+                          "freq_value_new"
+                          "freq_unit_new"
+                          "due_new"
+                          "linkedpage"]
+          transformed-params (reduce (fn [params key]
+                                       (if (contains? params key)
+                                         (update params key conform-to-vector)
+                                         params))
+                                     form-params
+                                     transform-keys)
+          updated-request (assoc request mapkey transformed-params)]
+      (handler updated-request))))
 
 (defn app
   "reitit with format negotiation and input & output coercion"
@@ -115,8 +118,7 @@
                :parameters {:path {:page-name ::string}}}}]
 
        ["/page/:page-name/"
-        {:middleware [wrap-auth
-                      wrap-filter-dummy-values]
+        {:middleware [wrap-auth]
          :post {:parameters {:path {:page-name ::string}}}}
 
         ;; single-request actions. these run a db query and re-display the
@@ -267,8 +269,7 @@
 
         ["update_agenda_pages"
          {:post {:handler sc/update-agenda-handler
-                 :middleware [wrap-filter-dummy-values
-                              sc/wrap-settings-page]
+                 :middleware [sc/wrap-settings-page]
                  :parameters {:form {:page_id ::int
                                      :linkedpage ::ints-list}}}}]]
 
@@ -285,8 +286,9 @@
       ;; router data affecting all routes
       {:data {:coercion   reitit.coercion.spec/coercion
               :muuntaja   m/instance
-              :middleware [
-                           parameters/parameters-middleware
+              :middleware [parameters/parameters-middleware
+                           [wrap-vector :params]
+                           [wrap-vector :form-params]
                            rrc/coerce-request-middleware
                            muuntaja/format-response-middleware
                            rrc/coerce-response-middleware

@@ -76,20 +76,21 @@
     x
     [x]))
 
+(defn keys-with-list-values
+  "this function helps parsing the ring request middleware"
+  [kv-map]
+  (for [[k v] kv-map
+        :when (clojure.string/includes? (name v) "-list")]
+    (name k)))
+
 (defn wrap-vector
-  "for some reason the coercion does not update these to vectors"
+  "for some reason the coercion does not update these to vectors. so we do it
+  ourselfes"
   [handler mapkey]
-  (fn [request]
+  (fn [{{{{{[coercion-info] :form} :parameters} :post} :data} :reitit.core/match
+        :as request}]
     (let [form-params (mapkey request)
-          transform-keys ["task_id"
-                          "habit_id"
-                          "thing_id"
-                          "task_newname"
-                          "habit_name_new"
-                          "freq_value_new"
-                          "freq_unit_new"
-                          "due_new"
-                          "linkedpage"]
+          transform-keys (keys-with-list-values coercion-info)
           transformed-params (reduce (fn [params key]
                                        (if (contains? params key)
                                          (update params key conform-to-vector)

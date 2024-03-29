@@ -94,9 +94,10 @@
    [(-> (insert-into :task)
         (values [{:task_name task_name
                   :page_ref [:cast page_ref :integer]
-                  :highlight highlight}]))
+                  :highlight highlight}])
+        (returning :task_id))
 
-    identity]))
+    #(:task_id (first %))]))
 
 (defn delete-task!
   "delete one or more tasks"
@@ -355,9 +356,10 @@
        (values [{:habit_name habit_name
                  :page_ref [:cast page_ref :integer]
                  :freq_unit [:cast freq_unit :timeUnit]
-                 :freq_value [:cast freq_value :integer]}]))
+                 :freq_value [:cast freq_value :integer]}])
+        (returning :habit_id))
 
-   identity])
+   #(:habit_id (first %))])
 
  (defn list-due-habits
    "get all due habits, ordered by due date"

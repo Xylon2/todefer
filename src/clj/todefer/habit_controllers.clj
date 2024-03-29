@@ -56,14 +56,6 @@
      (some-updated? (exec-query (q/defer-habit! [habit_id] (jt/plus now dayshence) true)))
      (some-updated? (exec-query (q/habit-untodo! [habit_id]))))))
 
-(defn add-habit-handler
-  "add habit"
-  [page-id
-   {exec-query :q-builder
-    {{:keys [habit_name freq_unit freq_value]} :form
-     {:keys [page-name]} :path} :parameters}]
-  (one-update? (exec-query (q/add-habit! habit_name page-id freq_unit freq_value))))
-
 (defn done-habit-handler
   "mark a habit as done, today or yesturday"
   [_
@@ -160,3 +152,21 @@
     {{:keys [habit_id date]} :form
      {:keys [page-name]} :path} :parameters}]
   (some-updated? (exec-query (q/defer-habit! habit_id date))))
+
+(defn add-habit-handler
+  "this one is not to be wrapped with wrap-show-habits. sometimes it needs to
+  return the defer page"
+  [{exec-query :q-builder
+    {{:keys [habit_name freq_unit freq_value xaction]} :form
+     {:keys [page-name]} :path} :parameters :as req}]
+  (let [page-id (get-page-id exec-query page-name)
+        habit_id (exec-query (q/add-habit! habit_name page-id freq_unit freq_value))]
+    (case xaction
+      "defer" (defer-habit-view (assoc-in req [:parameters :form :habit_id] [habit_id]))
+      "today" (do
+                (exec-query (q/habit-today! [habit_id]))
+                (show-habits-200 exec-query page-id))
+      "tomorrow" (do
+                   (exec-query (q/habit-tomorrow! [habit_id]))
+                   (show-habits-200 exec-query page-id))
+      (show-habits-200 exec-query page-id))))

@@ -227,9 +227,21 @@
                   [:div.t-container
                    [:input#add_new.flex-input {:type "text"
                                                :name "task_name"}]
-                   [:button {:type "submit"
+
+                   ;; invisible submit button to handle submit by pressing Enter
+                   [:button {:style "display: none"
+                             :type "submit"
                              :hx-post (str "/page/" page-name "/add-task")}
-                    "add task"]]
+                    "add task"]
+                   
+                   ;; real submit button
+                   [:select {:name "xaction"
+                             :hx-post (str "/page/" page-name "/add-task")}
+                    [:option {:value "due"} "add task"]
+                    [:option {:value "due"} "due"]
+                    [:option {:value "defer"} "defer"]
+                    [:option {:value "today"} "today"]
+                    [:option {:value "tomorrow"} "tomorrow"]]]
                   [:div
                    ;; delete
                    [:select {:name "really"
@@ -297,9 +309,22 @@
                     [:option {:value "weeks"} "weeks"]
                     [:option {:value "months"} "months"]
                     [:option {:value "years"} "years"]]
-                   [:button {:type "submit"
+
+                   ;; invisible submit button for when user presses Enter
+                   [:button {:style "display: none"
+                             :type "submit"
                              :hx-post (str "/page/" page-name "/add-habit")}
-                    "add habit"]]
+                    "add habit"]
+
+                   ;; real submit button
+                   [:select {:name "xaction"
+                             :hx-post (str "/page/" page-name "/add-habit")}
+                    [:option {:value "due"} "add habit"]
+                    [:option {:value "due"} "due"]
+                    [:option {:value "defer"} "defer"]
+                    [:option {:value "today"} "today"]
+                    [:option {:value "tomorrow"} "tomorrow"]
+                    ]]
                   [:div
                    ;; done
                    [:select {:name "donewhen"

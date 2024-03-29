@@ -124,17 +124,6 @@
 
         ;; single-request actions. these run a db query and re-display the
         ;; normal page contents
-        ["add-task"
-         {:post {:handler tc/add-task-handler
-                 :middleware [tc/wrap-show-tasks]
-                 :parameters {:form {:task_name ::string}}}}]
-        ["add-habit"
-         {:post {:handler hc/add-habit-handler
-                 :middleware [hc/wrap-show-habits]
-                 :parameters {:form {:habit_name ::string
-                                     :freq_value ::int
-                                     :freq_unit ::freq_unit}}}}]
-
         ["done-habit"
          {:post {:handler hc/done-habit-handler
                  :middleware [hc/wrap-show-habits]
@@ -227,6 +216,18 @@
                  :middleware [hc/wrap-show-habits]
                  :parameters {:form {:habit_id ::ints-list
                                      :date ::iso-date}}}}]
+
+        ;; special cases where it may be single or multi-request
+        ["add-task"
+         {:post {:handler tc/add-task-handler
+                 :parameters {:form {:task_name ::string
+                                     :xaction ::string}}}}]
+        ["add-habit"
+         {:post {:handler hc/add-habit-handler
+                 :parameters {:form {:habit_name ::string
+                                     :freq_value ::int
+                                     :freq_unit ::freq_unit
+                                     :xaction ::string}}}}]
 
         ;; actions for the agenda page
         ["done-delete"

@@ -41,14 +41,6 @@
           (show-tasks-200 exec-query page-id)
           (show-500 ":o")))))
 
-(defn add-task-handler
-  "add task"
-  [page-id
-   {exec-query :q-builder
-    {{:keys [task_name]} :form
-     {:keys [page-name]} :path} :parameters}]
-  (one-update? (exec-query (q/add-task! task_name page-id))))
-
 (defn delete-task-handler
   "delete one or more tasks"
   [_
@@ -159,3 +151,20 @@
                  (exec-query (q/create-defcat-named! new-catname)))]
     (some-updated? (exec-query (q/defer-task-named! cat-id task_id)))))
 
+(defn add-task-handler
+  "this one is not to be wrapped with wrap-show-tasks. sometimes it needs to
+  return the defer page"
+  [{exec-query :q-builder
+    {{:keys [task_name xaction]} :form
+     {:keys [page-name]} :path} :parameters :as req}]
+  (let [page-id (get-page-id exec-query page-name)
+        task_id (exec-query (q/add-task! task_name page-id))]
+    (case xaction
+      "defer" (defer-task-view (assoc-in req [:parameters :form :task_id] [task_id]))
+      "today" (do
+                (exec-query (q/task-today! [task_id]))
+                (show-tasks-200 exec-query page-id))
+      "tomorrow" (do
+                   (exec-query (q/task-tomorrow! [task_id]))
+                   (show-tasks-200 exec-query page-id))
+      (show-tasks-200 exec-query page-id))))

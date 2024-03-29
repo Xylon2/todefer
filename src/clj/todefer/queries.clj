@@ -119,12 +119,12 @@
 (defn list-linked-pages
   "to be used on Agenda pages only"
   [agenda_id]
-  [(-> (select :appPage.page_id)
+  [(-> (select :appPage.page_id :appPage.page_name :appPage.page_type)
        (from :appPage)
        (join :pageagenda [:= :appPage.page_id :pageagenda.page_id])
        (where [:= :agenda_id agenda_id]))
 
-   #(map :page_id %)])
+   identity])
 
 (defn nuke-linked-pages!
   "nuke all linked pages for a given agenda page"

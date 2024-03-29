@@ -81,3 +81,13 @@
                    :habit (fn [id]
                             (hc/todo-habit-handler -1 (assoc-in req [:parameters :form :habit_id] [id])))))
   true)
+
+(defn add-task-handler
+  [page-id
+   {exec-query :q-builder
+    {{:keys [task_name tpage aaction]} :form
+     {:keys [page-name]} :path} :parameters :as req}]
+  (let [task_id (exec-query (q/add-task! task_name tpage))]
+    (case aaction
+      "today" (exec-query (q/task-today! [task_id]))
+      "tomorrow" (exec-query (q/task-tomorrow! [task_id])))))

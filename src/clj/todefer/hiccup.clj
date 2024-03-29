@@ -374,7 +374,7 @@
 
 (defn agenda-page
   "render a full agenda page"
-  [page-list page-name page-id todo-today todo-tomorrow f-token]
+  [page-list page-name page-id todo-today todo-tomorrow tpages f-token]
   (let [contents (render-agenda page-id todo-today todo-tomorrow)]
     (render-base
      (str page-name " agenda")
@@ -388,6 +388,28 @@
                   [:input {:name "__anti-forgery-token"
                            :type "hidden"
                            :value f-token}]
+                  (when (< 0 (count tpages))
+                    [:div.t-container
+                     [:input#add_new.flex-input {:type "text"
+                                                 :name "task_name"}]
+
+                     ;; select tasks page
+                     [:select (into {:name "tpage"} (when (= 1 (count tpages)) {:style "display: none"}))
+                      (for [{:keys [page_id page_name]} tpages]
+                        [:option {:value page_id} page_name])]
+
+                     ;; invisible submit button to handle submit by pressing Enter
+                     [:button {:style "display: none"
+                               :type "submit"
+                               :hx-post (str "/page/" page-name "/agenda-add-task")}
+                      "add task"]
+                     
+                     ;; real submit button
+                     [:select {:name "aaction"
+                               :hx-post (str "/page/" page-name "/agenda-add-task")}
+                      [:option {:value "today"} "add task"]
+                      [:option {:value "today"} "today"]
+                      [:option {:value "tomorrow"} "tomorrow"]]])
                   [:div
                    ;; done/delete
                    [:select {:name "really"

@@ -14,7 +14,8 @@
   [page-list exec-query]
   (map (fn [page]
          (if (= (:page_type page) "agenda")
-           (assoc page :linked-pages (exec-query (q/list-linked-pages (:page_id page))))
+           (let [linked-page-ids (map :page_id (exec-query (q/list-linked-pages (:page_id page))))]
+             (assoc page :linked-pages linked-page-ids))
            page)) page-list))
 
 (defn settings-200 [exec-query f-token]

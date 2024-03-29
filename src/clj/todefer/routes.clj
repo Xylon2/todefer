@@ -241,6 +241,12 @@
                  :parameters {:form {:thing_id ::thing-list
                                      :action ::todo-actions}}}}]
 
+        ["agenda-add-task"
+         {:post {:handler ac/add-task-handler
+                 :middleware [ac/wrap-show-agenda]
+                 :parameters {:form {:task_name ::string
+                                     :tpage ::int
+                                     :aaction ::todo-actions}}}}]
         ]
 
        ["/settings"

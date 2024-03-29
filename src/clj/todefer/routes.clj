@@ -15,7 +15,7 @@
             [todefer.handlers :as hl]
             [todefer.task-controllers :as tc]
             [todefer.habit-controllers :as hc]
-            [todefer.agenda-controllers :as ac]
+            [todefer.todo-controllers :as ac]
             [todefer.settings-controllers :as sc]
             [ring.logger :as logger]
             [clojure.string :as string]
@@ -33,7 +33,7 @@
 (s/def ::freq_unit-list (s/coll-of ::freq_unit :kind vector?))
 
 (s/def ::donewhen #{"today" "yesturday"})
-(s/def ::pagetype #{"task" "habit" "agenda"})
+(s/def ::pagetype #{"task" "habit" "todo"})
 (s/def ::todo-actions #{"today" "tomorrow" "not"})
 
 ;; examples
@@ -229,21 +229,21 @@
                                      :freq_unit ::freq_unit
                                      :xaction ::string}}}}]
 
-        ;; actions for the agenda page
+        ;; actions for the todo page
         ["done-delete"
          {:post {:handler ac/done-delete-handler
-                 :middleware [ac/wrap-show-agenda]
+                 :middleware [ac/wrap-show-todo]
                  :parameters {:form {:thing_id ::thing-list}}}}]
 
         ["todo-thing"
          {:post {:handler ac/todo-thing-handler
-                 :middleware [ac/wrap-show-agenda]
+                 :middleware [ac/wrap-show-todo]
                  :parameters {:form {:thing_id ::thing-list
                                      :action ::todo-actions}}}}]
 
-        ["agenda-add-task"
+        ["todo-add-task"
          {:post {:handler ac/add-task-handler
-                 :middleware [ac/wrap-show-agenda]
+                 :middleware [ac/wrap-show-todo]
                  :parameters {:form {:task_name ::string
                                      :tpage ::int
                                      :aaction ::todo-actions}}}}]
@@ -275,8 +275,8 @@
                  :middleware [sc/wrap-settings-page]
                  :parameters {:form {:page_id ::int}}}}]
 
-        ["update_agenda_pages"
-         {:post {:handler sc/update-agenda-handler
+        ["update_todo_pages"
+         {:post {:handler sc/update-todo-handler
                  :middleware [sc/wrap-settings-page]
                  :parameters {:form {:page_id ::int
                                      :linkedpage ::ints-list}}}}]]

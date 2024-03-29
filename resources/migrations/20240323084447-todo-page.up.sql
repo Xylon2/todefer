@@ -8,12 +8,12 @@ ADD COLUMN todo date DEFAULT null;
 
 --;;
 
-CREATE TABLE pageagenda (
-  agenda_id INT REFERENCES apppage(page_id) ON DELETE CASCADE,
+CREATE TABLE pagetodo (
+  todo_id INT REFERENCES apppage(page_id) ON DELETE CASCADE,
   page_id INT REFERENCES apppage(page_id) ON DELETE CASCADE,
-  PRIMARY KEY (agenda_id, page_id)  
+  PRIMARY KEY (todo_id, page_id)  
 );
 
 --;;
 
-ALTER TYPE pagetype ADD VALUE 'agenda';
+ALTER TYPE pagetype ADD VALUE 'todo';

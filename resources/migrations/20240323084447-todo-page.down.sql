@@ -8,4 +8,4 @@ DROP COLUMN todo;
 
 --;;
 
-DROP TABLE pageagenda;
+DROP TABLE pagetodo;

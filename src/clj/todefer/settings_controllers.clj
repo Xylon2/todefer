@@ -10,10 +10,10 @@
 (def some-updated? #(< 0 (num-updated %)))
 
 (defn add-linked-pages
-  "for agenda pages, we add a list of the linked pages"
+  "for todo pages, we add a list of the linked pages"
   [page-list exec-query]
   (map (fn [page]
-         (if (= (:page_type page) "agenda")
+         (if (= (:page_type page) "todo")
            (let [linked-page-ids (map :page_id (exec-query (q/list-linked-pages (:page_id page))))]
              (assoc page :linked-pages linked-page-ids))
            page)) page-list))
@@ -97,7 +97,7 @@
 
     (apply-order exec-query (rseq reordered_list))))
 
-(defn update-agenda-handler
+(defn update-todo-handler
   [{exec-query :q-builder
     {{:keys [page_id linkedpage]} :form} :parameters}]
 

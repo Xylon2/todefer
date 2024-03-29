@@ -1,4 +1,4 @@
-(ns todefer.agenda
+(ns todefer.todo
   (:require [todefer.shared :refer [log byid byclass
                                     setup-collapsibles
                                     expand-it

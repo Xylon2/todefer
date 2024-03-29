@@ -114,12 +114,12 @@
                            (prettify-due :date_scheduled))]
     (map-of due-habits upcoming-habits)))
 
-(defn assemble-agenda-page-info
+(defn assemble-todo-page-info
   ""
   [exec-query page-id]
-  (let [agenda-pages (exec-query (q/list-linked-pages page-id))
-        tpages (filter #(= (:page_type %) "task") agenda-pages)
-        hpages (filter #(= (:page_type %) "habit") agenda-pages)
+  (let [todo-pages (exec-query (q/list-linked-pages page-id))
+        tpages (filter #(= (:page_type %) "task") todo-pages)
+        hpages (filter #(= (:page_type %) "habit") todo-pages)
 
         todo-tasks-today (exec-query (q/list-todo-tasks-today (map :page_id tpages)))
         todo-habits-today (-> (exec-query (q/list-todo-habits-today (map :page_id hpages)))
@@ -137,7 +137,7 @@
     (map-of tpages todo-today todo-tomorrow)))
 
 (defn display-page
-  "displays a task, habit or agenda page"
+  "displays a task, habit or todo page"
   [{exec-query :q-builder
     {{page-name :page-name} :path} :parameters :as request
     f-token :anti-forgery-token}]
@@ -169,12 +169,12 @@
                 page-list' page-name page-id
                 due-habits upcoming-habits
                 f-token))}
-      "agenda"
+      "todo"
       {:status 200
        :headers {"Content-Type" "text/html"}
        :body (let [{:keys [todo-today todo-tomorrow tpages]}
-                   (assemble-agenda-page-info exec-query page-id)]
-               (ph/agenda-page
+                   (assemble-todo-page-info exec-query page-id)]
+               (ph/todo-page
                 page-list' page-name page-id
                 todo-today todo-tomorrow tpages
                 f-token))}

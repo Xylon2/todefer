@@ -1,4 +1,4 @@
-(ns todefer.agenda-controllers
+(ns todefer.todo-controllers
   (:require [todefer.queries :as q]
             [todefer.hiccup :as ph]
             [todefer.handlers :as hl]
@@ -13,13 +13,13 @@
 (def one-update?   #(= 1 (num-updated %)))
 (def some-updated? #(< 0 (num-updated %)))
 
-(defn show-agenda-200
+(defn show-todo-200
   [exec-query page-id]
   (let [{:keys [todo-today todo-tomorrow]}
-        (hl/assemble-agenda-page-info exec-query page-id)]
+        (hl/assemble-todo-page-info exec-query page-id)]
     {:status 200
      :headers {"Content-Type" "text/html"}
-     :body (-> (ph/render-agenda page-id todo-today todo-tomorrow)
+     :body (-> (ph/render-todo page-id todo-today todo-tomorrow)
                h/html
                str)}))
 
@@ -34,14 +34,14 @@
   [exec-query page-name]
   (:page_id (exec-query (q/get-page page-name))))
 
-(defn wrap-show-agenda
+(defn wrap-show-todo
   "this is a middleware. wrap it around the action handlers."
   [handler]
   (fn [{exec-query :q-builder
         {{:keys [page-name]} :path} :parameters :as req}]
     (let [page-id (get-page-id exec-query page-name)]
         (if (handler page-id req)
-          (show-agenda-200 exec-query page-id)
+          (show-todo-200 exec-query page-id)
           (show-500 ":o")))))
 
 (defn dispatch-case

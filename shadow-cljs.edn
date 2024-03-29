@@ -9,5 +9,5 @@
                                   :depends-on #{:shared}}
                           :habits {:entries [todefer.habits]
                                    :depends-on #{:shared}}
-                          :agenda {:entries [todefer.agenda]
+                          :todo {:entries [todefer.todo]
                                    :depends-on #{:shared}}}}}}

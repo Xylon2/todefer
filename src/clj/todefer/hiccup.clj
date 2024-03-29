@@ -172,8 +172,8 @@
     
     (concat duehiccup upcominghiccup)))
 
-(defn render-agenda
-  "the meat of the agenda page. used both in initial page-load and by AJAX"
+(defn render-todo
+  "the meat of the todo page. used both in initial page-load and by AJAX"
   [page-id todo-today todo-tomorrow]
   (let [renderer
         (fn [section-id section-name todos]
@@ -372,14 +372,14 @@
                     "defer"]
                    ]]])))
 
-(defn agenda-page
-  "render a full agenda page"
+(defn todo-page
+  "render a full todo page"
   [page-list page-name page-id todo-today todo-tomorrow tpages f-token]
-  (let [contents (render-agenda page-id todo-today todo-tomorrow)]
+  (let [contents (render-todo page-id todo-today todo-tomorrow)]
     (render-base
-     (str page-name " agenda")
+     (str page-name " todo")
      contents
-     :scripts ["/public/cljs/shared.js" "/public/cljs/agenda.js"]
+     :scripts ["/public/cljs/shared.js" "/public/cljs/todo.js"]
      :pagelist page-list
      :actionbar [[:form {:method "post"
                          :style "padding-left: 0;"
@@ -401,12 +401,12 @@
                      ;; invisible submit button to handle submit by pressing Enter
                      [:button {:style "display: none"
                                :type "submit"
-                               :hx-post (str "/page/" page-name "/agenda-add-task")}
+                               :hx-post (str "/page/" page-name "/todo-add-task")}
                       "add task"]
                      
                      ;; real submit button
                      [:select {:name "aaction"
-                               :hx-post (str "/page/" page-name "/agenda-add-task")}
+                               :hx-post (str "/page/" page-name "/todo-add-task")}
                       [:option {:value "today"} "add task"]
                       [:option {:value "today"} "today"]
                       [:option {:value "tomorrow"} "tomorrow"]]])
@@ -562,13 +562,13 @@
             [:td page_name]
             [:td page_type]
 
-            ;; agenda page selection
+            ;; todo page selection
             (into [:td]
-                  (when (= page_type "agenda")
+                  (when (= page_type "todo")
                     [[:select {:name "linkedpage" :multiple true}
-                      (for [{:keys [page_id page_name page_type]} (filter #(not= (:page_type %) "agenda") page-list)]
+                      (for [{:keys [page_id page_name page_type]} (filter #(not= (:page_type %) "todo") page-list)]
                         [:option (into {:value page_id} (when (some #{page_id} linked-pages) {:selected true})) (str page_name " " page_type)])]
-                     [:button {:type "submit" :formaction "/settings/update_agenda_pages" :name "page_id" :value page_id} "update"]]))
+                     [:button {:type "submit" :formaction "/settings/update_todo_pages" :name "page_id" :value page_id} "update"]]))
 
             ;; delete
             [:td [:button {:type "submit" :formaction "/settings/delete" :name "page_id" :value page_id} "delete"]]
@@ -590,7 +590,7 @@
        [:select {:name "new_pagetype"}
         [:option {:value "task"} "tasks page"]
         [:option {:value "habit"} "habits page"]
-        [:option {:value "agenda"} "agenda page"]]
+        [:option {:value "todo"} "todo page"]]
        [:button {:type "submit"} "add page"]]
       [:h2 "Logout"]
       [:form {:method "get" :action "/logout"}

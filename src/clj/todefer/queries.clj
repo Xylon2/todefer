@@ -117,28 +117,28 @@
    identity])
 
 (defn list-linked-pages
-  "to be used on Agenda pages only"
-  [agenda_id]
+  "to be used on Todo pages only"
+  [todo_id]
   [(-> (select :appPage.page_id :appPage.page_name :appPage.page_type)
        (from :appPage)
-       (join :pageagenda [:= :appPage.page_id :pageagenda.page_id])
-       (where [:= :agenda_id agenda_id]))
+       (join :pagetodo [:= :appPage.page_id :pagetodo.page_id])
+       (where [:= :todo_id todo_id]))
 
    identity])
 
 (defn nuke-linked-pages!
-  "nuke all linked pages for a given agenda page"
+  "nuke all linked pages for a given todo page"
   [page_id]
-  [(-> (delete-from :pageagenda)
-       (where [:= :agenda_id page_id]))
+  [(-> (delete-from :pagetodo)
+       (where [:= :todo_id page_id]))
 
    identity])
 
 (defn update-linked-pages!
-  "update the linked pages of an Agenda page"
+  "update the linked pages of an Todo page"
   [page_id linkedpage]
-  [(-> (insert-into :pageagenda)
-       (values [{:agenda_id page_id :page_id linkedpage}])
+  [(-> (insert-into :pagetodo)
+       (values [{:todo_id page_id :page_id linkedpage}])
        (on-conflict (do-nothing)))
 
    identity])

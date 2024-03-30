@@ -16,6 +16,10 @@
                  :content "width=device-width, initial-scale=1.0"}]
          [:meta {:charset "UTF-8"}]
          [:link {:rel "stylesheet" :href "/public/style/style.css"}]
+         [:link {:rel "apple-touch-icon" :sizes "180x180" :href "/public/apple-touch-icon.png"}]
+         [:link {:rel "icon" :type "image/png" :sizes "32x32" :href "/public/favicon-32x32.png"}]
+         [:link {:rel "icon" :type "image/png" :sizes "16x16" :href "/public/favicon-16x16.png"}]
+         [:link {:rel "manifest" :href "/public/site.webmanifest"}]
          [:script {:src "https://unpkg.com/htmx.org@1.9.10"
           :integrity "sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC"
           :crossorigin "anonymous"}]]

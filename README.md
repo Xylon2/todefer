@@ -23,4 +23,9 @@ Don't forget to build your js:
 npx shadow-cljs compile app
 ```
 
+To compile to a .jar:
+```
+clj -T:build uber
+```
+
 If wanting to check dependencies, use: https://github.com/liquidz/antq

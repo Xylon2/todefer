@@ -1,0 +1,5 @@
+{:credentials/db {:file-path "/var/todefer/env.edn"}
+
+ :db.sql/connection {:db-credentials #ig/ref :credentials/db}
+
+ :migratus/config (:database #ig/ref :db.sql/connection)}

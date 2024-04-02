@@ -127,6 +127,27 @@
                                "tomorrow" (q/habit-tomorrow! habit_id)
                                "not" (q/habit-untodo! habit_id)))))
 
+(defn order-habit-handler
+  "order habits to top or bottom as appropriate"
+  [page-id
+   {exec-query :q-builder
+    {{:keys [habit_id order]} :form
+     {:keys [page-name]} :path} :parameters}]
+
+  (let [;; get all habits for this page
+        page-habits (vec (exec-query (q/list-page-habit-order page-id)))
+        ;; convert id list to set
+        id-set (set habit_id)
+        ;; remove ours
+        not-ours (vec (remove #(id-set %) page-habits))
+        ;; new vector, in-order
+        new-vec (case order
+                  "top" (into habit_id not-ours)
+                  "bottom" (into not-ours habit_id))]
+    (doseq [[order_key_habit habit_id] (map-indexed vector new-vec)]
+      (exec-query (q/update-habit-order-local habit_id order_key_habit)))
+    true))
+
 (defn defer-habit-view
   "always accessed with POST requests.
 

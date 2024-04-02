@@ -124,16 +124,19 @@
         todo-tasks-today (exec-query (q/list-todo-tasks-today (map :page_id tpages)))
         todo-habits-today (-> (exec-query (q/list-todo-habits-today (map :page_id hpages)))
                               (prettify-due :date_scheduled))
-        todo-today (into
-                    (map #(assoc % :ttype "task") todo-tasks-today)
-                    (map #(assoc % :ttype "habit") todo-habits-today))
+        todo-today (sort-by :order_key_todo
+                    (into
+                     (map #(assoc % :ttype "task") todo-tasks-today)
+                     (map #(assoc % :ttype "habit") todo-habits-today)))
 
         todo-tasks-tomorrow (exec-query (q/list-todo-tasks-tomorrow (map :page_id tpages)))
         todo-habits-tomorrow (-> (exec-query (q/list-todo-habits-tomorrow (map :page_id hpages)))
                                  (prettify-due :date_scheduled))
-        todo-tomorrow (into
-                       (map #(assoc % :ttype "task") todo-tasks-tomorrow)
-                       (map #(assoc % :ttype "habit") todo-habits-tomorrow))]
+        todo-tomorrow (sort-by :order_key_todo
+                       (into
+                        (map #(assoc % :ttype "task") todo-tasks-tomorrow)
+                        (map #(assoc % :ttype "habit") todo-habits-tomorrow)))]
+    
     (map-of tpages todo-today todo-tomorrow)))
 
 (defn display-page

@@ -170,9 +170,53 @@
        (where [:and [:= :page_ref page_ref]
                     [:is :defcat_named nil]
                     [:is :defcat_dated nil]])
-       (order-by [:sort_id :asc] [:task_id :asc]))
+       (order-by [:order_key_task :asc] [:task_id :asc]))
 
    identity])
+
+(defn list-page-task-order
+  "id and order_key for tasks on a given page"
+  [page_ref]
+  [(-> (select :task_id)
+       (from :task)
+       (where [:= :page_ref page_ref])
+       (order-by [:order_key_task :asc] [:task_id :asc]))
+
+   #(map :task_id %)])
+
+(defn list-page-habit-order
+  "id and order_key for habits on a given page"
+  [page_ref]
+  [(-> (select :habit_id)
+       (from :habit)
+       (where [:= :page_ref page_ref])
+       (order-by [:order_key_habit :asc] [:habit_id :asc]))
+
+   #(map :habit_id %)])
+
+(defn update-task-order
+  "given an id and order key, update"
+  [column task_id order_key]
+  [(-> (update :task)
+       (set {column order_key})
+       (where [:= :task_id task_id]))
+
+   identity])
+
+(def update-task-order-local #(update-task-order :order_key_task %1 %2))
+(def update-task-order-todo #(update-task-order :order_key_todo %1 %2))
+
+(defn update-habit-order
+  "given an id and order key, update"
+  [column habit_id order_key]
+  [(-> (update :habit)
+       (set {column order_key})
+       (where [:= :habit_id habit_id]))
+
+   identity])
+
+(def update-habit-order-local #(update-habit-order :order_key_habit %1 %2))
+(def update-habit-order-todo #(update-habit-order :order_key_todo %1 %2))
 
 (defn list-todo-things
   "lists the todo tasks for a list of pages"
@@ -184,8 +228,7 @@
        (from table)
        (where [:and
                [:= :page_ref [:any [:array page_refs :integer]]]
-               [op :todo :CURRENT_DATE]])
-       (order-by [:sort_id :asc] [fname :asc]))
+               [op :todo :CURRENT_DATE]]))
 
    identity])
 
@@ -368,7 +411,7 @@
         (from :habit)
         (where [:and [:= :page_ref page_ref]
                 [:<= :date_scheduled :CURRENT_DATE]])
-        (order-by [:sort_id :asc] [:date_scheduled :asc] [:habit_id :asc]))
+        (order-by [:order_key_habit :asc] [:date_scheduled :asc] [:habit_id :asc]))
 
     identity])
 

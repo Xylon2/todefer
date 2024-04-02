@@ -100,6 +100,27 @@
                                "tomorrow" (q/task-tomorrow! task_id)
                                "not" (q/task-untodo! task_id)))))
 
+(defn order-task-handler
+  "order tasks to top or bottom as appropriate"
+  [page-id
+   {exec-query :q-builder
+    {{:keys [task_id order]} :form
+     {:keys [page-name]} :path} :parameters}]
+
+  (let [;; get all tasks for this page
+        page-tasks (vec (exec-query (q/list-page-task-order page-id)))
+        ;; convert id list to set
+        id-set (set task_id)
+        ;; remove ours
+        not-ours (vec (remove #(id-set %) page-tasks))
+        ;; new vector, in-order
+        new-vec (case order
+                  "top" (into task_id not-ours)
+                  "bottom" (into not-ours task_id))]
+    (doseq [[order_key_task task_id] (map-indexed vector new-vec)]
+      (exec-query (q/update-task-order-local task_id order_key_task)))
+    true))
+
 (defn defer-task-view
   "always accessed with POST requests.
 

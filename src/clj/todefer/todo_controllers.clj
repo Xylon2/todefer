@@ -91,3 +91,35 @@
     (case aaction
       "today" (exec-query (q/task-today! [task_id]))
       "tomorrow" (exec-query (q/task-tomorrow! [task_id])))))
+
+(defn order-thing-handler
+  "order tasks to top or bottom as appropriate"
+  [page-id
+   {exec-query :q-builder
+    {{:keys [thing_id order]} :form
+     {:keys [page-name]} :path} :parameters}]
+
+  (let [;; get all things for this page and sort them
+        {:keys [todo-today todo-tomorrow]} (hl/assemble-todo-page-info exec-query page-id)
+        all-things (sort-by :order_key_todo (into todo-today todo-tomorrow))
+        ;; need just vector of thing ids
+        all-things' (mapv (fn [{ttype :ttype :as todo-item}]
+                           (case ttype
+                             "task"
+                             (str "task/" (:task_id todo-item))
+                             "habit"
+                             (str "habit/" (:habit_id todo-item)))) all-things)
+        ;; convert id list to set
+        id-set (set thing_id)
+        ;; remove ours
+        not-ours (vec (remove #(id-set %) all-things'))
+        ;; new vector, in-order
+        new-vec (case order
+                  "top" (into thing_id not-ours)
+                  "bottom" (into not-ours thing_id))]
+
+    (doseq [[order_key_todo thing_id] (map-indexed vector new-vec)]
+      (dispatch-case thing_id
+          :task  #(exec-query (q/update-task-order-todo  % order_key_todo))
+          :habit #(exec-query (q/update-habit-order-todo % order_key_todo))))
+    true))

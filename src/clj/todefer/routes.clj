@@ -35,6 +35,7 @@
 (s/def ::donewhen #{"today" "yesturday"})
 (s/def ::pagetype #{"task" "habit" "todo"})
 (s/def ::todo-actions #{"today" "tomorrow" "not"})
+(s/def ::order-values #{"top" "bottom"})
 
 ;; examples
 ;; - habit/34
@@ -162,6 +163,18 @@
                  :parameters {:form {:habit_id ::ints-list
                                      :action ::todo-actions}}}}]
 
+        ["order-task"
+         {:post {:handler tc/order-task-handler
+                 :middleware [tc/wrap-show-tasks]
+                 :parameters {:form {:task_id ::ints-list
+                                     :order ::order-values}}}}]
+
+        ["order-habit"
+         {:post {:handler hc/order-habit-handler
+                 :middleware [hc/wrap-show-habits]
+                 :parameters {:form {:habit_id ::ints-list
+                                     :order ::order-values}}}}]
+
         ;; multi-request actions. these actions have a view page, where the user
         ;; is asked for more input, and a save page, which will run a query and
         ;; re-display the normal page contents
@@ -247,6 +260,12 @@
                  :parameters {:form {:task_name ::string
                                      :tpage ::int
                                      :aaction ::todo-actions}}}}]
+
+        ["order-todo"
+         {:post {:handler ac/order-thing-handler
+                 :middleware [ac/wrap-show-todo]
+                 :parameters {:form {:thing_id ::thing-list
+                                     :order ::order-values}}}}]
         ]
 
        ["/settings"

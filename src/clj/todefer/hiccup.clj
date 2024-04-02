@@ -283,6 +283,14 @@
                              :hx-post (str "/page/" page-name "/defer-task-view")
                              :hx-include "[name='task_id']"}
                     "defer"]
+
+                   ;; order
+                   [:select {:name "order"
+                             :hx-post (str "/page/" page-name "/order-task")
+                             :hx-include "[name='task_id']"}
+                    [:option {:value ""} "order"]
+                    [:option {:value "top"} "top"]
+                    [:option {:value "bottom"} "bottom"]]
                    ]]])))
 
 (defn habits-page
@@ -374,6 +382,14 @@
                              :hx-post (str "/page/" page-name "/defer-habit-view")
                              :hx-include "[name='habit_id']"}
                     "defer"]
+
+                   ;; order
+                   [:select {:name "order"
+                             :hx-post (str "/page/" page-name "/order-habit")
+                             :hx-include "[name='habit_id']"}
+                    [:option {:value ""} "order"]
+                    [:option {:value "top"} "top"]
+                    [:option {:value "bottom"} "bottom"]]
                    ]]])))
 
 (defn todo-page
@@ -429,7 +445,16 @@
                     [:option {:value ""} "todo"]
                     [:option {:value "today"} "today"]
                     [:option {:value "tomorrow"} "tomorrow"]
-                    [:option {:value "not"} "not"]]]]])))
+                    [:option {:value "not"} "not"]]
+
+                   ;; order
+                   [:select {:name "order"
+                             :hx-post (str "/page/" page-name "/order-todo")
+                             :hx-include "[name='thing_id']"}
+                    [:option {:value ""} "order"]
+                    [:option {:value "top"} "top"]
+                    [:option {:value "bottom"} "bottom"]]
+                   ]]])))
 
 (defn render-modify-tasks
   "page to modify selected tasks"

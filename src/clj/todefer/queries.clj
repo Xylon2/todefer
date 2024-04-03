@@ -228,7 +228,8 @@
        (from table)
        (where [:and
                [:= :page_ref [:any [:array page_refs :integer]]]
-               [op :todo :CURRENT_DATE]]))
+               [op :todo :CURRENT_DATE]])
+       (order-by [fname :asc]))
 
    identity])
 

@@ -114,6 +114,16 @@
                            (prettify-due :date_scheduled))]
     (map-of due-habits upcoming-habits)))
 
+(defn nil-is-mega
+  [n]
+  (if (nil? n)
+    Double/POSITIVE_INFINITY
+    n))
+
+(defn my-compare
+  [x y]
+  (compare (nil-is-mega x) (nil-is-mega y)))
+
 (defn assemble-todo-page-info
   ""
   [exec-query page-id]
@@ -124,7 +134,7 @@
         todo-tasks-today (exec-query (q/list-todo-tasks-today (map :page_id tpages)))
         todo-habits-today (-> (exec-query (q/list-todo-habits-today (map :page_id hpages)))
                               (prettify-due :date_scheduled))
-        todo-today (sort-by :order_key_todo
+        todo-today (sort-by :order_key_todo my-compare
                     (into
                      (map #(assoc % :ttype "task") todo-tasks-today)
                      (map #(assoc % :ttype "habit") todo-habits-today)))
@@ -132,7 +142,7 @@
         todo-tasks-tomorrow (exec-query (q/list-todo-tasks-tomorrow (map :page_id tpages)))
         todo-habits-tomorrow (-> (exec-query (q/list-todo-habits-tomorrow (map :page_id hpages)))
                                  (prettify-due :date_scheduled))
-        todo-tomorrow (sort-by :order_key_todo
+        todo-tomorrow (sort-by :order_key_todo my-compare
                        (into
                         (map #(assoc % :ttype "task") todo-tasks-tomorrow)
                         (map #(assoc % :ttype "habit") todo-habits-tomorrow)))]

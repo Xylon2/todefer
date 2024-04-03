@@ -101,14 +101,14 @@
 
   (let [;; get all things for this page and sort them
         {:keys [todo-today todo-tomorrow]} (hl/assemble-todo-page-info exec-query page-id)
-        all-things (sort-by :order_key_todo (into todo-today todo-tomorrow))
+        all-things (sort-by :order_key_todo hl/my-compare (into todo-today todo-tomorrow))
         ;; need just vector of thing ids
         all-things' (mapv (fn [{ttype :ttype :as todo-item}]
-                           (case ttype
-                             "task"
-                             (str "task/" (:task_id todo-item))
-                             "habit"
-                             (str "habit/" (:habit_id todo-item)))) all-things)
+                            (case ttype
+                              "task"
+                              (str "task/" (:task_id todo-item))
+                              "habit"
+                              (str "habit/" (:habit_id todo-item)))) all-things)
         ;; convert id list to set
         id-set (set thing_id)
         ;; remove ours
@@ -120,6 +120,6 @@
 
     (doseq [[order_key_todo thing_id] (map-indexed vector new-vec)]
       (dispatch-case thing_id
-          :task  #(exec-query (q/update-task-order-todo  % order_key_todo))
-          :habit #(exec-query (q/update-habit-order-todo % order_key_todo))))
+                     :task  #(exec-query (q/update-task-order-todo  % order_key_todo))
+                     :habit #(exec-query (q/update-habit-order-todo % order_key_todo))))
     true))

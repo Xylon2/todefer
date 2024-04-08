@@ -8,8 +8,15 @@
 (defn num-updated [x]
   (:next.jdbc/update-count (first x)))
 
-(def one-update?   #(= 1 (num-updated %)))
-(def some-updated? #(< 0 (num-updated %)))
+(defn one-update?
+  "takes query results as args. checks they returned 1 update"
+  [& queries]
+  (every? #(= 1 (num-updated %)) queries))
+
+(defn some-updated?
+  "takes query results as args. checks they returned at-least 1 update"
+  [& queries]
+  (every? #(< 0 (num-updated %)) queries))
 
 (defn get-page-id
   "given the page name, get page id"
@@ -52,9 +59,8 @@
   (let [{:keys [freq_unit freq_value]} (first (exec-query (q/get-habit-info [habit_id])))
         dayshence (jt/days (* (get timeunit-multipliers freq_unit) freq_value))
         now (jt/minus (jt/local-date) (jt/days offset))]
-    (and
-     (some-updated? (exec-query (q/defer-habit! [habit_id] (jt/plus now dayshence) true)))
-     (some-updated? (exec-query (q/habit-untodo! [habit_id]))))))
+    (some-updated? (exec-query (q/defer-habit! [habit_id] (jt/plus now dayshence) true))
+                   (exec-query (q/habit-untodo! [habit_id])))))
 
 (defn done-habit-handler
   "mark a habit as done, today or yesturday"
@@ -172,7 +178,8 @@
    {exec-query :q-builder
     {{:keys [habit_id date]} :form
      {:keys [page-name]} :path} :parameters}]
-  (some-updated? (exec-query (q/defer-habit! habit_id date))))
+  (some-updated? (exec-query (q/defer-habit! habit_id date))
+                 (exec-query (q/habit-untodo! [habit_id]))))
 
 (defn add-habit-handler
   "this one is not to be wrapped with wrap-show-habits. sometimes it needs to

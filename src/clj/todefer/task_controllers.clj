@@ -7,8 +7,15 @@
 (defn num-updated [x]
   (:next.jdbc/update-count (first x)))
 
-(def one-update?   #(= 1 (num-updated %)))
-(def some-updated? #(< 0 (num-updated %)))
+(defn one-update?
+  "takes query results as args. checks they returned 1 update"
+  [& queries]
+  (every? #(= 1 (num-updated %)) queries))
+
+(defn some-updated?
+  "takes query results as args. checks they returned at-least 1 update"
+  [& queries]
+  (every? #(< 0 (num-updated %)) queries))
 
 (defn get-page-id
   "given the page name, get page id"
@@ -150,7 +157,8 @@
         cat-id (if (= 1 (count categories))
                  (:cat_id (first categories))
                  (exec-query (q/create-defcat-dated! date)))]
-    (some-updated? (exec-query (q/defer-task-dated! cat-id task_id)))))
+    (some-updated? (exec-query (q/defer-task-dated! cat-id task_id))
+                   (exec-query (q/task-untodo! task_id)))))
 
 (defn defer-task-category-save
   "defer task(s) to a named category"
@@ -158,7 +166,8 @@
    {exec-query :q-builder
     {{:keys [task_id cat_id]} :form
      {:keys [page-name]} :path} :parameters}]
-  (some-updated? (exec-query (q/defer-task-named! cat_id task_id))))
+  (some-updated? (exec-query (q/defer-task-named! cat_id task_id))
+                 (exec-query (q/task-untodo! task_id))))
 
 (defn defer-task-newcategory-save
   "defer task(s) to a new category"
@@ -170,7 +179,8 @@
         cat-id (if (< 0 (count categories))
                  (:cat_id (first categories))
                  (exec-query (q/create-defcat-named! new-catname)))]
-    (some-updated? (exec-query (q/defer-task-named! cat-id task_id)))))
+    (some-updated? (exec-query (q/defer-task-named! cat-id task_id))
+                   (exec-query (q/task-untodo! task_id)))))
 
 (defn add-task-handler
   "this one is not to be wrapped with wrap-show-tasks. sometimes it needs to

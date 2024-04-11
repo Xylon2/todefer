@@ -331,7 +331,9 @@
      ;; default handler
      (wrap-query-builder
       (wrap-session
-       hl/not-found-handler {:store session-store}))
+       hl/not-found-handler {:store session-store
+                             :cookie-attrs {:http-only true
+                                            :max-age 604800}}))
 
      ;; options
 

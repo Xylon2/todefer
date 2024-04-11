@@ -182,6 +182,14 @@
     (some-updated? (exec-query (q/defer-task-named! cat-id task_id))
                    (exec-query (q/task-untodo! task_id)))))
 
+(defn defer-task-not
+  "undefer a task from any type of defer"
+  [_
+   {exec-query :q-builder
+    {{:keys [task_id]} :form} :parameters}]
+  (some-updated? (exec-query (q/undefer-task-named! task_id))
+                 (exec-query (q/undefer-task-dated! task_id))))
+
 (defn add-task-handler
   "this one is not to be wrapped with wrap-show-tasks. sometimes it needs to
   return the defer page"

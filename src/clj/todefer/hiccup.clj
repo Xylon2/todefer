@@ -540,7 +540,11 @@
     [:input {:type "text" :name "new-catname"}]
     [:button {:type "submit"
               :hx-post (str "/page/" page-name "/defer-task-newcategory-save")}
-     "submit"]]))
+     "submit"]
+    [:h3 "not"]
+    [:button {:type "submit"
+              :hx-post (str "/page/" page-name "/defer-task-not")}
+     "undefer"]]))
 
 (defn render-defer-habits
   "page to defer habits to a date"

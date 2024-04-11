@@ -219,6 +219,10 @@
                  :middleware [tc/wrap-show-tasks]
                  :parameters {:form {:task_id ::ints-list
                                      :new-catname ::string}}}}]
+        ["defer-task-not"
+         {:post {:handler tc/defer-task-not
+                 :middleware [tc/wrap-show-tasks]
+                 :parameters {:form {:task_id ::ints-list}}}}]
 
         ;; defer habit only has one submit option
         ["defer-habit-view"

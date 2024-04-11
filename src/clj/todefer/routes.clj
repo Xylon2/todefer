@@ -321,7 +321,9 @@
                            rrc/coerce-response-middleware
                            logger/wrap-with-logger
                            wrap-query-builder
-                           [wrap-session {:store session-store}]
+                           [wrap-session {:store session-store
+                                          :cookie-attrs {:http-only true
+                                                         :max-age 604800}}]
                            wrap-anti-forgery
                            ;; [wrap-debug-reqmap "complete"]
                            ]}})

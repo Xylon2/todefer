@@ -86,6 +86,15 @@
 
    identity])
 
+(defn rename-page!
+  "updates the name of one page"
+  [page_id name]
+  [(-> (update :appPage)
+       (set {:page_name name})
+       (where [:= :page_id page_id]))
+
+   identity])
+
 (defn add-task!
   "add a task"
   ([task_name page_ref]

@@ -304,7 +304,9 @@
         ["update_pages"
          {:post {:handler sc/update-handler
                  :middleware [sc/wrap-settings-page]
-                 :parameters {:form {:linkedpage ::int-colon-int-list}}}}]]
+                 :parameters {:form {:rpid ::ints-list
+                                     :new_page_name ::strs-list
+                                     :linkedpage ::int-colon-int-list}}}}]]
 
        ["/login" {:get {:handler hl/login-handler}
                   :post {:handler hl/login-post-handler

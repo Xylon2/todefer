@@ -582,6 +582,10 @@
        [:input {:name "__anti-forgery-token"
                 :type "hidden"
                 :value f-token}]
+
+       ;; extra linkedpage input because reitit can't do optionals
+       [:input {:type "hidden" :name "linkedpage" :value "0:0"}]
+
        [:table
         [:colgroup
          [:col {:style "width: 100%;"}]
@@ -592,10 +596,17 @@
         [:tbody
          (for [[{:keys [page_id page_name page_type linked-pages]} {:keys [first last]}] (annotate-positions page-list)]
            [:tr
-            [:td [:input {:type "text" :value page_name :style "width: 100%"}]]
+            [:td
+             [:input {:type "hidden" :name "rpid" :value page_id}]
+             [:input {:type "text" :name "new_page_name" :value page_name :style "width: 100%"}]
+             
+             ;; invisible submit button to handle submit by pressing Enter
+             [:button {:style "display: none"
+                       :type "submit"
+                       :formaction "/settings/update_pages"} "save changes"]]
             [:td page_type]
 
-            ;; todo page selection
+            ;; linked pages selection
             (into [:td]
                   (when (= page_type "todo")
                     [[:select {:name "linkedpage" :multiple true}

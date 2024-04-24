@@ -106,8 +106,14 @@
 
 (defn update-handler
   [{exec-query :q-builder
-    {{:keys [linkedpage]} :form} :parameters}]
-  (let [pairs (map parse-int-pair linkedpage)
+    {{:keys [rpid new_page_name linkedpage]} :form} :parameters}]
+  
+  ;; handle page names
+  (doseq [[pg name] (map vector rpid new_page_name)]
+    (exec-query (q/rename-page! pg name)))
+  
+  ;; handle linked pages
+  (let [pairs (map parse-int-pair (rest linkedpage))  ;; rest because of kludge
         unique-pages (set (map first pairs))]
 
     ;; our list contains only positives so we have to nuke the old values

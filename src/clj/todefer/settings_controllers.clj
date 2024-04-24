@@ -1,7 +1,8 @@
 (ns todefer.settings-controllers
   (:require [todefer.queries :as q]
             [todefer.hiccup :as ph]
-            [hiccup2.core :as h]))
+            [hiccup2.core :as h]
+            [clojure.string :as string]))
 
 (defn num-updated [x]
   (:next.jdbc/update-count (first x)))
@@ -97,13 +98,25 @@
 
     (apply-order exec-query (rseq reordered_list))))
 
-(defn update-todo-handler
-  [{exec-query :q-builder
-    {{:keys [page_id linkedpage]} :form} :parameters}]
+(defn parse-int-pair
+  "parse colon-seperated pairs of ints"
+  [input]
+  (let [parts (string/split input #":")]
+    (vec (map #(Integer/parseInt %) parts))))
 
-  ;; our list contains only positives so we have to nuke the old values before
-  ;; adding them all back again
-  (exec-query (q/nuke-linked-pages! page_id))
-  (doseq [lpg linkedpage]
-    (exec-query (q/update-linked-pages! page_id lpg)))
+(defn update-handler
+  [{exec-query :q-builder
+    {{:keys [linkedpage]} :form} :parameters}]
+  (let [pairs (map parse-int-pair linkedpage)
+        unique-pages (set (map first pairs))]
+
+    ;; our list contains only positives so we have to nuke the old values
+    ;; before adding them all back again
+    (doseq [pg unique-pages]
+      (exec-query (q/nuke-linked-pages! pg)))
+    
+    ;; re-link them all
+    (doseq [[pg lpg] pairs]
+      (exec-query (q/update-linked-pages! pg lpg))))
+
   true)

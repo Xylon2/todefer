@@ -592,16 +592,17 @@
         [:tbody
          (for [[{:keys [page_id page_name page_type linked-pages]} {:keys [first last]}] (annotate-positions page-list)]
            [:tr
-            [:td page_name]
+            [:td [:input {:type "text" :value page_name :style "width: 100%"}]]
             [:td page_type]
 
             ;; todo page selection
             (into [:td]
                   (when (= page_type "todo")
                     [[:select {:name "linkedpage" :multiple true}
-                      (for [{:keys [page_id page_name page_type]} (filter #(not= (:page_type %) "todo") page-list)]
-                        [:option (into {:value page_id} (when (some #{page_id} linked-pages) {:selected true})) (str page_name " " page_type)])]
-                     [:button {:type "submit" :formaction "/settings/update_todo_pages" :name "page_id" :value page_id} "update"]]))
+                      (for [{page_type :page_type
+                             page_name :page_name
+                             linked_page_id :page_id} (filter #(not= (:page_type %) "todo") page-list)]
+                        [:option (into {:value (str page_id ":" linked_page_id)} (when (some #{linked_page_id} linked-pages) {:selected true})) (str page_name " " page_type)])]]))
 
             ;; delete
             [:td [:button {:type "submit" :formaction "/settings/delete" :name "page_id" :value page_id} "delete"]]
@@ -612,7 +613,8 @@
 
             ;; move down
             [:td (when (not last)
-                   [:button {:type "submit" :formaction "/settings/page_down" :name "page_id" :value page_id} "⇩"])]])]]]
+                   [:button {:type "submit" :formaction "/settings/page_down" :name "page_id" :value page_id} "⇩"])]])]]
+       [:button {:type "submit" :formaction "/settings/update_pages"} "save changes"]]
       [:h2 "Add Page"]
       [:form {:method "post" :action "/settings/add-page"}
        [:input {:name "__anti-forgery-token"

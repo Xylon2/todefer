@@ -26,11 +26,14 @@
 (s/def ::string string?)
 (s/def ::iso-date #(re-matches #"\d{4}-\d{2}-\d{2}" %))
 (s/def ::freq_unit #{"days" "weeks" "months" "years"})
+(s/def ::int-colon-int
+  (s/and string? #(re-matches #"\d+:\d+" %)))
 
-(s/def ::ints-list (s/coll-of ::int      :kind vector?))
-(s/def ::strs-list (s/coll-of ::string   :kind vector?))
-(s/def ::date-list (s/coll-of ::iso-date :kind vector?))
-(s/def ::freq_unit-list (s/coll-of ::freq_unit :kind vector?))
+(s/def ::ints-list (s/coll-of ::int                    :kind vector?))
+(s/def ::strs-list (s/coll-of ::string                 :kind vector?))
+(s/def ::date-list (s/coll-of ::iso-date               :kind vector?))
+(s/def ::freq_unit-list (s/coll-of ::freq_unit         :kind vector?))
+(s/def ::int-colon-int-list (s/coll-of ::int-colon-int :kind vector?))
 
 (s/def ::donewhen #{"today" "yesturday"})
 (s/def ::pagetype #{"task" "habit" "todo"})
@@ -298,11 +301,10 @@
                  :middleware [sc/wrap-settings-page]
                  :parameters {:form {:page_id ::int}}}}]
 
-        ["update_todo_pages"
-         {:post {:handler sc/update-todo-handler
+        ["update_pages"
+         {:post {:handler sc/update-handler
                  :middleware [sc/wrap-settings-page]
-                 :parameters {:form {:page_id ::int
-                                     :linkedpage ::ints-list}}}}]]
+                 :parameters {:form {:linkedpage ::int-colon-int-list}}}}]]
 
        ["/login" {:get {:handler hl/login-handler}
                   :post {:handler hl/login-post-handler

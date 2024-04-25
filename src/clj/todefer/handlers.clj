@@ -227,6 +227,6 @@
   [{session :session}]
 
   {:status 303
-     :headers {"Location" "/"}
-     :body ""
-     :session (dissoc session :user)})
+   :headers {"Location" "/"}
+   :body ""
+   :session (dissoc session :user)})

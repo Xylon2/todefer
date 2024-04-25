@@ -186,7 +186,7 @@
                  :parameters {:form {:task_id ::ints-list}}}}]
         ["modify-task-save"
          {:post {:handler tc/modify-task-save
-                 :middleware [tc/wrap-show-tasks]
+                 ;; :middleware [tc/wrap-show-tasks]
                  :parameters {:form {:task_id ::ints-list
                                      :task_newname ::strs-list}}}}]
 
@@ -195,13 +195,17 @@
                  :parameters {:form {:habit_id ::ints-list}}}}]
         ["modify-habit-save"
          {:post {:handler hc/modify-habit-save
-                 :middleware [hc/wrap-show-habits]
+                 ;; :middleware [hc/wrap-show-habits]
                  :parameters {:form {:habit_id ::ints-list
                                      :habit_name_new ::strs-list
                                      :freq_value_new ::ints-list
                                      :freq_unit_new ::freq_unit-list
                                      :due_new ::date-list
                                      }}}}]
+
+        ["modify-thing-view"
+         {:post {:handler ac/modify-thing-view
+                 :parameters {:form {:thing_id ::thing-list}}}}]
 
         ;; the defer task page has three possible actions
         ["defer-task-view"

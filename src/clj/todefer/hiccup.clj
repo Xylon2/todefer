@@ -438,6 +438,12 @@
                     [:option {:value ""} "done/delete"]
                     [:option {:value "really"} "really?"]]
 
+                   ;; modify
+                   [:button {:type "button"
+                             :hx-post (str "/page/" page-name "/modify-thing-view")
+                             :hx-include "[name='thing_id']"}
+                    "modify"]
+
                    ;; todo
                    [:select {:name "action"
                              :hx-post (str "/page/" page-name "/todo-thing")
@@ -462,8 +468,7 @@
   (list
    [:h2 "Modify tasks"]
    [:form {:method "post"
-           :hx-post (str "/page/" page-name "/modify-task-save")
-           :hx-target "main"}
+           :action (str "/page/" page-name "/modify-task-save")}
     [:input {:name "__anti-forgery-token"
              :type "hidden"
              :value f-token}]
@@ -484,8 +489,7 @@
   (list
    [:h2 "Modify habits"]
    [:form {:method "post"
-           :hx-post (str "/page/" page-name "/modify-habit-save")
-           :hx-target "main"}
+           :action (str "/page/" page-name "/modify-habit-save")}
     [:input {:name "__anti-forgery-token"
              :type "hidden"
              :value f-token}]

@@ -123,3 +123,14 @@
                      :task  #(exec-query (q/update-task-order-todo  % order_key_todo))
                      :habit #(exec-query (q/update-habit-order-todo % order_key_todo))))
     true))
+
+(defn modify-thing-view
+  "dispatch to either modify-task-view or modify-habit-view"
+  [{exec-query :q-builder
+    {{:keys [thing_id]} :form
+     {:keys [page-name]} :path} :parameters :as req}]
+  (dispatch-case (first thing_id)
+                 :task (fn [id]
+                         (tc/modify-task-view (assoc-in req [:parameters :form :task_id] [id])))
+                 :habit (fn [id]
+                          (hc/modify-habit-view (assoc-in req [:parameters :form :habit_id] [id])))))

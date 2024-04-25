@@ -105,14 +105,15 @@
 
   We receive a habit-list and values for each. We save the changes and redirect
   to the original page."
-  [page-id
-   {exec-query :q-builder
+  [{exec-query :q-builder
     {{:keys [habit_id habit_name_new freq_value_new freq_unit_new due_new]} :form
      {page-name :page-name} :path} :parameters :as request
     f-token :anti-forgery-token}]
   (doseq [[hid hname hvalue hunit hdue] (map vector habit_id habit_name_new freq_value_new freq_unit_new due_new)] ;; pair them up
     (exec-query (q/modify-habit! hid hname hvalue hunit hdue)))
-  true)
+  {:status 303
+   :headers {"Location" (str "/page/" page-name)}
+   :body ""})
 
 (defn move-habit-handler
   "move one or more habits to a different page"

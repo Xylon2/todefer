@@ -79,14 +79,15 @@
 
   We receive a task-list and values for each. We save the changes and redirect
   to the original page."
-  [page-id
-   {exec-query :q-builder
+  [{exec-query :q-builder
     {{:keys [task_id task_newname]} :form
      {page-name :page-name} :path} :parameters :as request
     f-token :anti-forgery-token}]
   (doseq [[tid tname] (map vector task_id task_newname)]  ;; pair them up
     (exec-query (q/modify-task! tid tname)))
-  true)
+  {:status 303
+   :headers {"Location" (str "/page/" page-name)}
+   :body ""})
 
 (defn move-task-handler
   "move one or more tasks to a different page"

@@ -429,7 +429,8 @@
                                :hx-post (str "/page/" page-name "/todo-add-task")}
                       [:option {:value "today"} "add task"]
                       [:option {:value "today"} "today"]
-                      [:option {:value "tomorrow"} "tomorrow"]]])
+                      [:option {:value "tomorrow"} "tomorrow"]
+                      [:option {:value "due"} "due"]]])
                   [:div
                    ;; done/delete
                    [:select {:name "really"

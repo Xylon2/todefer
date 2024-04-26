@@ -90,7 +90,8 @@
   (let [task_id (exec-query (q/add-task! task_name tpage))]
     (case aaction
       "today" (exec-query (q/task-today! [task_id]))
-      "tomorrow" (exec-query (q/task-tomorrow! [task_id])))))
+      "tomorrow" (exec-query (q/task-tomorrow! [task_id]))
+      true)))
 
 (defn order-thing-handler
   "order tasks to top or bottom as appropriate"

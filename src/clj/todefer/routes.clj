@@ -38,6 +38,7 @@
 (s/def ::donewhen #{"today" "yesturday"})
 (s/def ::pagetype #{"task" "habit" "todo"})
 (s/def ::todo-actions #{"today" "tomorrow" "not"})
+(s/def ::add-thing-actions #{"due" "defer" "today" "tomorrow"})
 (s/def ::order-values #{"top" "bottom"})
 
 ;; examples
@@ -207,7 +208,7 @@
          {:post {:handler ac/modify-thing-view
                  :parameters {:form {:thing_id ::thing-list}}}}]
 
-        ;; the defer task page has three possible actions
+        ;; the defer task page has four possible actions
         ["defer-task-view"
          {:post {:handler tc/defer-task-view
                  :parameters {:form {:task_id ::ints-list}}}}]
@@ -245,13 +246,13 @@
         ["add-task"
          {:post {:handler tc/add-task-handler
                  :parameters {:form {:task_name ::string
-                                     :xaction ::string}}}}]
+                                     :xaction ::add-thing-actions}}}}]
         ["add-habit"
          {:post {:handler hc/add-habit-handler
                  :parameters {:form {:habit_name ::string
                                      :freq_value ::int
                                      :freq_unit ::freq_unit
-                                     :xaction ::string}}}}]
+                                     :xaction ::add-thing-actions}}}}]
 
         ;; actions for the todo page
         ["done-delete"
@@ -270,7 +271,7 @@
                  :middleware [ac/wrap-show-todo]
                  :parameters {:form {:task_name ::string
                                      :tpage ::int
-                                     :aaction ::todo-actions}}}}]
+                                     :aaction ::add-thing-actions}}}}]
 
         ["order-todo"
          {:post {:handler ac/order-thing-handler

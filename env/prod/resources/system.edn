@@ -13,6 +13,6 @@
 
  :migratus/config (:database #ig/ref :db.sql/connection)
 
- :ring.adaptor/jetty {:opts {:port 3000
+ :ring.adaptor/jetty {:opts {:port 3001
                              :join? false}
                       :handler #ig/ref :todefer/handler}}

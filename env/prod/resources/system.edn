@@ -14,5 +14,6 @@
  :migratus/config (:database #ig/ref :db.sql/connection)
 
  :ring.adaptor/jetty {:opts {:port 3001
+                             :host "localhost"
                              :join? false}
                       :handler #ig/ref :todefer/handler}}

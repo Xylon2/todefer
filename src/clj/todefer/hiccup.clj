@@ -151,11 +151,14 @@
             [:col {:style "width: 2em;"}]
             [:col {:style "width: 100%;"}]]
            [:tbody
-            (for [{:keys [todo habit_id habit_name freq_value freq_unit prettydue]} due-habits]
+            (for [{:keys [todo habit_id habit_name freq_value freq_unit prettydue last_done]} due-habits]
               [:tr (render-color todo)
                [:td [:input {:type "checkbox" :name "habit_id" :value habit_id}]]
                [:td habit_name
-                [:span.habit-info (str "every " freq_value " " freq_unit ", due " prettydue)]]]
+                [:span.habit-info (str "every " freq_value " " freq_unit ", due " prettydue)
+                 [:span.responsive-span ", last done " (if last_done last_done "never")]
+                 [:span.hover-icon "…"
+                  [:span.tooltip "last done " (if last_done last_done "never")]]]]]
               )]]]
          [:div [:br]]]
         upcominghiccup

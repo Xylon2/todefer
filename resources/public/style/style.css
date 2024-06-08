@@ -150,3 +150,37 @@ button {
 #selected-page a {
     background-color: #bbb;
 }
+
+/* the bellow is for the popup on the habits page */
+.hover-icon {
+    display: none;
+    position: relative;
+}
+
+.tooltip {
+    display: none;
+    position: absolute;
+    background-color: #333;
+    color: #fff;
+    padding: 5px;
+    border-radius: 5px;
+    white-space: nowrap;
+    z-index: 1;
+}
+
+@media (max-width: 700px) {
+    .responsive-span {
+        display: none;
+    }
+
+    .hover-icon {
+        display: inline-block;
+        cursor: pointer;
+    }
+
+    .hover-icon:hover .tooltip,
+    .hover-icon:focus .tooltip,
+    .hover-icon:active .tooltip {
+        display: block;
+    }
+}

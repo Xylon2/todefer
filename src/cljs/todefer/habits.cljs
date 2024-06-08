@@ -62,4 +62,6 @@
     (doseq [hover-icon hover-icons]
       (.addEventListener hover-icon "mouseover" adjust-tooltip-position)
       (.addEventListener hover-icon "focus" adjust-tooltip-position)
-      (.addEventListener hover-icon "click" adjust-tooltip-position)))
+      (.addEventListener hover-icon "click" adjust-tooltip-position)
+      (.addEventListener hover-icon "touchstart" adjust-tooltip-position)
+      (.addEventListener hover-icon "touchend" adjust-tooltip-position)))

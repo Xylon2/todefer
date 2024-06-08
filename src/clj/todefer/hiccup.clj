@@ -169,11 +169,14 @@
             [:col {:style "width: 2em;"}]
             [:col {:style "width: 100%;"}]]
            [:tbody
-            (for [{:keys [todo habit_id habit_name freq_value freq_unit prettydue]} upcoming-habits]
+            (for [{:keys [todo habit_id habit_name freq_value freq_unit prettydue last_done]} upcoming-habits]
               [:tr (render-color todo)
                [:td [:input {:type "checkbox" :name "habit_id" :value habit_id}]]
                [:td habit_name
-               [:span.habit-info (str "every " freq_value " " freq_unit ", due " prettydue)]]])]]]
+                [:span.habit-info (str "every " freq_value " " freq_unit ", due " prettydue)
+                 [:span.responsive-span ", last done " (if last_done last_done "never")]
+                 [:span.hover-icon "…"
+                  [:span.tooltip "last done " (if last_done last_done "never")]]]]])]]]
          [:div [:br]]]
         ]
     
@@ -200,12 +203,15 @@
                                    :value (str "task/" task_id)}]]
                      [:td task_name]])
                   "habit"
-                  (let [{:keys [habit_id habit_name freq_value freq_unit prettydue]} todo-item]
+                  (let [{:keys [habit_id habit_name freq_value freq_unit prettydue last_done]} todo-item]
                     [:tr
                      [:td [:input {:type "checkbox" :name "thing_id"
                                    :value (str "habit/" habit_id)}]]
                      [:td habit_name
-                      [:span.habit-info (str "every " freq_value " " freq_unit ", due " prettydue)]]])))]]]
+                      [:span.habit-info (str "every " freq_value " " freq_unit ", due " prettydue)
+                       [:span.responsive-span ", last done " (if last_done last_done "never")]
+                       [:span.hover-icon "…"
+                        [:span.tooltip "last done " (if last_done last_done "never")]]]]])))]]]
            [:div [:br]]])
         today (renderer "today" "Today" todo-today)
         tomorrow (renderer "tomorrow" "Tomorrow" todo-tomorrow)]

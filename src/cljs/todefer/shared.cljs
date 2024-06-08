@@ -56,3 +56,33 @@
       (.addEventListener elem "click" collapser)
       (when (contains? @expanded-collapsibles (.-id elem))
         (expand-it elem)))))
+
+;; tooltip
+(defn adjust-tooltip-position [event]
+  (js/console.log "adjusting tooltip")
+
+  (let [hover-icon (.-currentTarget event)
+        tooltip (.querySelector hover-icon ".tooltip")
+        tooltip-rect (.getBoundingClientRect tooltip)
+        hover-icon-rect (.getBoundingClientRect hover-icon)
+        viewport-width js/window.innerWidth]
+
+    ;; Adjust if tooltip goes off the left edge
+    (when (< (.-left tooltip-rect) 0)
+      (set! (.-left (.-style tooltip)) "0")
+      (set! (.-transform (.-style tooltip)) "translateX(0)"))
+
+    ;; Adjust if tooltip goes off the right edge
+    (when (> (.-right tooltip-rect) viewport-width)
+      (set! (.-left (.-style tooltip)) "auto")
+      (set! (.-right (.-style tooltip)) "0")
+      (set! (.-transform (.-style tooltip)) "translateX(0)"))))
+
+(defn setup-tooltips []
+  (let [hover-icons (.querySelectorAll js/document ".hover-icon")]
+    (doseq [hover-icon hover-icons]
+      (.addEventListener hover-icon "mouseover" adjust-tooltip-position)
+      (.addEventListener hover-icon "focus" adjust-tooltip-position)
+      (.addEventListener hover-icon "click" adjust-tooltip-position)
+      (.addEventListener hover-icon "touchstart" adjust-tooltip-position)
+      (.addEventListener hover-icon "touchend" adjust-tooltip-position))))

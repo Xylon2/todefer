@@ -19,7 +19,7 @@
         io.github.Xylon2/ring-redis-session {:git/tag "v4.0.2"
                                              :git/sha "6b2221d"}}
 
- :aliases {:build {:deps {io.github.clojure/tools.build {:git/tag "v0.10.4" :git/sha "3a2c484"}}
+ :aliases {:build {:deps {io.github.clojure/tools.build {:git/tag "v0.10.4" :git/sha "31388ff"}}
                    :ns-default build}
 
            :dev {:extra-paths ["env/dev" "env/dev/resources" "test/clj"]

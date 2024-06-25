@@ -88,7 +88,11 @@ To compile to a .jar:
 clj -T:build uber
 ```
 
-If wanting to check dependencies, use: https://github.com/liquidz/antq
+## Upgrading
+
+Update deps.edn with: https://github.com/liquidz/antq
+
+Update node with: `npm update`
 
 ## License
 

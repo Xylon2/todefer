@@ -4,7 +4,8 @@
                                     expand-it
                                     toggle-element
                                     adjust-tooltip-position
-                                    setup-tooltips]]))
+                                    setup-tooltips
+                                    setup-form-handlers]]))
 
 ;; (set! (.-onkeyup js/document)
 ;;       (fn [e]
@@ -37,6 +38,7 @@
 
 (setup-collapsibles)
 (setup-tooltips)
+(setup-form-handlers)
 
 (.onLoad js/htmx setup-collapsibles)
 

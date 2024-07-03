@@ -27,7 +27,8 @@
   (let [{:keys [due-tasks defcats-named defcats-dated]}
         (hl/assemble-task-page-info exec-query page-id)]
     {:status 200
-     :headers {"Content-Type" "text/html"}
+     :headers {"Content-Type" "text/html"
+               "HX-Trigger" "clearform"}
      :body (-> (ph/render-tasks page-id due-tasks defcats-named defcats-dated)
                h/html
                str)}))

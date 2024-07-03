@@ -2,7 +2,8 @@
   (:require [todefer.shared :refer [log byid byclass
                                     setup-collapsibles
                                     expand-it
-                                    toggle-element]]))
+                                    toggle-element
+                                    setup-form-handlers]]))
 
 ;; (set! (.-onkeyup js/document)
 ;;       (fn [e]
@@ -34,5 +35,6 @@
   (expand-it duesection))
 
 (setup-collapsibles)
+(setup-form-handlers)
 
 (.onLoad js/htmx setup-collapsibles)

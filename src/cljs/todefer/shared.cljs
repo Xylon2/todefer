@@ -57,6 +57,16 @@
       (when (contains? @expanded-collapsibles (.-id elem))
         (expand-it elem)))))
 
+(defn clearform
+  "just clear the new habit form"
+  []
+  (.reset (.getElementById js/document "pageform")))
+
+(defn setup-form-handlers
+  []
+  ;; html produces this event https://htmx.org/headers/hx-trigger/
+  (.addEventListener js/document.body "clearform" clearform))
+
 ;; tooltip
 (defn adjust-tooltip-position [event]
   (js/console.log "adjusting tooltip")

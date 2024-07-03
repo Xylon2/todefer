@@ -4,7 +4,8 @@
                                     expand-it
                                     toggle-element
                                     adjust-tooltip-position
-                                    setup-tooltips]]))
+                                    setup-tooltips
+                                    setup-form-handlers]]))
 
 ;; want to expand the today section by default
 (let [elementname "today"
@@ -14,5 +15,6 @@
 
 (setup-collapsibles)
 (setup-tooltips)
+(setup-form-handlers)
 
 (.onLoad js/htmx setup-collapsibles)

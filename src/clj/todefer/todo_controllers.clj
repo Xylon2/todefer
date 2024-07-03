@@ -18,7 +18,8 @@
   (let [{:keys [todo-today todo-tomorrow]}
         (hl/assemble-todo-page-info exec-query page-id)]
     {:status 200
-     :headers {"Content-Type" "text/html"}
+     :headers {"Content-Type" "text/html"
+               "HX-Trigger" "clearform"}
      :body (-> (ph/render-todo page-id todo-today todo-tomorrow)
                h/html
                str)}))

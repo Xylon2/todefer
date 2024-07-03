@@ -230,10 +230,9 @@
      contents
      :scripts ["/public/cljs/shared.js" "/public/cljs/tasks.js"]
      :pagelist pagelist
-     :actionbar [[:form {:method "post"
-                         :style "padding-left: 0;"
-                         :hx-target "main"
-                         :hx-on:htmx:after-request "this.reset()"}
+     :actionbar [[:form#pageform {:method "post"
+                                  :style "padding-left: 0;"
+                                  :hx-target "main"}
                   [:input {:name "__anti-forgery-token"
                            :type "hidden"
                            :value f-token}]
@@ -314,10 +313,9 @@
      contents
      :scripts ["/public/cljs/shared.js" "/public/cljs/habits.js"]
      :pagelist page-list
-     :actionbar [[:form {:method "post"
-                         :style "padding-left: 0;"
-                         :hx-target "main"
-                         :hx-on:htmx:after-request "this.reset()"}
+     :actionbar [[:form#pageform {:method "post"
+                                   :style "padding-left: 0;"
+                                   :hx-target "main"}
                   [:input {:name "__anti-forgery-token"
                            :type "hidden"
                            :value f-token}]
@@ -410,10 +408,9 @@
      contents
      :scripts ["/public/cljs/shared.js" "/public/cljs/todo.js"]
      :pagelist page-list
-     :actionbar [[:form {:method "post"
-                         :style "padding-left: 0;"
-                         :hx-target "main"
-                         :hx-on:htmx:after-request "this.reset()"}
+     :actionbar [[:form#pageform {:method "post"
+                                  :style "padding-left: 0;"
+                                  :hx-target "main"}
                   [:input {:name "__anti-forgery-token"
                            :type "hidden"
                            :value f-token}]

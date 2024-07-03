@@ -28,7 +28,8 @@
   (let [{:keys [due-habits upcoming-habits]}
         (hl/assemble-habit-page-info exec-query page-id)]
     {:status 200
-     :headers {"Content-Type" "text/html"}
+     :headers {"Content-Type" "text/html"
+               "HX-Trigger" "clearform"}
      :body (-> (ph/render-habits page-id due-habits upcoming-habits)
                h/html
                str)}))

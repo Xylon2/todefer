@@ -40,5 +40,7 @@
 (setup-tooltips)
 (setup-form-handlers)
 
-(.onLoad js/htmx setup-collapsibles)
+(.onLoad js/htmx (fn []
+                   (setup-collapsibles)
+                   (setup-tooltips)))
 

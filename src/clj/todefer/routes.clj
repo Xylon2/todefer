@@ -24,6 +24,7 @@
 
 (s/def ::int int?)
 (s/def ::string string?)
+(s/def ::non-empty-string (s/and string? #(> (count %) 0)))
 (s/def ::iso-date #(re-matches #"\d{4}-\d{2}-\d{2}" %))
 (s/def ::freq_unit #{"days" "weeks" "months" "years"})
 (s/def ::int-colon-int
@@ -226,7 +227,7 @@
          {:post {:handler tc/defer-task-newcategory-save
                  :middleware [tc/wrap-show-tasks]
                  :parameters {:form {:task_id ::ints-list
-                                     :new-catname ::string}}}}]
+                                     :new-catname ::non-empty-string}}}}]
         ["defer-task-not"
          {:post {:handler tc/defer-task-not
                  :middleware [tc/wrap-show-tasks]
@@ -245,11 +246,11 @@
         ;; special cases where it may be single or multi-request
         ["add-task"
          {:post {:handler tc/add-task-handler
-                 :parameters {:form {:task_name ::string
+                 :parameters {:form {:task_name ::non-empty-string
                                      :xaction ::add-thing-actions}}}}]
         ["add-habit"
          {:post {:handler hc/add-habit-handler
-                 :parameters {:form {:habit_name ::string
+                 :parameters {:form {:habit_name ::non-empty-string
                                      :freq_value ::int
                                      :freq_unit ::freq_unit
                                      :xaction ::add-thing-actions}}}}]
@@ -269,7 +270,7 @@
         ["todo-add-task"
          {:post {:handler ac/add-task-handler
                  :middleware [ac/wrap-show-todo]
-                 :parameters {:form {:task_name ::string
+                 :parameters {:form {:task_name ::non-empty-string
                                      :tpage ::int
                                      :aaction ::add-thing-actions}}}}]
 
@@ -289,7 +290,7 @@
         ["add-page"
          {:post {:handler sc/add-page-handler
                  :middleware [sc/wrap-settings-page]
-                 :parameters {:form {:new_pagename ::string
+                 :parameters {:form {:new_pagename ::non-empty-string
                                      :new_pagetype ::pagetype}}}}]
         ["delete"
          {:post {:handler sc/delete-page-handler

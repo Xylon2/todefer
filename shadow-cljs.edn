@@ -1,6 +1,6 @@
 {:source-paths ["src/cljs"]
  :dependencies []
- :dev-http {3010 "resources/public/cljs/"}
+ :dev-http {3010 "resources/public/"}
  :builds {:app {:output-dir "resources/public/cljs/"
                 :asset-path "."
                 :target :browser

@@ -6,6 +6,7 @@
             [migratus.core :as migratus]
             [todefer.queries :as queries]
             [todefer.routes :as routes]
+            [todefer.add-user :refer [add-user]]
             [ring.redis.session :refer [redis-store read-redis-session write-redis-session]])
   (:gen-class))
 
@@ -102,6 +103,8 @@
                 (migratus/migrate (:migratus/config system)))
     "rollback" (let [system (start-system :db)]
                  (migratus/rollback (:migratus/config system)))
+    "add-user" (let [system (start-system :db)]
+                 (add-user (:todefer/queries system)))
     (print-usage)))
 
 (comment

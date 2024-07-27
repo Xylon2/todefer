@@ -83,10 +83,91 @@ Don't forget to build your js:
 npx shadow-cljs compile app
 ```
 
-To compile to a .jar:
+## Deployment
+
+This is an example guide on how to deploy this app onto Debian.
+
+### Compile
+Compile your js:
+```
+npx shadow-cljs release app
+```
+
+Compile your .jar:
 ```
 clj -T:build uber
 ```
+
+### Server
+First you need a Debian server with these packages installed from apt:
+- postgresql
+- redis
+- default-jre
+- nginx
+
+### DB
+Create a postgres user and database.
+
+### Application
+Create a system user "deploy".
+
+Make these directories and chown them to deploy
+- /var/todefer
+- /var/log/todefer
+
+Upload the .jar you compiled to /var/todefer.
+
+Add a systemd config at `/lib/systemd/system/todefer.service`:
+```
+[Unit]
+Description=Todefer
+After=network.target postgresql.service
+
+[Service]
+WorkingDirectory=/var/todefer
+SuccessExitStatus=143
+ExecStart=/usr/bin/java -jar /var/todefer/todefer.jar run-app
+User=deploy
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Add the environment config to /var/todefer/env.edn
+```
+{:db-name "todefer"
+ :user "todefer"
+ :password "EDITME"}
+```
+
+### Run the migrations and create a Todefer login
+```
+sudo -u deploy java -jar /var/todefer/todefer.jar migrate
+sudo -u deploy java -jar /var/todefer/todefer.jar add-user
+```
+
+### Nginx
+Include this snippet in your Nginx vhost:
+```
+location / {
+    proxy_pass http://127.0.0.1:3001/;
+    proxy_set_header Host $http_host;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_redirect  off;
+}
+```
+
+### Start everything up
+
+Enable and start your todefer systemd service.
+
+Reload Nginx.
+
+### Log into the UI
+
+Now it should be accessible on the web. Log in and go to the settings page to
+create your first pages.
 
 ## Upgrading
 

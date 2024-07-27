@@ -83,6 +83,12 @@ Don't forget to build your js:
 npx shadow-cljs compile app
 ```
 
+## Upgrading the codebase dependencies
+
+Update deps.edn with: https://github.com/liquidz/antq
+
+Update node with: `npm update`
+
 ## Deployment
 
 This is an example guide on how to deploy this app onto Debian.
@@ -99,7 +105,7 @@ clj -T:build uber
 ```
 
 ### Server
-First you need a Debian server with these packages installed from apt:
+You need a Debian server with these packages installed from apt:
 - postgresql
 - redis
 - default-jre
@@ -168,12 +174,6 @@ Reload Nginx.
 
 Now it should be accessible on the web. Log in and go to the settings page to
 create your first pages.
-
-## Upgrading
-
-Update deps.edn with: https://github.com/liquidz/antq
-
-Update node with: `npm update`
 
 ## License
 

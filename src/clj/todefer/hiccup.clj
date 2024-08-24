@@ -1,5 +1,6 @@
 (ns todefer.hiccup
     (:require [hiccup2.core :as h]
+              [hiccup.util :as hu]
               [java-time :as jt]
               [clojure.pprint :refer [pprint]]))
 
@@ -11,6 +12,7 @@
   [title contents & {:keys [pagelist scripts actionbar settings?]}]
   (->> [:html {:lang "en"}
         [:head
+         (hu/raw-string "<!-- Todefer Task Manager -->")
          [:title title]
          [:meta {:name "viewport"
                  :content "width=device-width, initial-scale=1.0"}]

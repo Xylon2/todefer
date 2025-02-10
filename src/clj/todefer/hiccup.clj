@@ -62,7 +62,8 @@
         errorprint (if errormsg
                      [:p [:em errormsg]]
                      "")
-        login-form [:form {:method "POST" :action post-to}
+        login-form [:form {:method "POST" :action post-to
+                           :autocomplete "off"}
                     [:input {:name "__anti-forgery-token"
                              :type "hidden"
                              :value f-token}]
@@ -234,7 +235,8 @@
      :pagelist pagelist
      :actionbar [[:form#pageform {:method "post"
                                   :style "padding-left: 0;"
-                                  :hx-target "main"}
+                                  :hx-target "main"
+                                  :autocomplete "off"}
                   [:input {:name "__anti-forgery-token"
                            :type "hidden"
                            :value f-token}]
@@ -316,8 +318,9 @@
      :scripts ["/public/cljs/shared.js" "/public/cljs/habits.js"]
      :pagelist page-list
      :actionbar [[:form#pageform {:method "post"
-                                   :style "padding-left: 0;"
-                                   :hx-target "main"}
+                                  :style "padding-left: 0;"
+                                  :hx-target "main"
+                                  :autocomplete "off"}
                   [:input {:name "__anti-forgery-token"
                            :type "hidden"
                            :value f-token}]
@@ -412,7 +415,8 @@
      :pagelist page-list
      :actionbar [[:form#pageform {:method "post"
                                   :style "padding-left: 0;"
-                                  :hx-target "main"}
+                                  :hx-target "main"
+                                  :autocomplete "off"}
                   [:input {:name "__anti-forgery-token"
                            :type "hidden"
                            :value f-token}]
@@ -477,7 +481,8 @@
   (list
    [:h2 "Modify tasks"]
    [:form {:method "post"
-           :action (str "/page/" page-name "/modify-task-save")}
+           :action (str "/page/" page-name "/modify-task-save")
+           :autocomplete "off"}
     [:input {:name "__anti-forgery-token"
              :type "hidden"
              :value f-token}]
@@ -498,7 +503,8 @@
   (list
    [:h2 "Modify habits"]
    [:form {:method "post"
-           :action (str "/page/" page-name "/modify-habit-save")}
+           :action (str "/page/" page-name "/modify-habit-save")
+           :autocomplete "off"}
     [:input {:name "__anti-forgery-token"
              :type "hidden"
              :value f-token}]
@@ -531,7 +537,8 @@
   (list
    [:h2 "Defer to..."]
    [:form {:method "post"
-           :hx-target "main"}
+           :hx-target "main"
+           :autocomplete "off"}
     [:input {:name "__anti-forgery-token"
              :type "hidden"
              :value f-token}]
@@ -565,7 +572,8 @@
   (list
    [:h2 "Defer until..."]
    [:form {:method "post"
-           :hx-target "main"}
+           :hx-target "main"
+           :autocomplete "off"}
     [:input {:name "__anti-forgery-token"
              :type "hidden"
              :value f-token}]
@@ -591,7 +599,8 @@
     (render-base
      (str "Settings")
      [[:h2 "Pages"]
-      [:form {:method "post"}
+      [:form {:method "post"
+              :autocomplete "off"}
        [:input {:name "__anti-forgery-token"
                 :type "hidden"
                 :value f-token}]
@@ -640,7 +649,9 @@
                    [:button {:type "submit" :formaction "/settings/page_down" :name "page_id" :value page_id} "⇩"])]])]]
        [:button {:type "submit" :formaction "/settings/update_pages"} "save changes"]]
       [:h2 "Add Page"]
-      [:form {:method "post" :action "/settings/add-page"}
+      [:form {:method "post"
+              :action "/settings/add-page"
+              :autocomplete "off"}
        [:input {:name "__anti-forgery-token"
                 :type "hidden"
                 :value f-token}]
@@ -652,7 +663,9 @@
         [:option {:value "todo"} "todo page"]]
        [:button {:type "submit"} "add page"]]
       [:h2 "Logout"]
-      [:form {:method "get" :action "/logout"}
+      [:form {:method "get"
+              :action "/logout"
+              :autocomplete "off"}
        [:button {:type "submit"} "Logout"]]
       ]
      :pagelist page-list

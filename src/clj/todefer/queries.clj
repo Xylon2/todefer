@@ -106,7 +106,7 @@
                   :highlight highlight}])
         (returning :task_id))
 
-    #(:task_id (first %))]))
+    (comp :task_id first)]))
 
 (defn delete-task!
   "delete one or more tasks"
@@ -328,7 +328,7 @@
        (values [{:cat_name cat_name}])
        (returning :cat_id))
    
-   (fn [[{cat_id :cat_id}]] cat_id)])
+   (comp :cat_id first)])
 
 (defn create-defcat-dated!
   "create a defCatDated"
@@ -337,7 +337,7 @@
        (values [{:def_date [:cast def_date :date]}])
        (returning :cat_id))
    
-   (fn [[{cat_id :cat_id}]] cat_id)])
+   (comp :cat_id first)])
 
 (defn delete-defcat-named!
   "delete a defCatNamed"
@@ -412,7 +412,7 @@
                  :freq_value [:cast freq_value :integer]}])
         (returning :habit_id))
 
-   #(:habit_id (first %))])
+   (comp :habit_id first)])
 
  (defn list-due-habits
    "get all due habits, ordered by due date"

@@ -1,6 +1,6 @@
 (ns todefer.queries
   ;; exclude these core clojure functions
-  (:refer-clojure :exclude [distinct filter for group-by into partition-by set update])
+  (:refer-clojure :exclude [distinct filter for group-by into partition-by set update assert])
   
   (:require [honey.sql :as sql]
             [honey.sql.helpers :refer :all]  ;; shadows core functions

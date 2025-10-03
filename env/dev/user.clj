@@ -6,7 +6,7 @@
             [migratus.core :as migratus]
             [todefer.queries :as q]))
 
-(integrant.repl/set-prep! #(ig/prep (pc/system-config :app)))
+(integrant.repl/set-prep! #(ig/expand (pc/system-config :app) (ig/deprofile [:dev])))
 
 (defn migrate []
   (migratus/migrate (:migratus/config integrant.repl.state/system)))

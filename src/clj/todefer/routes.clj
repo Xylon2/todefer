@@ -64,10 +64,14 @@
     (handler req)))
 
 (defn wrap-auth [handler]
-  (fn [{:keys [uri query-string session] :as request}]
+  (fn [{:keys [uri query-string session request-method] :as request}]
     (if (contains? session :user)
-      ;; user is logged in. proceed
-      (handler request)
+      ;; user is logged in. proceed, renewing session cookie on POST
+      (let [response (handler request)]
+        (if (and (= request-method :post)
+                 (not (contains? response :session)))
+          (assoc response :session (with-meta session {:recreate true}))
+          response))
 
       ;; user not logged in. redirect
       (let [redirect-url (java.net.URLEncoder/encode
